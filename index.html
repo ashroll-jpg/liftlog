@@ -3,53 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#E9ECEF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#161A21" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0E0E0E">
+<meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Lift Log">
-<title>Lift Log</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tally">
+<title>Tally</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root{
-  --bg:#E9ECEF; --surface:#F7F8F9; --ink:#1C2230; --mute:#5E6778; --line:#D3D8DE; --field:#EEF1F4;
-  --accent:#D63B3B; --accent-ink:#fff; --gold:#C98A0B;
-  --chest:#D63B3B; --back:#2F6FD6; --legs:#E0A91B; --shoulders:#2E9E5B; --arms:#7A5AC7;
-  --core:#E3762B; --full:#2F9C98; --cardio:#D9487F; --mobility:#8A94A6;
-  --font:"Barlow Semi Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --bg:#0E0E0E; --surface:#161616; --ink:#F2EFE8; --mute:#8C8A85; --line:#2A2A2A; --field:#111111;
+  --accent:#B38B2D; --accent-ink:#0E0E0E; --gold:#B38B2D;
+  /* muscle groups: a gold-to-gray ramp so charts stay on brand */
+  --chest:#B38B2D; --back:#F2EFE8; --legs:#8C8A85; --shoulders:#D9C9A0; --arms:#6B5320;
+  --core:#C9A24A; --full:#B8B5AE; --cardio:#5E5E5E; --mobility:#3A3A3A;
+  --font:Archivo,"Helvetica Neue",Arial,sans-serif;
+  --display:Archivo,"Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#161A21; --surface:#20262F; --ink:#E8EBF0; --mute:#97A0B0; --line:#2E3642; --field:#1A1F27;
-    --accent:#F0524F; --gold:#F2B33D;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#161A21; --surface:#20262F; --ink:#E8EBF0; --mute:#97A0B0; --line:#2E3642; --field:#1A1F27;
-  --accent:#F0524F; --gold:#F2B33D;
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.4}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
-:focus-visible{outline:3px solid var(--back);outline-offset:2px}
-.wrap{max-width:640px;margin:0 auto;padding:0 16px 110px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px 110px;position:relative;z-index:1}
+/* faded black-and-white photo behind each tab */
+.bg-photo{position:fixed;left:0;right:0;top:0;height:64vh;z-index:0;pointer-events:none;background-size:cover;background-repeat:no-repeat;filter:grayscale(1) contrast(1.15);opacity:0;transition:opacity .6s ease;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.6) 45%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.6) 45%,transparent 100%)}
+.bg-photo.show{opacity:var(--bg-op,.16)}
+@media (prefers-reduced-motion:reduce){.bg-photo{transition:none}}
+.slot{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.slot .thumb{width:64px;height:64px;border-radius:4px;background:var(--field) center/cover no-repeat;border:1px solid var(--line);filter:grayscale(1)}
+.slot b{display:block;font-size:18px}
+.slot small{display:block;color:var(--mute);font-size:14px}
+.slot .acts{display:flex;flex-direction:column;gap:2px;align-items:center}
+.slot .acts .btn{padding:8px 12px;font-size:15px}
+.slot .acts .link{padding:6px 0;font-size:14px;color:var(--mute)}
+.slot .seg{margin-top:6px}
+.slot .seg button{padding:5px 8px;font-size:14px}
 body.timing .wrap{padding-bottom:180px}
 
 /* top bar */
-.top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0 6px;position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--bg);box-shadow:0 -60px 0 60px var(--bg)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0 6px;position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:color-mix(in srgb,var(--bg) 78%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 -60px 0 60px color-mix(in srgb,var(--bg) 78%,transparent)}
 .clock{display:flex;align-items:center;gap:4px;margin-left:auto}
-.clock-main{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px 6px 10px;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1;min-width:98px}
+.clock-main{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:4px;padding:6px 14px 6px 10px;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1;min-width:98px}
 .clock-main svg{width:18px;height:18px;flex-shrink:0}
 .clock-main .awake{width:15px;height:15px;opacity:.75;margin-left:2px}
 .clock.running .clock-main{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -74,12 +82,12 @@ body.timing .wrap{padding-bottom:180px}
 .day .sub button{background:none;border:0;color:var(--back);font-weight:600;padding:0 0 0 6px;text-decoration:underline}
 .day .icon-btn:disabled{opacity:.3;cursor:default}
 .daytools{display:flex;justify-content:center;gap:8px;margin-top:8px}
-.pill{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-size:15px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.pill{border:1px solid var(--line);background:var(--surface);border-radius:4px;padding:6px 14px;font-size:15px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
 .pill svg{width:16px;height:16px;color:var(--mute)}
 
 /* exercise blocks */
 .list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
-.ex{background:var(--surface);border-radius:14px;padding:14px 10px 6px 14px;border-left:6px solid var(--c)}
+.ex{background:var(--surface);border-radius:4px;padding:14px 10px 6px 14px;border-left:6px solid var(--c)}
 .ex header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .ex header .icon-btn{width:34px;height:34px;margin:-4px 0 0}
 .ex h3{margin:0;font-size:21px;font-weight:600;line-height:1.15}
@@ -91,24 +99,24 @@ body.timing .wrap{padding-bottom:180px}
 .set.one{grid-template-columns:30px 1fr 32px}
 .set.tb{grid-template-columns:30px 1fr 44px 32px}
 .set.tw{grid-template-columns:30px 1fr 1fr 44px 32px}
-.hold-btn{height:40px;border-radius:10px;border:1px solid var(--line);background:var(--field);color:var(--shoulders);display:grid;place-items:center;padding:0}
+.hold-btn{height:40px;border-radius:4px;border:1px solid var(--line);background:var(--field);color:var(--shoulders);display:grid;place-items:center;padding:0}
 .hold-btn svg{width:18px;height:18px}
-.hold-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.hold-btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .set input.live{border-color:var(--accent);color:var(--accent)}
 .version{font-variant-numeric:tabular-nums}
 .set.head{font-size:14px;color:var(--mute);font-weight:500}
 .set .n{color:var(--mute);font-weight:600;text-align:center;font-size:16px}
-.set .n.pr{color:#fff;background:var(--gold);border-radius:6px;font-size:13px;font-weight:700;padding:3px 0}
-.set input{width:100%;min-width:0;background:var(--field);border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;text-align:center}
+.set .n.pr{color:var(--accent-ink);background:var(--gold);border-radius:6px;font-size:13px;font-weight:700;padding:3px 0}
+.set input{width:100%;min-width:0;background:var(--field);border:1px solid var(--line);border-radius:4px;padding:9px 10px;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;text-align:center}
 .set input::placeholder{color:var(--mute);opacity:.5;font-weight:500}
-.set .rm{background:none;border:0;color:var(--mute);font-size:22px;line-height:1;height:32px;border-radius:8px}
+.set .rm{background:none;border:0;color:var(--mute);font-size:22px;line-height:1;height:32px;border-radius:4px}
 .set .rm:hover{background:var(--field)}
 .ex .row{display:flex;justify-content:space-between;align-items:center;margin-top:4px;padding-right:4px}
 .ex .row .right{display:flex;gap:16px}
 .link{background:none;border:0;color:var(--back);font-weight:600;padding:10px 0;display:inline-flex;align-items:center;gap:5px}
 .link svg{width:17px;height:17px}
 
-.add-big{width:100%;margin-top:14px;padding:15px;border:2px dashed var(--line);background:transparent;border-radius:14px;font-size:19px;font-weight:600;color:var(--ink)}
+.add-big{width:100%;margin-top:14px;padding:15px;border:2px dashed var(--line);background:transparent;border-radius:4px;font-size:19px;font-weight:600;color:var(--ink)}
 .add-big:hover{border-color:var(--mute)}
 .empty{text-align:center;color:var(--mute);padding:30px 12px 4px;font-size:18px}
 .empty strong{display:block;color:var(--ink);font-size:22px;margin-bottom:4px}
@@ -125,17 +133,17 @@ body.timing .wrap{padding-bottom:180px}
 
 /* rest timer */
 .timer{position:fixed;left:0;right:0;bottom:calc(66px + env(safe-area-inset-bottom,0px));z-index:6;display:flex;justify-content:center;padding:0 12px 8px}
-.timer .in{width:100%;max-width:616px;background:var(--ink);color:var(--bg);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.timer .in{width:100%;max-width:616px;background:var(--ink);color:var(--bg);border-radius:4px;padding:10px 12px;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 .timer .fill{position:absolute;left:0;bottom:0;height:4px;width:100%;background:var(--accent);transform-origin:left;transition:transform .25s linear}
 .timer .t{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;flex:1;line-height:1}
 .timer .t small{display:block;font-size:13px;font-weight:500;opacity:.7}
-.timer button{background:rgba(255,255,255,.12);border:0;color:inherit;border-radius:9px;padding:8px 11px;font-weight:600;font-size:16px}
-.timer.done .in{background:var(--accent);color:#fff}
+.timer button{background:rgba(255,255,255,.12);border:0;color:inherit;border-radius:4px;padding:8px 11px;font-weight:600;font-size:16px}
+.timer.done .in{background:var(--accent);color:var(--accent-ink)}
 @media (prefers-color-scheme: dark){ .timer button{background:rgba(0,0,0,.12)} }
 
 /* progress */
 .page-title{font-size:clamp(34px,9vw,46px);font-weight:700;line-height:1;margin:10px 0 16px}
-.goal{background:var(--surface);border-radius:14px;padding:16px;display:flex;align-items:center;gap:18px}
+.goal{background:var(--surface);border-radius:4px;padding:16px;display:flex;align-items:center;gap:18px}
 .goal svg{width:112px;height:112px;flex-shrink:0}
 .goal .ring-num{font-size:30px;font-weight:700;fill:var(--ink);font-family:var(--font)}
 .goal .ring-sub{font-size:13px;fill:var(--mute);font-family:var(--font)}
@@ -144,15 +152,15 @@ body.timing .wrap{padding-bottom:180px}
 .goal .link{padding:6px 0 0}
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
 @media (min-width:520px){.stats{grid-template-columns:repeat(4,1fr)}}
-.stat{background:var(--surface);border-radius:14px;padding:12px 14px}
+.stat{background:var(--surface);border-radius:4px;padding:12px 14px}
 .stat b{display:block;font-size:30px;line-height:1.05;font-weight:700;font-variant-numeric:tabular-nums}
 .stat span{color:var(--mute);font-size:15px}
-.card{background:var(--surface);border-radius:14px;padding:14px;margin-top:12px}
+.card{background:var(--surface);border-radius:4px;padding:14px;margin-top:12px}
 .card h2{margin:0 0 2px;font-size:20px;font-weight:600}
 .card p.note{margin:0 0 10px;color:var(--mute);font-size:15px}
 .chart{position:relative;height:220px}
 .chart.tall{height:250px}
-.card select{width:100%;margin:0 0 10px;padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:var(--field);font-size:17px}
+.card select{width:100%;margin:0 0 10px;padding:9px 10px;border-radius:4px;border:1px solid var(--line);background:var(--field);font-size:17px}
 
 .heat{overflow-x:auto;padding:2px}
 .heat .grid{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;gap:3px;width:max-content}
@@ -176,16 +184,16 @@ button.cell{cursor:pointer}
 .sheet{position:fixed;inset:0;z-index:10;display:none}
 .sheet.open{display:block}
 .sheet .scrim{position:absolute;inset:0;background:rgba(10,14,20,.45)}
-.sheet .panel{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:640px;height:min(88vh,760px);background:var(--bg);border-radius:18px 18px 0 0;display:flex;flex-direction:column;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));animation:up .22s ease-out;overflow-y:auto}
+.sheet .panel{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:640px;height:min(88vh,760px);background:var(--bg);border-radius:4px 18px 0 0;display:flex;flex-direction:column;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));animation:up .22s ease-out;overflow-y:auto}
 .sheet .panel.short{height:auto;max-height:88vh}
 @keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.sheet .panel{animation:none}.timer .fill{transition:none}}
 .sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .sheet-head h2{margin:0;font-size:24px;font-weight:700}
-.search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:18px}
+.search{width:100%;padding:12px 14px;border-radius:4px;border:1px solid var(--line);background:var(--surface);font-size:18px}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:10px 0 6px;scrollbar-width:none;flex-shrink:0}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex-shrink:0;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;font-size:15px;font-weight:600;color:var(--mute)}
+.chip{flex-shrink:0;border:1px solid var(--line);background:var(--surface);border-radius:4px;padding:6px 13px;font-size:15px;font-weight:600;color:var(--mute)}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .results{flex:1;overflow-y:auto;margin:4px -4px 0;padding:0 4px}
 .res{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:12px 2px}
@@ -196,8 +204,8 @@ button.cell{cursor:pointer}
 .custom{padding:14px 2px;border-bottom:1px solid var(--line)}
 .custom p{margin:0 0 8px}
 .custom .ctl{display:flex;gap:8px}
-.custom select{flex:1;padding:9px;border-radius:9px;border:1px solid var(--line);background:var(--surface)}
-.btn{border:0;border-radius:10px;padding:11px 16px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:17px}
+.custom select{flex:1;padding:9px;border-radius:4px;border:1px solid var(--line);background:var(--surface)}
+.btn{border:0;border-radius:4px;padding:11px 16px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:17px}
 .btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
 .btn.wide{width:100%;margin-top:14px}
 .hint{color:var(--mute);font-size:15px;padding:12px 2px;margin:0}
@@ -211,7 +219,7 @@ button.cell{cursor:pointer}
 .setting:last-child{border-bottom:0}
 .setting p{margin:0}
 .setting small{display:block;color:var(--mute);font-size:15px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;flex-shrink:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;flex-shrink:0}
 .seg button{border:0;background:var(--surface);padding:8px 12px;font-weight:600}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .stepper{display:inline-flex;align-items:center;gap:10px;flex-shrink:0}
@@ -221,7 +229,7 @@ button.cell{cursor:pointer}
 /* plate calculator */
 .field{display:block}
 .field span{display:block;color:var(--mute);font-size:15px;margin-bottom:4px}
-.field input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+.field input{width:100%;padding:12px 14px;border-radius:4px;border:1px solid var(--line);background:var(--surface);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
 .barviz{display:flex;align-items:center;justify-content:center;height:150px;margin:18px 0 6px;overflow-x:auto}
 .barviz .sleeve{height:14px;width:28px;background:var(--mute);border-radius:3px;flex-shrink:0}
 .barviz .shaft{height:8px;width:70px;background:var(--mute);opacity:.7;flex-shrink:0}
@@ -230,12 +238,12 @@ button.cell{cursor:pointer}
 .plate-text{text-align:center;margin:0;font-size:18px}
 .plate-text small{display:block;color:var(--mute);font-size:15px}
 
-.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;width:max-content;max-width:calc(100vw - 32px);text-align:center}
-.toast.gold{background:var(--gold);color:#fff}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:4px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;width:max-content;max-width:calc(100vw - 32px);text-align:center}
+.toast.gold{background:var(--gold);color:var(--accent-ink)}
 body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .toast.show{opacity:1}
 /* nudges */
-.nudge{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border-radius:14px;padding:12px 6px 10px 14px;margin-top:12px;border-left:6px solid var(--back)}
+.nudge{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border-radius:4px;padding:12px 6px 10px 14px;margin-top:12px;border-left:6px solid var(--back)}
 .nudge div{flex:1;min-width:0}
 .nudge b{display:block;font-size:18px;font-weight:600;line-height:1.2}
 .nudge p{margin:3px 0 0;color:var(--mute);font-size:15px}
@@ -244,11 +252,11 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 
 /* notes */
 .ex-note{display:block;margin:6px 0 0;padding:0;border:0;background:none;text-align:left;font-size:15px;font-style:italic;color:var(--ink);opacity:.85}
-.note-edit{display:block;width:100%;margin-top:8px;border:1px solid var(--line);background:var(--field);border-radius:9px;padding:8px 10px;font-size:16px;font-family:var(--font);resize:vertical;min-height:56px}
+.note-edit{display:block;width:100%;margin-top:8px;border:1px solid var(--line);background:var(--field);border-radius:4px;padding:8px 10px;font-size:16px;font-family:var(--font);resize:vertical;min-height:56px}
 .ex header .btns{display:flex;flex-shrink:0}
 
 /* supersets */
-.ss-link{align-self:center;margin:-7px 0;border:1px dashed var(--line);background:var(--bg);color:var(--mute);border-radius:999px;padding:3px 12px 3px 9px;font-size:14px;font-weight:600;display:inline-flex;gap:5px;align-items:center;position:relative;z-index:1}
+.ss-link{align-self:center;margin:-7px 0;border:1px dashed var(--line);background:var(--bg);color:var(--mute);border-radius:4px;padding:3px 12px 3px 9px;font-size:14px;font-weight:600;display:inline-flex;gap:5px;align-items:center;position:relative;z-index:1}
 .ss-link svg{width:15px;height:15px}
 .ss-link.on{border-style:solid;border-color:var(--ink);color:var(--bg);background:var(--ink)}
 .ex.ss-top{border-bottom-left-radius:4px;border-bottom-right-radius:4px}
@@ -256,7 +264,7 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .ss-tag{margin-left:10px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
 
 /* celebration */
-.cele{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(340px,86vw);background:var(--surface);border-radius:20px;padding:24px 22px 20px;text-align:center;border-top:8px solid var(--gold);animation:pop .3s ease-out}
+.cele{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(340px,86vw);background:var(--surface);border-radius:4px;padding:24px 22px 20px;text-align:center;border-top:8px solid var(--gold);animation:pop .3s ease-out}
 @keyframes pop{from{transform:translate(-50%,-46%) scale(.94);opacity:0}to{transform:translate(-50%,-50%);opacity:1}}
 @media (prefers-reduced-motion:reduce){.cele{animation:none}}
 .cele .plates{margin-bottom:10px}
@@ -270,12 +278,12 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 /* reminders */
 .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:4px 0 6px}
 .days .chip{padding:9px 0;text-align:center}
-.time{padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:var(--surface);font-size:18px;font-weight:600}
+.time{padding:8px 10px;border-radius:4px;border:1px solid var(--line);background:var(--surface);font-size:18px;font-weight:600}
 .cal-btns{display:grid;gap:8px;margin-top:14px}
 .clock .save{width:34px;height:34px;color:var(--shoulders)}
 @media (max-width:430px){ .top:has(.clock .reset:not([hidden])) .brand-name{display:none} }
 /* bodyweight toggle */
-.mode{margin-left:10px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:1px 9px;font-size:13px;font-weight:600;color:var(--mute);vertical-align:1px}
+.mode{margin-left:10px;border:1px solid var(--line);background:transparent;border-radius:4px;padding:1px 9px;font-size:13px;font-weight:600;color:var(--mute);vertical-align:1px}
 .mode.bw{border-color:var(--shoulders);color:var(--shoulders)}
 
 /* interval flash (visible even when muted) */
@@ -307,13 +315,54 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .bal .v{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
 .bal.zero{color:var(--mute)}
 .bal.sel{font-weight:700}
+/* ===== Tally brand: refined grit ===== */
+.tally{display:block;width:26px;height:22px}
+.brand{font-family:var(--display);font-weight:900;font-stretch:125%;font-size:20px;letter-spacing:-.01em;gap:10px}
+.dot{color:var(--accent)}
+.day h1,.page-title,.goal h2,.cele h2,.sheet-head h2,.md-head h2{font-family:var(--display);font-weight:900;font-stretch:125%;text-transform:uppercase;letter-spacing:-.015em}
+.day h1{font-size:clamp(36px,12vw,54px);line-height:.95}
+.day .sub{font-size:13px;letter-spacing:.02em}
+.ss-link{font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;font-size:12px}
+.page-title{font-size:clamp(34px,11vw,50px)}
+.sheet-head h2{font-size:22px}
+.ex{border:1px solid var(--line);background:var(--surface)}
+.ex h3{font-family:var(--display);font-weight:800;font-stretch:115%;text-transform:uppercase;font-size:20px;letter-spacing:0}
+.tag::before{display:none}
+.tag,.ss-tag,.mode,.set.head,.last,.day .sub,.tabs button,.chip,.pill,.seg button,.stat span,.card p.note,.legend,.hint,.md-ex li span:last-child{font-family:var(--mono)}
+.tag,.ss-tag,.set.head,.tabs button{text-transform:uppercase;letter-spacing:.14em;font-size:11px}
+.mode{text-transform:uppercase;letter-spacing:.1em;font-size:11px}
+.mode.bw{border-color:var(--ink);color:var(--ink)}
+.set input,.stat b,.clock-main,.timer .t,.md-num,.bal .v,.goal .ring-num,.cele .big,.set .n{font-family:var(--mono)}
+.set input{background:var(--field);border-color:var(--line)}
+.link{font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;font-size:13px;color:var(--accent)}
+.day .sub button{color:var(--accent)}
+.btn{font-family:var(--display);font-weight:800;font-stretch:112%;text-transform:uppercase;letter-spacing:.06em;font-size:15px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.add-big{background:var(--ink);color:var(--bg);border:0;font-family:var(--display);font-weight:800;font-stretch:115%;text-transform:uppercase;letter-spacing:.08em;font-size:16px}
+.add-big:hover{opacity:.9}
+.tabs{background:var(--bg)}
+.tabs button{font-weight:700}
+.tabs button[aria-selected="true"]{box-shadow:inset 0 2px 0 var(--accent)}
+.tabs button[aria-selected="true"] svg{color:var(--ink)}
+.pill{background:transparent}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.stat,.card,.goal,.nudge{border:1px solid var(--line)}
+.nudge{border-left:2px solid var(--accent)}
+.ss-link.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cele{border-top:4px solid var(--gold)}
+.cele .tally{width:48px;height:42px;margin:0 auto 12px}
+.clock-main{font-size:18px}
+/* fine film grain over everything */
+.grain{position:fixed;inset:0;pointer-events:none;z-index:70;opacity:.045;background-repeat:repeat;background-size:160px 160px}
+
 [hidden]{display:none!important}
 </style>
 </head>
 <body>
+<div class="bg-photo" id="bgPhoto" aria-hidden="true"></div>
 <div class="wrap">
   <div class="top">
-    <div class="brand"><span class="plates" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brand-name">Lift Log</span></div>
+    <div class="brand"><svg class="tally" viewBox="0 0 120 104" aria-hidden="true"><g fill="#F2EFE8"><rect x="14" y="8" width="13" height="88"/><rect x="38" y="8" width="13" height="88"/><rect x="62" y="8" width="13" height="88"/><rect x="86" y="8" width="13" height="88"/></g><rect x="-2" y="45" width="124" height="13" fill="#B38B2D" transform="rotate(-28 60 52)"/></svg><span class="brand-name">TALLY<span class="dot">.</span></span></div>
     <div class="clock" id="clock">
       <button class="clock-main" id="clockBtn" aria-label="Start workout timer"></button>
       <button class="icon-btn save" id="clockSave" aria-label="Save workout time to the log" title="Save to log" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
@@ -482,6 +531,7 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
       <button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="setting"><p>Weekly goal<small>Workouts per week</small></p><div class="stepper"><button id="goalDown" aria-label="Lower goal">−</button><b id="goalVal">3</b><button id="goalUp" aria-label="Raise goal">+</button></div></div>
+    <div class="setting"><p>Background photos<small id="photoStatus">Faded black-and-white photos behind each tab</small></p><button class="btn ghost" id="openPhotos">Set up</button></div>
     <div class="setting"><p>Workout reminders<small id="remStatus">Add alerts to your phone's calendar</small></p><button class="btn ghost" id="openRem">Set up</button></div>
     <div class="setting"><p>Workout timer beeps<small id="awakeStatus">Keeps your screen on while running</small></p><div class="seg" id="beepSeg"><button data-b="0">Off</button><button data-b="30">30s</button><button data-b="60">1 min</button></div></div>
     <div class="setting"><p>Vibrate with beeps<small id="vibStatus">Buzzes at each interval</small></p><div class="seg" id="vibSeg"><button data-v="0">Off</button><button data-v="1">On</button></div></div>
@@ -491,8 +541,23 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
     <div class="setting"><p>Weight unit</p><div class="seg" id="unitSeg"><button data-u="lb">lb</button><button data-u="kg">kg</button></div></div>
     <div class="setting"><p>Back up your log<small>Your data lives in this browser. Save a backup file now and then.</small></p><button class="btn ghost" id="exportBtn">Export</button></div>
     <div class="setting"><p>Restore from backup<small>Replaces what's on this device.</small></p><button class="btn ghost" id="importBtn">Import</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
-    <div class="setting"><p>Lift Log <span class="version" id="versionLabel"></span><small id="updateStatus">Updates install automatically when you open the app</small></p><button class="btn ghost" id="checkUpdate">Check now</button></div>
+    <div class="setting"><p>Tally <span class="version" id="versionLabel"></span><small id="updateStatus">Updates install automatically when you open the app</small></p><button class="btn ghost" id="checkUpdate">Check now</button></div>
     <div class="setting"><p>Exercise catalog<small id="catStatus"></small><small id="offlineStatus"></small></p><button class="btn ghost" id="reloadCat">Refresh</button></div>
+  </div>
+</div>
+
+<!-- background photos -->
+<div class="sheet" id="photoSheet" role="dialog" aria-modal="true" aria-labelledby="photoTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel short">
+    <div class="sheet-head">
+      <h2 id="photoTitle">Background photos</h2>
+      <button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <p class="hint" style="padding-top:0">Pick a photo for each tab. They're turned black and white and faded behind your workouts. Photos stay on this phone and are never uploaded to GitHub.</p>
+    <div id="photoSlots"></div>
+    <div class="setting"><p>Strength</p><div class="seg" id="photoStr"><button data-o="0">Off</button><button data-o="0.1">Faint</button><button data-o="0.16">Subtle</button><button data-o="0.26">Bold</button></div></div>
+    <input type="file" id="photoFile" accept="image/*" hidden>
   </div>
 </div>
 
@@ -520,15 +585,16 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 <div class="sheet" id="celebrate" role="dialog" aria-modal="true" aria-labelledby="celeTitle">
   <div class="scrim" data-close></div>
   <div class="cele">
-    <span class="plates" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <svg class="tally" viewBox="0 0 120 104" aria-hidden="true"><g fill="#F2EFE8"><rect x="14" y="8" width="13" height="88"/><rect x="38" y="8" width="13" height="88"/><rect x="62" y="8" width="13" height="88"/><rect x="86" y="8" width="13" height="88"/></g><rect x="-2" y="45" width="124" height="13" fill="#B38B2D" transform="rotate(-28 60 52)"/></svg>
     <div class="big" id="celeBig"></div>
     <h2 id="celeTitle"></h2>
     <p id="celeSub"></p>
-    <button class="btn" data-close>Keep going</button>
+    <button class="btn" data-close>Done</button>
   </div>
 </div>
 
 <div class="toast" id="toast" role="status"></div>
+<div class="grain" id="grain" aria-hidden="true"></div>
 <div class="flash" id="flash" aria-hidden="true"></div>
 
 <script>
@@ -536,14 +602,14 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.8.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
   get(k){ try { return localStorage.getItem(k); } catch(e){ return mem[k] || null; } },
   set(k,v){ try { localStorage.setItem(k,v); } catch(e){ mem[k] = v; } }
 };
-const DEFAULTS = {workouts:{}, custom:[], templates:[], unit:"lb", goal:3, rest:90, autoRest:false, bar:null, beepEvery:30, clock:{start:null, acc:0}, dur:{}, notes:{}, reminders:{days:[1,3,5], time:"18:00", alert:15, set:false}, nudgeOff:null, celebrated:null, mode:{}, vibrate:true, silentBeep:false, bodyRange:7, typeOver:{}, timedMigrated:false};
+const DEFAULTS = {workouts:{}, custom:[], templates:[], unit:"lb", goal:3, rest:90, autoRest:false, bar:null, beepEvery:30, clock:{start:null, acc:0}, dur:{}, notes:{}, reminders:{days:[1,3,5], time:"18:00", alert:15, set:false}, nudgeOff:null, celebrated:null, mode:{}, vibrate:true, silentBeep:false, bodyRange:7, typeOver:{}, timedMigrated:false, photoOp:0.16, photoFocus:{}};
 function load(){
   try { const s = JSON.parse(store.get(KEY)); if (s && s.workouts) return Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), s); } catch(e){}
   return JSON.parse(JSON.stringify(DEFAULTS));
@@ -748,7 +814,7 @@ function updatePR(i, announce){
   });
   if (announce && pr.j >= 0){
     const key = curDate + e.name + pr.val;
-    if (!toasted[key]){ toasted[key] = 1; toast("New PR: " + e.name + ", " + pr.val + " " + pr.u, true); }
+    if (!toasted[key]){ toasted[key] = 1; toast("New best. " + e.name + ", " + pr.val + " " + pr.u + ".", true); }
   }
 }
 
@@ -808,7 +874,7 @@ function renderLog(){
       quick += `<button class="btn" id="repeatLast">Repeat ${esc(shortDate(prev))} workout (${n} ${n === 1 ? "exercise" : "exercises"})</button>`;
     }
     quick += `<button class="btn ghost" id="loadTplEmpty">${state.templates.length ? "Load a template" : "Templates"}</button>`;
-    $("#exList").innerHTML = `<div class="empty"><strong>Nothing logged yet</strong>Add an exercise, or start from a past workout.<div class="quick">${quick}</div></div>`;
+    $("#exList").innerHTML = `<div class="empty"><strong>Nothing counted yet</strong>Add an exercise, or repeat a past workout.<div class="quick">${quick}</div></div>`;
     const rl = $("#repeatLast"); if (rl) rl.onclick = () => repeatDay(prev);
     $("#loadTplEmpty").onclick = openTemplates;
     return;
@@ -930,7 +996,7 @@ function setsFor(name, type, fallback){
 function repeatDay(k){
   state.workouts[curDate] = entries(k).filter(e => e.sets.some(filled)).map(e => ({name:e.name, group:e.group, type:e.type, ss:!!e.ss, sets:clone(e.sets.filter(filled))}));
   const L = state.workouts[curDate]; if (L.length) L[L.length-1].ss = false;
-  save(); renderLog(); toast("Workout copied. Update the numbers as you go."); checkMilestones();
+  save(); renderLog(); toast("Copied. Beat the numbers."); checkMilestones();
 }
 
 /* ---------- PICKER ---------- */
@@ -1279,16 +1345,16 @@ function pickNudge(){
   const t = today();
   if (curDate !== t || state.nudgeOff === t || isWorkoutDay(t)) return null;
   const days = workoutDays(), goal = state.goal;
-  if (!days.length) return {title:"Ready for your first workout?", sub:"Tap Add exercise below to start logging."};
+  if (!days.length) return {title:"First workout. Let's count it.", sub:"Tap Add exercise to start."};
   const done = days.filter(d => d >= mondayOf(t)).length, left = goal - done;
   const daysLeft = 7 - (new Date().getDay()+6)%7;
   const gap = daysBetween(days[days.length-1], t);
   const r = state.reminders || {};
   const planned = r.set && r.days.includes(new Date().getDay());
-  if (left > 0 && left >= daysLeft) return {title: left === 1 ? "Today's your last shot at this week's goal" : `${left} workouts left and ${daysLeft} days to do them`, sub:"Get one in today to stay on track."};
-  if (gap >= 3) return {title:`${gap} days since your last workout`, sub:"Even a short session keeps the habit going."};
-  if (planned) return {title:"Today's a planned workout day", sub:`Your reminder is set for ${fmtTime(r.time)}.`};
-  if (left === 1) return {title:"One more workout hits your weekly goal", sub:"You're close."};
+  if (left > 0 && left >= daysLeft) return {title: left === 1 ? "Last shot at this week's goal." : `${left} workouts left. ${daysLeft} days.`, sub:"Get one in today."};
+  if (gap >= 3) return {title:`${gap} days off. Back at it.`, sub:"A short session still counts."};
+  if (planned) return {title:"Planned day.", sub:`Reminder at ${fmtTime(r.time)}.`};
+  if (left === 1) return {title:"One more hits the week.", sub:"Close."};
   return null;
 }
 function renderNudge(){
@@ -1337,10 +1403,10 @@ function markRemindersSet(){ state.reminders.set = true; save(); renderNudge(); 
 $("#remIcs").onclick = () => {
   const p = reminderPlan();
   const utc = new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z";
-  const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Lift Log//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH",
+  const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Tally//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH",
     "BEGIN:VEVENT","UID:liftlog-workout-reminder@liftlog.app","DTSTAMP:" + utc,
     "DTSTART:" + p.start, "DURATION:PT" + p.mins + "M", "RRULE:FREQ=WEEKLY;BYDAY=" + p.byday,
-    "SUMMARY:Workout", "DESCRIPTION:Time to lift." + (p.url ? " Open Lift Log: " + p.url : ""),
+    "SUMMARY:Workout", "DESCRIPTION:Time to lift." + (p.url ? " Open Tally: " + p.url : ""),
     ...(p.url ? ["URL:" + p.url] : []),
     "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:Workout time","TRIGGER:-PT" + p.alert + "M","END:VALARM",
     "END:VEVENT","END:VCALENDAR"].join("\r\n");
@@ -1352,7 +1418,7 @@ $("#remIcs").onclick = () => {
     window.location.href = href;
   } else {
     const a = document.createElement("a");
-    a.href = href; a.download = "lift-log-reminders.ics";
+    a.href = href; a.download = "tally-reminders.ics";
     document.body.appendChild(a); a.click(); a.remove();
     toast("Calendar file saved. Open it to add the reminders.");
   }
@@ -1361,7 +1427,7 @@ $("#remIcs").onclick = () => {
 };
 $("#remGoogle").onclick = () => {
   const p = reminderPlan();
-  const q = new URLSearchParams({action:"TEMPLATE", text:"Workout", dates:p.start + "/" + p.end, recur:"RRULE:FREQ=WEEKLY;BYDAY=" + p.byday, details:"Time to lift." + (p.url ? " Open Lift Log: " + p.url : "")});
+  const q = new URLSearchParams({action:"TEMPLATE", text:"Workout", dates:p.start + "/" + p.end, recur:"RRULE:FREQ=WEEKLY;BYDAY=" + p.byday, details:"Time to lift." + (p.url ? " Open Tally: " + p.url : "")});
   window.open("https://calendar.google.com/calendar/render?" + q.toString(), "_blank");
   markRemindersSet();
 };
@@ -1454,7 +1520,7 @@ function mkChart(id, cfg){
 }
 function baseOpts(){
   const line = css("--line");
-  Chart.defaults.font.family = css("--font");
+  Chart.defaults.font.family = css("--mono");
   Chart.defaults.font.size = 14;
   Chart.defaults.color = css("--mute");
   return {
@@ -1795,6 +1861,90 @@ $("#bodyView").addEventListener("click", e => {
   if (m){ selMuscle = m.dataset.m; renderBody(); if (m.closest(".fig")) $("#muscleDetail").scrollIntoView({behavior:"smooth", block:"nearest"}); }
 });
 
+/* ---------- BACKGROUND PHOTOS (stored on this device only) ---------- */
+const PHOTO_KEY = "liftlog.photos";
+const PHOTO_TABS = [["log","Log"],["body","Body"],["progress","Progress"]];
+let photos = {};
+try { photos = JSON.parse(localStorage.getItem(PHOTO_KEY)) || {}; } catch(e){ photos = {}; }
+let currentTab = "log", photoTarget = null;
+function savePhotos(){
+  try { localStorage.setItem(PHOTO_KEY, JSON.stringify(photos)); return true; }
+  catch(e){ toast("Not enough space on this device for that photo"); return false; }
+}
+/* shrink, convert to black and white, and compress so it loads instantly */
+function processPhoto(file){
+  return new Promise((resolve, reject) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const sc = Math.min(1, 1100 / Math.max(img.width, img.height));
+      const w = Math.round(img.width*sc), h = Math.round(img.height*sc);
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const x = c.getContext("2d"); x.drawImage(img, 0, 0, w, h);
+      const d = x.getImageData(0, 0, w, h), px = d.data;
+      for (let i=0; i<px.length; i+=4){ const g = px[i]*.299 + px[i+1]*.587 + px[i+2]*.114; px[i] = px[i+1] = px[i+2] = g; }
+      x.putImageData(d, 0, 0);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL("image/jpeg", .62));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("unreadable")); };
+    img.src = url;
+  });
+}
+const FOCUS_POS = {left:"22% 40%", center:"50% 40%", right:"78% 40%"};
+function applyBg(tab){
+  currentTab = tab || currentTab;
+  const el = $("#bgPhoto");
+  const key = photos[currentTab] ? currentTab : PHOTO_TABS.map(t => t[0]).find(k => photos[k]);
+  const op = state.photoOp ?? .16;
+  if (!key || !op){ el.classList.remove("show"); return; }
+  const src = photos[key];
+  if (el.dataset.src === key + src.length){ el.style.setProperty("--bg-op", op); el.classList.add("show"); return; }
+  el.classList.remove("show");
+  setTimeout(() => {
+    el.style.backgroundImage = `url("${src}")`;
+    el.style.backgroundPosition = FOCUS_POS[(state.photoFocus || {})[key] || "center"];
+    el.style.setProperty("--bg-op", op);
+    el.dataset.src = key + src.length;
+    requestAnimationFrame(() => el.classList.add("show"));
+  }, el.dataset.src ? 250 : 0);
+}
+function renderPhotoSheet(){
+  $("#photoSlots").innerHTML = PHOTO_TABS.map(([k, label]) => {
+    const has = !!photos[k], f = (state.photoFocus || {})[k] || "center";
+    return `<div class="slot"><span class="thumb" style="${has ? `background-image:url('${photos[k]}');background-position:${FOCUS_POS[f]}` : ""}"></span>
+      <div><b>${label}</b><small>${has ? "Photo set" : "Uses another tab's photo, if any"}</small>
+        ${has ? `<div class="seg" role="group" aria-label="${label} photo focus">${["left","center","right"].map(x => `<button data-focus="${x}" data-k="${k}" aria-pressed="${x === f}">${x[0].toUpperCase() + x.slice(1)}</button>`).join("")}</div>` : ""}</div>
+      <div class="acts"><button class="btn ghost" data-pick="${k}">${has ? "Change" : "Choose"}</button>${has ? `<button class="link" data-rm="${k}" aria-label="Remove ${label} photo">Remove</button>` : ""}</div></div>`;
+  }).join("");
+  document.querySelectorAll("#photoStr button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.o === (state.photoOp ?? .16)));
+}
+function photoStatusText(){
+  const n = PHOTO_TABS.filter(t => photos[t[0]]).length;
+  return n ? `${n} ${n === 1 ? "photo" : "photos"} set` : "Faded black-and-white photos behind each tab";
+}
+$("#openPhotos").onclick = () => { closeSheet($("#settings")); renderPhotoSheet(); openSheet($("#photoSheet")); };
+$("#photoSlots").addEventListener("click", e => {
+  const pick = e.target.closest("[data-pick]"), rm = e.target.closest("[data-rm]"), fo = e.target.closest("[data-focus]");
+  if (pick){ photoTarget = pick.dataset.pick; $("#photoFile").click(); }
+  else if (rm){ delete photos[rm.dataset.rm]; savePhotos(); $("#bgPhoto").dataset.src = ""; renderPhotoSheet(); applyBg(); }
+  else if (fo){ state.photoFocus = Object.assign({}, state.photoFocus, {[fo.dataset.k]: fo.dataset.focus}); save(); $("#bgPhoto").dataset.src = ""; renderPhotoSheet(); applyBg(); }
+});
+$("#photoFile").addEventListener("change", async function(){
+  const f = this.files[0]; this.value = "";
+  if (!f || !photoTarget) return;
+  try {
+    const prev = photos[photoTarget];
+    photos[photoTarget] = await processPhoto(f);
+    if (!savePhotos()){ if (prev) photos[photoTarget] = prev; else delete photos[photoTarget]; }
+    $("#bgPhoto").dataset.src = "";
+    renderPhotoSheet(); applyBg(photoTarget === currentTab ? currentTab : undefined);
+  } catch(err){ toast("Couldn't read that photo. Try a different one."); }
+});
+$("#photoStr").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.photoOp = +b.dataset.o; save(); renderPhotoSheet(); applyBg();
+});
+
 /* ---------- tabs ---------- */
 function showTab(tab){
   document.querySelectorAll("[data-tab]").forEach(x => x.setAttribute("aria-selected", x.dataset.tab === tab));
@@ -1803,6 +1953,7 @@ function showTab(tab){
   $("#bodyView").hidden = tab !== "body";
   window.scrollTo(0,0);
   if (tab === "progress") renderProgress(); else if (tab === "body") renderBody(); else renderLog();
+  applyBg(tab);
 }
 document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => showTab(b.dataset.tab));
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!$("#progressView").hidden) renderProgress(); });
@@ -1820,6 +1971,7 @@ function renderSettings(){
   document.querySelectorAll("#autoSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.a === "1") === !!state.autoRest));
   $("#goalVal").textContent = state.goal;
   $("#versionLabel").textContent = "version " + APP_VERSION;
+  $("#photoStatus").textContent = photoStatusText();
   const r = state.reminders;
   $("#remStatus").textContent = r.set ? `${DAY_ORDER.filter(d => r.days.includes(d)).map(d => DAYNAMES[d].slice(0,3)).join(", ")} at ${fmtTime(r.time)}` : "Add alerts to your phone's calendar";
   $("#openRem").textContent = r.set ? "Change" : "Set up";
@@ -1840,7 +1992,7 @@ $("#goalUp").onclick = () => { state.goal = Math.min(7, state.goal+1); save(); r
 $("#exportBtn").onclick = () => {
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob); a.download = "lift-log-backup-" + today() + ".json";
+  a.href = URL.createObjectURL(blob); a.download = "tally-backup-" + today() + ".json";
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   toast("Backup exported");
@@ -1856,7 +2008,7 @@ $("#importFile").onchange = function(){
       if (!confirm("Replace the log on this device with this backup?")) return;
       state = Object.assign(clone(DEFAULTS), d); save();
       loadRemote(false); closeSheet($("#settings")); refreshViews(); toast("Backup restored");
-    } catch(e){ toast("That file isn't a Lift Log backup"); }
+    } catch(e){ toast("That file isn't a Tally backup"); }
   };
   r.readAsText(f); this.value = "";
 };
@@ -1911,12 +2063,24 @@ if ("serviceWorker" in navigator && location.protocol === "https:"){
   }).catch(() => {});
 }
 
+/* ---------- film grain (drawn once on the device) ---------- */
+(() => {
+  try {
+    const c = document.createElement("canvas"); c.width = c.height = 160;
+    const x = c.getContext("2d"), d = x.createImageData(160, 160);
+    for (let i=0; i<d.data.length; i+=4){ const v = Math.random()*255|0; d.data[i] = d.data[i+1] = d.data[i+2] = v; d.data[i+3] = 255; }
+    x.putImageData(d, 0, 0);
+    document.getElementById("grain").style.backgroundImage = `url(${c.toDataURL("image/png")})`;
+  } catch(e){}
+})();
+
 /* ---------- start ---------- */
 if (!state.celebrated) checkMilestones(true);
 applyAudioSession();
 loadRemote(false);
 migrateTimed();
 renderLog();
+applyBg("log");
 resetBeepMark(); renderClock(); syncWake();
 })();
 </script>

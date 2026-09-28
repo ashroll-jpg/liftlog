@@ -1,12 +1,12 @@
 {
-  "name": "Lift Log",
-  "short_name": "Lift Log",
-  "description": "Log workouts and see your progress.",
+  "name": "Tally",
+  "short_name": "Tally",
+  "description": "Log it. Move on.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#E9ECEF",
-  "theme_color": "#E9ECEF",
+  "background_color": "#0E0E0E",
+  "theme_color": "#0E0E0E",
   "icons": [
     {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
     {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
