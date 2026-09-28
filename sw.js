@@ -1,6 +1,6 @@
-// Lift Log offline support. Bump VERSION when you upload a new index.html
-// if you want phones to drop the old cache right away.
-const VERSION = "liftlog-v4";
+// Lift Log offline support + automatic updates.
+// The version below changes with every release so phones pick up the new files.
+const VERSION = "liftlog-1.6.0";
 const CORE = [
   "./", "./index.html", "./manifest.json",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png",
@@ -8,7 +8,7 @@ const CORE = [
 ];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(VERSION).then(c => Promise.allSettled(CORE.map(u => c.add(u)))).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then(c => Promise.allSettled(CORE.map(u => c.add(new Request(u, {cache: "reload"}))))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", e => {
@@ -18,13 +18,16 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
+  const url = new URL(req.url);
 
-  // The app page: try the network first so updates show up, fall back to the saved copy.
+  // Update checks always go straight to the network.
+  if (url.searchParams.has("fresh")) return;
+
+  // The app page: always ask GitHub for the newest copy first, fall back to the saved one offline.
   if (req.mode === "navigate"){
     e.respondWith(
-      fetch(req).then(res => {
-        const copy = res.clone();
-        caches.open(VERSION).then(c => c.put("./index.html", copy));
+      fetch(req.url, {cache: "no-cache"}).then(res => {
+        if (res.ok){ const copy = res.clone(); caches.open(VERSION).then(c => c.put("./index.html", copy)); }
         return res;
       }).catch(() => caches.match("./index.html").then(r => r || caches.match("./")))
     );
