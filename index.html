@@ -32,8 +32,10 @@
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
 *,*::before,*::after{box-sizing:inherit}
-html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.4}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%;min-height:100%;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.4;
+  /* always fill the whole screen, even on short pages, so the tab bar sits on the bottom edge on iPhone */
+  min-height:100vh;min-height:100lvh;min-height:var(--app-h,100lvh)}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -802,7 +804,7 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "2.1.0";
+const APP_VERSION = "2.1.2";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -2348,6 +2350,8 @@ const MOB_CATALOG = [
   ["Neck Rolls","Neck",0,30,{traps:1}],
   ["Shoulder Rolls","Shoulders",0,30,{traps:.8,sideDelts:.3}],
   ["Arm Circles","Shoulders",0,30,{sideDelts:.6,frontDelts:.5,rearDelts:.4}],
+  ["Standing Torso Twists","Back",0,30,{obliques:1,midBack:.6,lowerBack:.3}],
+  ["Standing Knee to Hands","Hips",0,30,{quads:.5,glutes:.5,abs:.4,lowerBack:.2}],
   ["Standing Side Reach","Back",1,20,{lats:.8,obliques:.6}],
   ["Seated Spinal Twist","Back",1,20,{obliques:.8,midBack:.5}],
   ["Ankle Circles","Ankles",1,30,{calves:.6}],
@@ -2367,7 +2371,7 @@ const MOB_RULES = [
   [/groin|adductor|butterfly|frog/, {adductors:1}], [/yoga|stretch|flow|foam|mobility|pilates/, {hamstrings:.3,glutes:.3,midBack:.3,quads:.2,lats:.2}]
 ];
 const STARTER_ROUTINES = [
-  {name:"Morning wake-up", items:[["Cat-Cow",45],["Hip Flexor Lunge Stretch",30],["Behind-Back Clasp",30],["Standing Forward Fold",30]]},
+  {name:"Morning wake-up", items:[["Cat-Cow",45],["Hip Flexor Lunge Stretch",30],["Standing Knee to Hands",30],["Standing Torso Twists",30],["Behind-Back Clasp",30],["Standing Forward Fold",30]]},
   {name:"Hips & legs", items:[["Leg Swings",30],["Hip Circles",30],["Figure-4 Stretch",30],["Legs Up the Wall",120]]},
   {name:"Desk reset", items:[["Neck Rolls",30],["Shoulder Rolls",30],["Seated Spinal Twist",20],["Calf Pumps",30]]},
   {name:"Post-run", items:[["Standing Quad Stretch",30],["Wall Calf Stretch",30],["Standing Hamstring Stretch",30],["Legs Up the Wall",120]]},
@@ -2611,12 +2615,21 @@ const CIRCLES = {
   neckRolls:{view:"front", period:4, fn:(p, a) => { p.head = [100+7*Math.cos(a), 32+4*Math.sin(a)]; }},
   shoulderRolls:{view:"front", period:2.2, fn:(p, a) => { const dy = -4*Math.sin(a), dx = 2*Math.cos(a); p.sl = [87+dx,56+dy]; p.sr = [113-dx,56+dy]; p.el = [83+dx,82+dy/2]; p.er = [117-dx,82+dy/2]; }},
   armCircles:{view:"front", period:1.6, base:{el:[66,58],er:[134,58]}, fn:(p, a) => { p.hl = [46+8*Math.cos(a), 58+8*Math.sin(a)]; p.hr = [154-8*Math.cos(a), 58+8*Math.sin(a)]; }},
+  torsoTwist:{view:"front", period:2.4, fn:(p, a) => { const t = Math.sin(a);
+    p.sl = [87 + 7*Math.max(0,t), 56]; p.sr = [113 - 7*Math.max(0,-t), 56];
+    p.el = [86 + 22*t, 78]; p.hl = [96 + 34*t, 92]; p.er = [114 + 22*t, 78]; p.hr = [104 + 34*t, 92];
+    p.head = [100 + 3*t, 34]; p.sp = [100 + 2*t, 80]; }},
+  kneeToHands:{view:"side", period:2, base:{el:[112,82],er:[112,82],hl:[128,104],hr:[128,104]}, fn:(p, a) => { const t = Math.sin(a), up = Math.abs(t);
+    const knee = [100 + 32*up, 145 - 33*up], foot = [100 + 30*up, 180 - 36*up];
+    if (t > 0){ p.kr = knee; p.fr = foot; } else { p.kl = knee; p.fl = foot; }
+    p.hl = p.hr = [128, 104 + 4*up]; }},
   ankleCircles:{view:"front", period:1.8, base:{kr:[112,140]}, fn:(p, a) => { p.fr = [118+6*Math.cos(a), 162+5*Math.sin(a)]; }},
   calfPumps:{view:"side", period:1.3, base:{el:[106,82],er:[106,82],hl:[112,104],hr:[112,104]}, fn:(p, a) => { const up = 7*(1-Math.cos(a))/2; for (const k in p) if (k !== "fl" && k !== "fr") p[k] = [p[k][0], p[k][1]-up]; p.fl = p.fr = [100+up*.6, 180-up*.4]; }},
   sideReach:{view:"front", period:4.5, base:{er:[118,30],hr:[114,8]}, fn:(p, a) => { const t = (1-Math.cos(a))/2, L = (x, y, x2, y2) => [x+(x2-x)*t, y+(y2-y)*t];
     p.sp = L(100,80,95,80); p.neck = L(100,52,90,56); p.head = L(100,34,84,40); p.sl = L(87,56,78,62); p.sr = L(113,56,102,52); p.er = L(118,30,94,30); p.hr = L(114,8,76,12); p.el = [80,90]; p.hl = [92,110]; }}
 };
 const ANIM_MAP = [
+  [/torso twist/,"torsoTwist"],[/knee to hand|knee raise/,"kneeToHands"],
   [/cat.?cow/,"catcow"],[/child/,"child"],[/thread/,"thread"],[/hip flexor|couch|world'?s greatest|split squat|lunge/,"lunge"],
   [/standing quad|quad stretch/,"standQuad"],[/standing hamstring/,"standHam"],[/lying hamstring|legs up/,"legsWall"],
   [/wall calf|calf stretch|soleus/,"calfWall"],[/seated forward|butterfly|frog|pancake/,"seatedFold"],[/forward fold/,"forwardFold"],
@@ -3191,6 +3204,12 @@ if ("serviceWorker" in navigator && location.protocol === "https:"){
     document.getElementById("grain").style.backgroundImage = `url(${c.toDataURL("image/png")})`;
   } catch(e){}
 })();
+
+/* ---------- full-height fix for iPhone home-screen apps ---------- */
+function setAppHeight(){ document.documentElement.style.setProperty("--app-h", Math.max(window.innerHeight, screen.height && window.navigator.standalone ? screen.height : 0) + "px"); }
+setAppHeight();
+window.addEventListener("resize", setAppHeight);
+window.addEventListener("orientationchange", () => setTimeout(setAppHeight, 300));
 
 /* ---------- start ---------- */
 if (!state.celebrated) checkMilestones(true);
