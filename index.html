@@ -440,6 +440,30 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .bal .seg-s{background:var(--str)}.bal .seg-c{background:var(--car)}.bal .seg-m{background:var(--mob)}
 .bal .track span{display:block;height:100%}
 
+/* loaded routines / templates, with undo */
+.loaded{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.lchip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:4px;padding:3px 3px 3px 10px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);background:transparent}
+.lchip button{background:none;border:0;color:var(--mute);width:28px;height:28px;font-size:17px;line-height:1;padding:0;border-radius:4px}
+.lchip button:hover{color:var(--ink);background:var(--field)}
+.lchip.add{border-style:dashed;color:var(--mute);padding:7px 12px;cursor:pointer}
+.toast.has-act{pointer-events:auto;display:flex;align-items:center;gap:14px}
+.toast .act{background:none;border:0;color:var(--accent);font-family:var(--mono);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:13px;padding:4px 0}
+.toast.gold .act{color:var(--accent-ink)}
+/* guided player, full screen with the animated figure */
+#mobPlayer .panel{height:min(94vh,860px)}
+#plBody{flex:1;display:flex;flex-direction:column}
+.player{flex:1;justify-content:space-between;gap:6px;padding:4px 0}
+.pl-fig{width:min(62vw,250px);height:auto;display:block;margin:2px auto 0;transition:opacity .3s}
+.pl-fig.ready{opacity:.4}
+.pl-fig polyline,.pl-fig path,.pl-fig line{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.pl-fig .near{stroke:var(--ink)}
+.pl-fig .far{stroke:var(--mute);opacity:.7}
+.pl-fig .head{fill:var(--bg);stroke-width:6}
+.pl-fig .ground{stroke:var(--line);stroke-width:2}
+.pl-fig .prop{stroke:var(--mob);stroke-width:3;fill:none;opacity:.8}
+.pl-time{font-size:min(26vw,108px)}
+.pl-up{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--mob);text-transform:uppercase;min-height:14px}
+
 [hidden]{display:none!important}
 </style>
 </head>
@@ -496,10 +520,11 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
       <button class="icon-btn" id="mobNext" aria-label="Next day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
       <div class="sub" id="mobSub"></div>
     </div>
+    <div class="loaded" id="mobLoaded"></div>
     <button class="start-routine" id="mobStart" hidden>Start routine</button>
     <div class="mob-actions">
       <button class="add-big" id="mobAdd">+ Add stretch</button>
-      <button class="btn ghost" id="mobRoutines">Routines</button>
+      <button class="btn ghost" id="mobRoutines">+ Routine</button>
     </div>
     <div id="mobList"></div>
   </main>
@@ -700,7 +725,7 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 <!-- mobility: guided player -->
 <div class="sheet" id="mobPlayer" role="dialog" aria-modal="true" aria-labelledby="plTitle">
   <div class="scrim"></div>
-  <div class="panel short">
+  <div class="panel">
     <div class="sheet-head"><h2 id="plTitle">Routine</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div id="plBody"></div>
   </div>
@@ -777,7 +802,7 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "2.1.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -945,9 +970,35 @@ function describeSets(e){
   }).join(", ");
 }
 let toastT;
-function toast(msg, gold){
-  const t = $("#toast"); t.textContent = msg; t.classList.toggle("gold", !!gold); t.classList.add("show");
-  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), gold ? 2600 : 1800);
+function toast(msg, gold, action){
+  const t = $("#toast"); t.textContent = msg; t.classList.toggle("gold", !!gold); t.classList.toggle("has-act", !!action);
+  if (action){
+    const b = document.createElement("button"); b.className = "act"; b.textContent = action.label;
+    b.onclick = () => { t.classList.remove("show", "has-act"); action.fn(); };
+    t.appendChild(b);
+  }
+  t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show", "has-act"), action ? 6000 : gold ? 2600 : 1800);
+}
+/* remember a day before loading a template or routine, so it can be undone */
+function snapshotDay(k){ return state.workouts[k] ? clone(state.workouts[k]) : null; }
+function restoreDay(k, snap){ if (snap) state.workouts[k] = snap; else delete state.workouts[k]; save(); }
+/* remove everything a loaded template or routine added */
+function removeLoaded(k, fromId, label, rerender){
+  const L = state.workouts[k] || [];
+  const mine = L.filter(e => e.from && e.from.id === fromId);
+  if (!mine.length) return;
+  if (mine.some(e => e.sets.some(filled)) && !confirm(`Remove ${label}, including what you've logged from it?`)) return;
+  const snap = snapshotDay(k);
+  state.workouts[k] = L.filter(e => !(e.from && e.from.id === fromId));
+  if (!state.workouts[k].length) delete state.workouts[k];
+  save(); rerender();
+  toast(label + " removed.", false, {label:"Undo", fn: () => { restoreDay(k, snap); rerender(); }});
+}
+function loadedChips(list, attr){
+  const seen = {}, out = [];
+  list.forEach(e => { if (e.from && !seen[e.from.id]){ seen[e.from.id] = 1; out.push(e.from); } });
+  return out.map(f => `<span class="lchip">${esc(f.name)}<button ${attr}="${f.id}" data-label="${esc(f.name)}" aria-label="Remove ${esc(f.name)}">×</button></span>`).join("");
 }
 
 /* ---------- personal records ---------- */
@@ -1046,8 +1097,9 @@ function renderLog(){
 
   const list = entries(curDate), u = state.unit;
   const strength = list.filter(e => e.type !== "c" && e.type !== "m").length;
-  $("#dayTools").innerHTML = strength ? `<button class="pill" id="toolTpl">${ICON_TPL}Templates</button>` : "";
+  $("#dayTools").innerHTML = strength ? `<div class="loaded">${loadedChips(list.filter(e => e.type !== "c" && e.type !== "m"), "data-unload")}<button class="lchip add" id="toolTpl">+ Template</button></div>` : "";
   const tt = $("#toolTpl"); if (tt) tt.onclick = openTemplates;
+  document.querySelectorAll("#dayTools [data-unload]").forEach(b => b.onclick = () => removeLoaded(curDate, b.dataset.unload, b.dataset.label, renderLog));
 
   if (!strength){
     const prev = lastWorkoutBefore(curDate);
@@ -1178,9 +1230,12 @@ function setsFor(name, type, fallback){
   return f;
 }
 function repeatDay(k){
+  const snap = snapshotDay(curDate), from = {id:uid(), name:"Repeat " + shortDate(k)};
   state.workouts[curDate] = entries(curDate).filter(e => e.type === "c" || e.type === "m").concat(entries(k).filter(e => e.type !== "c" && e.type !== "m" && e.sets.some(filled)).map(e => ({name:e.name, group:e.group, type:e.type, ss:!!e.ss, sets:clone(e.sets.filter(filled))})));
   const L = state.workouts[curDate]; if (L.length) L[L.length-1].ss = false;
-  save(); renderLog(); toast("Copied. Beat the numbers."); checkMilestones();
+  L.forEach(e => { if (e.type !== "c" && e.type !== "m" && !e.from) e.from = from; });
+  save(); renderLog(); checkMilestones();
+  toast("Copied. Beat the numbers.", false, {label:"Undo", fn: () => { restoreDay(curDate, snap); renderLog(); }});
 }
 
 /* ---------- PICKER ---------- */
@@ -1262,12 +1317,13 @@ function renderTemplates(){
 $("#tplList").addEventListener("click", e => {
   const l = e.target.closest("[data-load]"), d = e.target.closest("[data-del]");
   if (l){
-    const t = state.templates[+l.dataset.load];
+    const t = state.templates[+l.dataset.load], snap = snapshotDay(curDate), from = {id:uid(), name:t.name};
     if (!state.workouts[curDate]) state.workouts[curDate] = [];
     const day = state.workouts[curDate];
-    t.items.forEach(x => { if (!day.some(y => y.name === x.name)) day.push({name:x.name, group:x.group, type:x.type, ss:!!x.ss, sets:setsFor(x.name, x.type, x.sets)}); });
+    t.items.forEach(x => { if (!day.some(y => y.name === x.name)) day.push({name:x.name, group:x.group, type:x.type, ss:!!x.ss, from, sets:setsFor(x.name, x.type, x.sets)}); });
     if (day.length) day[day.length-1].ss = false;
-    save(); closeSheet($("#tplSheet")); renderLog(); toast(t.name + " loaded"); checkMilestones();
+    save(); closeSheet($("#tplSheet")); renderLog(); checkMilestones();
+    toast(t.name + " loaded.", false, {label:"Undo", fn: () => { restoreDay(curDate, snap); renderLog(); }});
   } else if (d){
     const t = state.templates[+d.dataset.del];
     if (!confirm("Delete the " + t.name + " template?")) return;
@@ -2285,6 +2341,17 @@ const MOB_CATALOG = [
   ["Foam Roll: Glutes","Foam roll",0,60,{glutes:1}],
   ["Foam Roll: Upper Back","Foam roll",0,60,{midBack:1,traps:.4}],
   ["Foam Roll: Lats","Foam roll",1,45,{lats:1}],
+  ["Standing Forward Fold","Legs",0,30,{hamstrings:1,calves:.3,lowerBack:.3}],
+  ["Legs Up the Wall","Legs",0,120,{hamstrings:.5,calves:.4}],
+  ["Leg Swings","Hips",1,30,{hamstrings:.6,quads:.4,glutes:.4,adductors:.3}],
+  ["Hip Circles","Hips",0,30,{glutes:.6,adductors:.4,lowerBack:.3}],
+  ["Neck Rolls","Neck",0,30,{traps:1}],
+  ["Shoulder Rolls","Shoulders",0,30,{traps:.8,sideDelts:.3}],
+  ["Arm Circles","Shoulders",0,30,{sideDelts:.6,frontDelts:.5,rearDelts:.4}],
+  ["Standing Side Reach","Back",1,20,{lats:.8,obliques:.6}],
+  ["Seated Spinal Twist","Back",1,20,{obliques:.8,midBack:.5}],
+  ["Ankle Circles","Ankles",1,30,{calves:.6}],
+  ["Calf Pumps","Ankles",0,30,{calves:1}],
   ["Yoga","Sessions",0,1800,{hamstrings:.4,glutes:.4,lats:.3,midBack:.3,quads:.3,frontDelts:.2,abs:.3}],
   ["Pilates","Sessions",0,1800,{abs:.8,obliques:.5,glutes:.4,lowerBack:.3}],
   ["Mobility Flow","Sessions",0,600,{glutes:.4,hamstrings:.4,midBack:.4,quads:.3,frontDelts:.2}],
@@ -2300,11 +2367,12 @@ const MOB_RULES = [
   [/groin|adductor|butterfly|frog/, {adductors:1}], [/yoga|stretch|flow|foam|mobility|pilates/, {hamstrings:.3,glutes:.3,midBack:.3,quads:.2,lats:.2}]
 ];
 const STARTER_ROUTINES = [
-  {name:"Morning 10", items:[["Cat-Cow",60],["World's Greatest Stretch",30],["Hip Flexor Lunge Stretch",45],["Standing Hamstring Stretch",30],["Child's Pose",60],["Doorway Chest Stretch",45]]},
-  {name:"Hips & hamstrings", items:[["90/90 Hold",45],["Pigeon Pose",60],["Couch Stretch",45],["Seated Forward Fold",60],["Butterfly Stretch",60],["Deep Squat Hold",60]]},
-  {name:"Desk reset", items:[["Neck Side Stretch",30],["Doorway Chest Stretch",45],["Thread the Needle",30],["Open Book",30],["Wrist Flexor Stretch",30],["Hip Flexor Lunge Stretch",45]]},
-  {name:"Post-run", items:[["Standing Quad Stretch",30],["Wall Calf Stretch",45],["Standing Hamstring Stretch",30],["Figure-4 Stretch",45],["Hip Flexor Lunge Stretch",45],["Downward Dog",45]]},
-  {name:"Post-lift upper body", items:[["Cross-Body Shoulder Stretch",30],["Overhead Triceps Stretch",30],["Doorway Chest Stretch",45],["Lat Stretch",30],["Child's Pose",60],["Supine Spinal Twist",45]]}
+  {name:"Morning wake-up", items:[["Cat-Cow",45],["Hip Flexor Lunge Stretch",30],["Behind-Back Clasp",30],["Standing Forward Fold",30]]},
+  {name:"Hips & legs", items:[["Leg Swings",30],["Hip Circles",30],["Figure-4 Stretch",30],["Legs Up the Wall",120]]},
+  {name:"Desk reset", items:[["Neck Rolls",30],["Shoulder Rolls",30],["Seated Spinal Twist",20],["Calf Pumps",30]]},
+  {name:"Post-run", items:[["Standing Quad Stretch",30],["Wall Calf Stretch",30],["Standing Hamstring Stretch",30],["Legs Up the Wall",120]]},
+  {name:"Post-lift upper body", items:[["Arm Circles",30],["Cross-Body Shoulder Stretch",20],["Doorway Chest Stretch",30],["Child's Pose",45]]},
+  {name:"Wind-down", items:[["Child's Pose",45],["Supine Spinal Twist",30],["Happy Baby",30],["Legs Up the Wall",120]]}
 ];
 const mobRow = name => MOB_CATALOG.find(r => r[0].toLowerCase() === String(name).toLowerCase());
 function mobInfo(name){
@@ -2346,6 +2414,8 @@ function renderMobility(){
   $("#mobSub").innerHTML = esc(parts.join(" · ")) + (mobDate !== t ? '<button id="mobToday">Back to today</button>' : "");
   const mt = $("#mobToday"); if (mt) mt.onclick = () => { mobDate = today(); renderMobility(); };
   $("#mobStart").hidden = !todo;
+  $("#mobLoaded").innerHTML = loadedChips(list, "data-unload");
+  document.querySelectorAll("#mobLoaded [data-unload]").forEach(b => b.onclick = () => removeLoaded(mobDate, b.dataset.unload, b.dataset.label, renderMobility));
   $("#mobStart").textContent = list.some(e => e.sets.some(filled)) ? "Continue routine" : "Start routine";
 
   if (!list.length){
@@ -2437,15 +2507,18 @@ $("#mobResults").addEventListener("click", e => { const b = e.target.closest(".r
 
 /* ----- routines ----- */
 function loadMobRoutine(r){
+  const snap = snapshotDay(mobDate), from = {id:uid(), name:r.name}, day = mobDate;
   const L = state.workouts[mobDate] = state.workouts[mobDate] || [];
   r.items.forEach(it => {
     const name = Array.isArray(it) ? it[0] : it.name;
     if (L.some(e => e.type === "m" && e.name === name)) return;
     const en = newMobEntry(name, Array.isArray(it) ? it[1] : it.target);
     if (!Array.isArray(it)){ en.side = it.side; en.rounds = it.rounds || 1; }
+    en.from = from;
     L.push(en);
   });
-  save(); closeSheet($("#mobRoutineSheet")); renderMobility(); toast(r.name + " loaded. Tap Start routine.");
+  save(); closeSheet($("#mobRoutineSheet")); renderMobility();
+  toast(r.name + " loaded.", false, {label:"Undo", fn: () => { restoreDay(day, snap); renderMobility(); }});
 }
 function renderMobRoutines(){
   const saved = state.mobRoutines || [];
@@ -2469,6 +2542,147 @@ $("#mobSaveRoutine").onclick = () => {
   save(); renderMobRoutines(); toast("Routine saved.");
 };
 
+/* ----- simple stick-figure animations for each stretch ----- */
+/* 200 x 200 canvas, ground at y = 180. Side views face right; "r" limbs are the near side. */
+const P_SIDE = {head:[100,34],neck:[100,52],sp:[100,80],hip:[100,110],sl:[100,56],sr:[100,56],el:[100,82],hl:[100,106],er:[100,82],hr:[100,106],pl:[100,110],pr:[100,110],kl:[100,145],fl:[100,180],kr:[100,145],fr:[100,180]};
+const P_FRONT = {head:[100,34],neck:[100,52],sp:[100,80],hip:[100,110],sl:[87,56],sr:[113,56],el:[83,82],hl:[81,106],er:[117,82],hr:[119,106],pl:[93,110],pr:[107,110],kl:[92,145],fl:[92,180],kr:[108,145],fr:[108,180]};
+const both = (a, b, pts) => { const o = {}; pts.forEach(k => o[k] = a); return o; };
+const ANIMS = {
+  breathe:{view:"front", period:5, A:{}, B:{el:[75,80],hl:[66,100],er:[125,80],hr:[134,100],sp:[100,78]}},
+  catcow:{view:"side", period:4, base:{hip:[70,112],pl:[70,112],pr:[70,112],kl:[70,178],kr:[70,178],fl:[36,178],fr:[36,178],sl:[130,112],sr:[130,112],el:[130,145],er:[130,145],hl:[130,178],hr:[130,178]},
+    A:{sp:[100,128],neck:[130,110],head:[147,97]}, B:{sp:[100,90],neck:[130,112],head:[142,127]}},
+  child:{view:"side", period:5, base:{fl:[40,178],fr:[40,178],kl:[88,178],kr:[88,178],hip:[52,160],pl:[52,160],pr:[52,160],sl:[118,156],sr:[118,156],el:[146,168],er:[146,168],hl:[172,176],hr:[172,176]},
+    A:{sp:[86,138],neck:[118,152],head:[134,162]}, B:{sp:[86,145],neck:[120,157],head:[136,167]}},
+  thread:{view:"side", period:4.5, base:{hip:[70,112],pl:[70,112],pr:[70,112],kl:[70,178],kr:[70,178],fl:[36,178],fr:[36,178],sp:[100,110],neck:[130,110],sl:[130,110],sr:[130,110],el:[130,145],hl:[130,178]},
+    A:{er:[140,84],hr:[150,58],head:[146,98]}, B:{er:[112,150],hr:[90,170],head:[138,128]}},
+  lunge:{view:"side", period:4, base:{kr:[138,146],fr:[138,180],kl:[72,176],fl:[36,176]},
+    A:{hip:[100,132],pl:[100,132],pr:[100,132],sp:[100,104],neck:[100,76],head:[101,58],sl:[100,80],sr:[100,80],el:[88,102],hl:[97,122],er:[90,104],hr:[99,124]},
+    B:{hip:[110,138],pl:[110,138],pr:[110,138],sp:[110,110],neck:[108,82],head:[109,64],sl:[108,86],sr:[108,86],el:[96,108],hl:[106,128],er:[98,110],hr:[108,130]}},
+  standQuad:{view:"side", period:4, base:{er:[118,72],hr:[136,66],el:[92,100]},
+    A:{kl:[100,146],fl:[80,122],hl:[80,122]}, B:{kl:[97,150],fl:[76,118],hl:[76,118],sp:[101,80]}},
+  standHam:{view:"side", period:4.5, base:{hip:[95,112],pl:[95,112],pr:[95,112],kr:[128,150],fr:[150,178],kl:[96,146],fl:[92,180],el:[116,112],hl:[128,132]},
+    A:{sp:[104,86],neck:[112,62],head:[118,45],sl:[112,66],sr:[112,66],er:[118,110],hr:[130,130]},
+    B:{sp:[112,92],neck:[130,76],head:[142,66],sl:[130,80],sr:[130,80],er:[124,116],hr:[138,138]}},
+  calfWall:{view:"side", period:4, prop:'<line x1="166" y1="30" x2="166" y2="180" class="prop"/>', base:{kr:[128,150],fr:[132,180],kl:[82,146],fl:[62,180],hl:[164,70],hr:[164,70]},
+    A:{hip:[104,116],pl:[104,116],pr:[104,116],sp:[118,92],neck:[132,68],head:[144,54],sl:[132,72],sr:[132,72],el:[148,76],er:[148,76]},
+    B:{hip:[112,118],pl:[112,118],pr:[112,118],sp:[126,94],neck:[140,72],head:[151,60],sl:[140,76],sr:[140,76],el:[153,78],er:[153,78]}},
+  forwardFold:{view:"side", period:5, base:{kl:[100,145],kr:[100,145],fl:[100,180],fr:[100,180]},
+    A:{hip:[97,112],pl:[97,112],pr:[97,112],sp:[114,104],neck:[126,110],head:[133,124],sl:[126,112],sr:[126,112],el:[122,132],er:[122,132],hl:[118,152],hr:[118,152]},
+    B:{hip:[93,112],pl:[93,112],pr:[93,112],sp:[110,122],neck:[112,142],head:[110,159],sl:[112,144],sr:[112,144],el:[108,162],er:[108,162],hl:[106,178],hr:[106,178]}},
+  clasp:{view:"side", period:4, A:{el:[88,84],er:[88,84],hl:[80,110],hr:[80,110]}, B:{el:[85,88],er:[85,88],hl:[71,98],hr:[71,98],neck:[104,52],head:[107,34],sp:[103,80],sl:[103,56],sr:[103,56]}},
+  legsWall:{view:"side", period:6, prop:'<line x1="126" y1="40" x2="126" y2="180" class="prop"/>', base:{head:[36,168],neck:[52,172],hip:[112,174],pl:[112,174],pr:[112,174],kl:[114,132],kr:[114,132],fl:[116,90],fr:[116,90],sl:[52,172],sr:[52,172],el:[70,176],er:[70,176],hl:[90,176],hr:[90,176]},
+    A:{sp:[82,175]}, B:{sp:[82,170]}},
+  legSwings:{view:"side", period:1.8, base:{er:[118,72],hr:[138,70]}, A:{kr:[122,142],fr:[142,166]}, B:{kr:[84,144],fr:[70,172]}},
+  crossBody:{view:"front", period:4, base:{er:[98,66],el:[80,78],hl:[94,70]}, A:{hr:[66,62]}, B:{hr:[61,60]}},
+  doorway:{view:"side", period:4, prop:'<line x1="114" y1="20" x2="114" y2="180" class="prop"/>', base:{er:[113,56],hr:[113,30]},
+    A:{}, B:{neck:[106,54],sp:[104,82],hip:[101,112],pl:[101,112],pr:[101,112],head:[109,36],sl:[106,58],sr:[106,58]}},
+  tricepsOH:{view:"front", period:4, base:{er:[114,24],hr:[102,44],el:[96,32],hl:[112,24]}, A:{}, B:{head:[97,35]}},
+  downDog:{view:"side", period:4, base:{hl:[150,180],hr:[150,180],el:[140,158],er:[140,158],sl:[128,136],sr:[128,136],neck:[128,138],head:[137,152],sp:[114,112],fl:[66,180],fr:[66,180]},
+    A:{hip:[98,92],pl:[98,92],pr:[98,92],kl:[84,138],kr:[80,134]}, B:{hip:[96,86],pl:[96,86],pr:[96,86],kl:[80,134],kr:[84,138]}},
+  seatedFold:{view:"side", period:5, base:{hip:[80,170],pl:[80,170],pr:[80,170],kl:[120,172],kr:[120,172],fl:[158,176],fr:[158,176]},
+    A:{sp:[84,142],neck:[90,116],head:[94,98],sl:[90,120],sr:[90,120],el:[104,142],er:[104,142],hl:[118,164],hr:[118,164]},
+    B:{sp:[102,150],neck:[124,154],head:[139,152],sl:[124,156],sr:[124,156],el:[140,168],er:[140,168],hl:[156,173],hr:[156,173]}},
+  cobra:{view:"side", period:4, base:{fl:[36,178],fr:[36,178],kl:[66,178],kr:[66,178],hip:[98,176],pl:[98,176],pr:[98,176],hl:[136,178],hr:[136,178]},
+    A:{sp:[118,172],neck:[136,164],head:[150,160],sl:[136,164],sr:[136,164],el:[134,172],er:[134,172]},
+    B:{sp:[114,160],neck:[132,136],head:[142,120],sl:[132,138],sr:[132,138],el:[134,158],er:[134,158]}},
+  deepSquat:{view:"side", period:4, base:{kl:[124,142],kr:[124,142],fl:[112,180],fr:[112,180],el:[124,130],er:[124,130],hl:[118,150],hr:[118,150]},
+    A:{hip:[92,162],pl:[92,162],pr:[92,162],sp:[102,132],neck:[110,104],head:[114,86],sl:[110,108],sr:[110,108]},
+    B:{hip:[92,165],pl:[92,165],pr:[92,165],sp:[102,134],neck:[108,102],head:[112,84],sl:[108,106],sr:[108,106]}},
+  pigeon:{view:"side", period:5, base:{hip:[96,160],pl:[96,160],pr:[96,160],kr:[132,174],fr:[104,178],kl:[60,178],fl:[26,178]},
+    A:{sp:[100,130],neck:[104,102],head:[108,84],sl:[104,106],sr:[104,106],el:[118,130],er:[118,130],hl:[122,166],hr:[122,166]},
+    B:{sp:[114,150],neck:[134,158],head:[150,160],sl:[134,160],sr:[134,160],el:[160,170],er:[160,170],hl:[178,176],hr:[178,176]}},
+  neckSide:{view:"front", period:4, base:{er:[124,44],hr:[108,28]}, A:{head:[100,34]}, B:{head:[112,38],hr:[116,32]}},
+  lyingTwist:{view:"side", period:5, base:{head:[36,168],neck:[52,172],sp:[82,174],hip:[112,174],pl:[112,174],pr:[112,174],sl:[52,172],sr:[52,172],el:[64,154],er:[64,154],hl:[80,140],hr:[80,140]},
+    A:{kl:[124,146],kr:[124,146],fl:[146,176],fr:[146,176]}, B:{kl:[132,158],kr:[134,164],fl:[150,176],fr:[150,178]}},
+  happyBaby:{view:"side", period:3, base:{head:[36,168],neck:[52,172],sp:[80,172],hip:[108,172],pl:[108,172],pr:[108,172],sl:[52,172],sr:[52,172],el:[80,140],er:[80,140]},
+    A:{kl:[92,140],kr:[92,140],fl:[112,112],fr:[112,112],hl:[108,114],hr:[108,114]}, B:{kl:[96,142],kr:[96,142],fl:[118,116],fr:[118,116],hl:[114,118],hr:[114,118]}},
+  figure4:{view:"side", period:4.5, base:{head:[36,168],neck:[52,172],sp:[82,174],hip:[112,174],pl:[112,174],pr:[112,174],sl:[52,172],sr:[52,172]},
+    A:{kr:[122,146],fr:[146,176],kl:[118,130],fl:[136,148],el:[82,150],er:[82,150],hl:[112,144],hr:[112,144]},
+    B:{kr:[116,140],fr:[140,168],kl:[112,124],fl:[130,142],el:[78,146],er:[78,146],hl:[106,138],hr:[106,138]}},
+  foamRoll:{view:"side", period:2.4, prop:'<circle cx="86" cy="171" r="9" class="prop"/>', base:{el:[140,178],er:[140,178],hl:[160,178],hr:[160,178],sl:[140,158],sr:[140,158],neck:[140,156],head:[154,150],sp:[118,160],hip:[96,162],pl:[96,162],pr:[96,162],kl:[66,166],kr:[66,166],fl:[36,172],fr:[36,172]},
+    A:{}, shift:14},
+  seatedTwist:{view:"front", period:4.5, base:{hip:[100,160],pl:[92,160],pr:[108,160],kl:[72,172],fl:[112,176],kr:[128,172],fr:[88,176],sp:[100,132],neck:[100,106]},
+    A:{head:[100,88],sl:[87,110],sr:[113,110],el:[80,134],hl:[86,156],er:[120,134],hr:[114,156]},
+    B:{head:[104,88],sl:[93,110],sr:[108,108],el:[96,130],hl:[112,150],er:[124,126],hr:[132,150]}}
+};
+/* moves that circle instead of going back and forth */
+const CIRCLES = {
+  hipCircles:{view:"front", period:2.6, base:{el:[80,96],er:[120,96]}, fn:(p, a) => { const dx = 10*Math.cos(a), dy = 3*Math.sin(a); ["hip","pl","pr"].forEach(k => p[k] = [p[k][0]+dx, p[k][1]+dy]); p.hl = [92+dx,110+dy]; p.hr = [108+dx,110+dy]; p.kl = [92+dx/2,145]; p.kr = [108+dx/2,145]; p.sp = [100+dx/2,80]; }},
+  neckRolls:{view:"front", period:4, fn:(p, a) => { p.head = [100+7*Math.cos(a), 32+4*Math.sin(a)]; }},
+  shoulderRolls:{view:"front", period:2.2, fn:(p, a) => { const dy = -4*Math.sin(a), dx = 2*Math.cos(a); p.sl = [87+dx,56+dy]; p.sr = [113-dx,56+dy]; p.el = [83+dx,82+dy/2]; p.er = [117-dx,82+dy/2]; }},
+  armCircles:{view:"front", period:1.6, base:{el:[66,58],er:[134,58]}, fn:(p, a) => { p.hl = [46+8*Math.cos(a), 58+8*Math.sin(a)]; p.hr = [154-8*Math.cos(a), 58+8*Math.sin(a)]; }},
+  ankleCircles:{view:"front", period:1.8, base:{kr:[112,140]}, fn:(p, a) => { p.fr = [118+6*Math.cos(a), 162+5*Math.sin(a)]; }},
+  calfPumps:{view:"side", period:1.3, base:{el:[106,82],er:[106,82],hl:[112,104],hr:[112,104]}, fn:(p, a) => { const up = 7*(1-Math.cos(a))/2; for (const k in p) if (k !== "fl" && k !== "fr") p[k] = [p[k][0], p[k][1]-up]; p.fl = p.fr = [100+up*.6, 180-up*.4]; }},
+  sideReach:{view:"front", period:4.5, base:{er:[118,30],hr:[114,8]}, fn:(p, a) => { const t = (1-Math.cos(a))/2, L = (x, y, x2, y2) => [x+(x2-x)*t, y+(y2-y)*t];
+    p.sp = L(100,80,95,80); p.neck = L(100,52,90,56); p.head = L(100,34,84,40); p.sl = L(87,56,78,62); p.sr = L(113,56,102,52); p.er = L(118,30,94,30); p.hr = L(114,8,76,12); p.el = [80,90]; p.hl = [92,110]; }}
+};
+const ANIM_MAP = [
+  [/cat.?cow/,"catcow"],[/child/,"child"],[/thread/,"thread"],[/hip flexor|couch|world'?s greatest|split squat|lunge/,"lunge"],
+  [/standing quad|quad stretch/,"standQuad"],[/standing hamstring/,"standHam"],[/lying hamstring|legs up/,"legsWall"],
+  [/wall calf|calf stretch|soleus/,"calfWall"],[/seated forward|butterfly|frog|pancake/,"seatedFold"],[/forward fold/,"forwardFold"],
+  [/clasp/,"clasp"],[/leg swing/,"legSwings"],[/hip circle/,"hipCircles"],[/neck roll/,"neckRolls"],[/neck|trap|levator/,"neckSide"],
+  [/shoulder roll/,"shoulderRolls"],[/arm circle/,"armCircles"],[/side reach|lat stretch/,"sideReach"],[/seated.*twist/,"seatedTwist"],
+  [/twist|open book/,"lyingTwist"],[/calf pump|heel raise/,"calfPumps"],[/ankle/,"ankleCircles"],[/cross.?body|sleeper|wrist|prayer/,"crossBody"],
+  [/doorway|chest/,"doorway"],[/tricep/,"tricepsOH"],[/downward dog/,"downDog"],[/cobra|sphinx/,"cobra"],[/squat/,"deepSquat"],
+  [/pigeon|90\/90/,"pigeon"],[/happy baby/,"happyBaby"],[/figure/,"figure4"],[/foam roll|thoracic/,"foamRoll"]
+];
+const animKey = name => { const n = String(name).toLowerCase(); const m = ANIM_MAP.find(([re]) => re.test(n)); return m ? m[1] : "breathe"; };
+function animPose(key, t){
+  const def = ANIMS[key] || CIRCLES[key] || ANIMS.breathe;
+  const base = Object.assign({}, def.view === "side" ? P_SIDE : P_FRONT, def.base || {});
+  const p = {}; for (const k in base) p[k] = base[k].slice();
+  const phase = (t / def.period) % 1;
+  if (def.fn){ def.fn(p, phase * Math.PI * 2); return {p, def}; }
+  const e = (1 - Math.cos(phase * Math.PI * 2)) / 2;
+  const A = Object.assign({}, p, def.A || {}), B = Object.assign({}, A, def.B || {});
+  for (const k in p) p[k] = [A[k][0] + (B[k][0]-A[k][0])*e, A[k][1] + (B[k][1]-A[k][1])*e];
+  if (def.shift) for (const k in p) p[k][0] += def.shift * e;
+  return {p, def};
+}
+const FIG_SVG = `<svg class="pl-fig" id="plFig" viewBox="0 0 200 200" aria-hidden="true">
+  <line x1="10" y1="181" x2="190" y2="181" class="ground"/><g id="plProp"></g>
+  <polyline id="fgFarLeg" class="far"/><polyline id="fgFarArm" class="far"/>
+  <path id="fgTorso" class="near"/><line id="fgNeck" class="near"/><circle id="fgHead" r="10" class="near head"/>
+  <polyline id="fgNearLeg" class="near"/><polyline id="fgNearArm" class="near"/></svg>`;
+const anim = {raf:0, key:"", side:"", t:0, last:0, running:false, refs:null};
+function animSet(name, side){
+  const k = animKey(name);
+  if (k !== anim.key || side !== anim.side) anim.t = 0;
+  anim.key = k; anim.side = side;
+  const f = document.getElementById("plFig"); if (!f) return;
+  anim.refs = {prop:f.querySelector("#plProp"), fl:f.querySelector("#fgFarLeg"), fa:f.querySelector("#fgFarArm"), to:f.querySelector("#fgTorso"), ne:f.querySelector("#fgNeck"), he:f.querySelector("#fgHead"), nl:f.querySelector("#fgNearLeg"), na:f.querySelector("#fgNearArm")};
+  const def = ANIMS[anim.key] || CIRCLES[anim.key] || {};
+  anim.refs.prop.innerHTML = def.prop || "";
+  /* in front views both sides are equally visible */
+  [anim.refs.fl, anim.refs.fa].forEach(x => x.setAttribute("class", def.view === "front" ? "near" : "far"));
+  anim.refs.prop.setAttribute("transform", side === "R" ? "matrix(-1 0 0 1 200 0)" : "");
+  animDraw();
+}
+function animDraw(){
+  if (!anim.refs) return;
+  const {p} = animPose(anim.key, anim.t);
+  const X = x => anim.side === "R" ? 200 - x : x;
+  const pt = k => `${X(p[k][0]).toFixed(1)},${p[k][1].toFixed(1)}`;
+  const r = anim.refs;
+  r.fl.setAttribute("points", `${pt("pl")} ${pt("kl")} ${pt("fl")}`);
+  r.fa.setAttribute("points", `${pt("sl")} ${pt("el")} ${pt("hl")}`);
+  r.nl.setAttribute("points", `${pt("pr")} ${pt("kr")} ${pt("fr")}`);
+  r.na.setAttribute("points", `${pt("sr")} ${pt("er")} ${pt("hr")}`);
+  r.to.setAttribute("d", `M${pt("hip")} Q${pt("sp")} ${pt("neck")}`);
+  const hx = X(p.head[0]), hy = p.head[1];
+  r.ne.setAttribute("x1", X(p.neck[0])); r.ne.setAttribute("y1", p.neck[1]); r.ne.setAttribute("x2", hx); r.ne.setAttribute("y2", hy);
+  r.he.setAttribute("cx", hx); r.he.setAttribute("cy", hy);
+}
+function animLoop(ts){
+  if (!anim.running){ anim.raf = 0; return; }
+  const dt = anim.last ? Math.min(.1, (ts - anim.last)/1000) : 0; anim.last = ts;
+  if (player.phase === "hold" || player.phase === "ready") anim.t += dt;
+  animDraw();
+  anim.raf = requestAnimationFrame(animLoop);
+}
+function animStart(){ if (anim.running) return; anim.running = true; anim.last = 0; anim.raf = requestAnimationFrame(animLoop); }
+function animStop(){ anim.running = false; }
+
 /* ----- guided player: counts down every hold, switches sides, moves on by itself ----- */
 const player = {steps:[], i:0, phase:"", end:0, left:0, iv:null, lastBeep:-1, date:null, held:0};
 function buildSteps(list){
@@ -2486,6 +2700,7 @@ function startPlayer(steps){
   Object.assign(player, {steps, i:0, date:mobDate, held:0});
   openSheet($("#mobPlayer"));
   playerReady(5);
+  animStart();
   clearInterval(player.iv); player.iv = setInterval(playerTick, 200);
   syncWake();
 }
@@ -2512,10 +2727,10 @@ function playerDone(secs){
   player.i++;
   if (player.i >= player.steps.length) return finishPlayer();
   const next = player.steps[player.i];
-  playerReady(next.id === step.id ? 3 : 8);   /* quick switch for the other side, a breather between stretches */
+  playerReady(5);   /* 5 seconds to reset before the next hold starts by itself */
 }
 function finishPlayer(){
-  clearInterval(player.iv); player.iv = null; player.phase = "done";
+  clearInterval(player.iv); player.iv = null; player.phase = "done"; animStop();
   renderPlayer(); syncWake();
   if (player.date === mobDate) renderMobility();
   checkMilestones();
@@ -2528,17 +2743,20 @@ function renderPlayer(){
       <div class="pl-side">${fmtHMS(p.held)} of mobility</div><div class="pl-ctrl" style="grid-template-columns:1fr"><button class="btn" data-close-player>Close</button></div></div>`;
     return;
   }
-  const paused = p.phase === "paused";
+  const paused = p.phase === "paused", ready = p.phase === "ready" || (paused && p.was === "ready");
   $("#plBody").innerHTML = `<div class="player">
     <div class="pl-step">${p.i + 1} / ${p.steps.length}</div>
+    <div class="pl-up">${ready ? (p.i && p.steps[p.i-1].id === st.id ? "Switch sides" : p.i ? "Up next" : "First up") : ""}</div>
     <h3 class="pl-name">${esc(st.name)}</h3>
     <div class="pl-side">${sideTxt(st.side)}</div>
+    ${FIG_SVG.replace('class="pl-fig"', `class="pl-fig${ready ? " ready" : ""}"`)}
     <button class="pl-time${p.phase === "ready" ? " ready" : ""}" id="plTime" aria-label="${p.phase === "ready" ? "Start now" : "Time left"}">${fmtHMS(paused ? p.left : Math.max(0, Math.ceil((p.end - Date.now())/1000)))}</button>
     <div class="pl-bar"><i id="plBar" style="width:0%"></i></div>
-    <div class="pl-phase">${paused ? "Paused" : p.phase === "ready" ? "Get ready · tap the time to start now" : "Hold"}</div>
+    <div class="pl-phase">${paused ? "Paused" : p.phase === "ready" ? "Reset · starts by itself · tap the time to start now" : "Hold"}</div>
     <div class="pl-next">${nx ? "Next: " + esc(nx.name) + (nx.side ? " · " + sideTxt(nx.side).toLowerCase() : "") : "Last one"}</div>
     <div class="pl-ctrl"><button class="btn ghost" id="plPause">${paused ? "Resume" : "Pause"}</button><button class="btn ghost" id="plSkip">Skip</button><button class="btn ghost" id="plEnd">End</button></div>
   </div>`;
+  animSet(st.name, st.side);
 }
 $("#plBody").addEventListener("click", e => {
   const p = player;
@@ -2554,7 +2772,7 @@ $("#plBody").addEventListener("click", e => {
     const heldFor = p.phase === "hold" ? st.sec - Math.max(0, (p.end - Date.now())/1000) : p.phase === "paused" && p.was === "hold" ? st.sec - p.left : 0;
     if (heldFor >= 5) recordHold(st, heldFor);
     p.i++;
-    if (p.i >= p.steps.length) finishPlayer(); else playerReady(3);
+    if (p.i >= p.steps.length) finishPlayer(); else playerReady(5);
     return;
   }
   if (e.target.closest("#plEnd")){
