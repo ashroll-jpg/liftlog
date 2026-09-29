@@ -355,6 +355,91 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 /* fine film grain over everything */
 .grain{position:fixed;inset:0;pointer-events:none;z-index:70;opacity:.045;background-repeat:repeat;background-size:160px 160px}
 
+/* ===== cardio ===== */
+.tabs button{font-size:10px;letter-spacing:.1em}
+.stats.three{grid-template-columns:repeat(3,1fr)}
+.stats.three .stat b{font-size:24px}
+.cardio-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.cardio-actions .add-big,.cardio-actions .btn{font-size:14px;min-height:52px}
+.cardio-actions .add-big{margin-top:0}
+.cardio-actions .btn{padding:0 16px}
+.cday{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin:22px 0 6px}
+.crow{width:100%;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:13px 2px}
+.crow:hover{background:var(--surface)}
+.crow b{display:block;font-family:var(--display);font-weight:800;font-stretch:112%;text-transform:uppercase;font-size:17px;letter-spacing:0}
+.crow small{display:block;font-family:var(--mono);font-size:13px;color:var(--mute);margin-top:2px}
+.crow .pace{font-family:var(--mono);font-size:14px;color:var(--ink);text-align:right;white-space:nowrap}
+.crow .pace small{font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.cform{border:1px solid var(--line);background:var(--surface);padding:14px;margin-bottom:12px;display:grid;gap:12px}
+.cform .shot{width:100%;max-height:180px;object-fit:cover;object-position:top;border:1px solid var(--line)}
+.fl{display:grid;gap:5px}
+.fl>span{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.fl select,.fl input[type=date],.fl input[type=text],.fl input:not([type]){width:100%;padding:11px 12px;border:1px solid var(--line);background:var(--field);border-radius:4px;font-size:17px}
+.hms{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto;gap:6px;align-items:center}
+.hms input,.distrow input{width:100%;min-width:0;padding:11px 8px;border:1px solid var(--line);background:var(--field);border-radius:4px;font-family:var(--mono);font-size:20px;font-weight:700;text-align:center}
+.hms b{font-family:var(--mono);color:var(--mute);font-weight:500}
+.distrow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.inc{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:14px}
+.inc input{width:20px;height:20px;accent-color:var(--accent)}
+.cform .warn{color:var(--accent);font-family:var(--mono);font-size:13px;margin:0}
+.cardio-foot{display:flex;gap:8px;padding-top:12px}
+.cardio-foot .btn{flex:1;padding:14px}
+
+/* ===== mobility + three training types ===== */
+:root{--str:#B38B2D;--car:#A3262A;--mob:#4E9A6B}
+.tabs button{font-size:9.5px;letter-spacing:.08em;padding-left:0;padding-right:0}
+.mob{border:1px solid var(--line);background:var(--surface);padding:14px 12px 8px 14px;display:grid;gap:10px}
+.mob header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.mob h3{margin:0;font-family:var(--display);font-weight:800;font-stretch:115%;text-transform:uppercase;font-size:19px;line-height:1.15}
+.mob header .icon-btn{width:34px;height:34px;margin:-4px 0 0}
+.mob .tag{font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--mob)}
+.plan{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-family:var(--mono)}
+.plan .grp{display:flex;align-items:center;gap:6px}
+.plan .lbl{font-size:11px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase;margin-right:2px}
+.plan b{min-width:3.2em;text-align:center;font-size:17px}
+.plan button{width:32px;height:32px;border:1px solid var(--line);background:var(--field);color:var(--ink);font-size:17px;border-radius:4px;display:grid;place-items:center;padding:0}
+.holds{display:flex;flex-wrap:wrap;gap:6px}
+.hold{font-family:var(--mono);font-size:13px;padding:5px 8px;border-radius:4px;border:1px solid var(--mob);color:var(--ink);background:color-mix(in srgb,var(--mob) 18%,transparent);display:inline-flex;gap:6px;align-items:center}
+.hold button{background:none;border:0;color:var(--mute);padding:0;font-size:15px;line-height:1}
+.hold.todo{border:1px dashed var(--line);background:transparent;color:var(--mute)}
+.mob .row{display:flex;justify-content:space-between;align-items:center}
+.mob .go{background:var(--mob);color:#0E0E0E;border:0;border-radius:4px;padding:9px 14px;font-family:var(--display);font-weight:800;font-stretch:112%;letter-spacing:.06em;text-transform:uppercase;font-size:14px;display:inline-flex;gap:6px;align-items:center}
+.mob .go svg{width:14px;height:14px}
+.mob-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.mob-actions .add-big{margin-top:0;font-size:14px;min-height:52px}
+.mob-actions .btn{font-size:14px;min-height:52px}
+.start-routine{width:100%;margin-top:12px;background:var(--mob);color:#0E0E0E;border:0;border-radius:4px;padding:15px;font-family:var(--display);font-weight:800;font-stretch:115%;letter-spacing:.08em;text-transform:uppercase;font-size:16px}
+#mobList{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.rt{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.rt div{flex:1;min-width:0}
+.rt b{display:block;font-family:var(--display);font-weight:800;font-stretch:112%;text-transform:uppercase;font-size:17px}
+.rt small{display:block;color:var(--mute);font-family:var(--mono);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt .star{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--mob);text-transform:uppercase}
+/* guided player */
+.player{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:10px 0 4px}
+.pl-step{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--mute)}
+.pl-name{margin:0;font-family:var(--display);font-weight:900;font-stretch:120%;text-transform:uppercase;font-size:26px;line-height:1.1}
+.pl-side{font-family:var(--mono);font-size:14px;letter-spacing:.2em;color:var(--mob);min-height:18px}
+.pl-time{background:none;border:0;font-family:var(--mono);font-weight:700;font-size:92px;line-height:1;color:var(--ink);padding:6px 0;font-variant-numeric:tabular-nums}
+.pl-time.ready{color:var(--mute)}
+.pl-bar{width:100%;height:4px;background:var(--line)}
+.pl-bar i{display:block;height:100%;background:var(--mob);transition:width .25s linear}
+.pl-phase{font-family:var(--mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.pl-next{font-family:var(--mono);font-size:13px;color:var(--mute);min-height:18px}
+.pl-ctrl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;margin-top:6px}
+.pl-ctrl .btn{padding:14px 6px}
+/* body map views */
+.bl{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:flex-end;margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--mute);align-items:center}
+.bl i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.md-types{display:grid;gap:8px;margin-top:12px}
+.md-types div{display:grid;grid-template-columns:78px 1fr auto;gap:10px;align-items:center;font-family:var(--mono);font-size:13px}
+.md-types .tr{height:8px;background:var(--field);border-radius:2px;overflow:hidden}
+.md-types .tr i{display:block;height:100%}
+.md-ex li span:first-child::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:8px;background:var(--dc,var(--str))}
+.bal .track{display:flex}
+.bal .seg-s{background:var(--str)}.bal .seg-c{background:var(--car)}.bal .seg-m{background:var(--mob)}
+.bal .track span{display:block;height:100%}
+
 [hidden]{display:none!important}
 </style>
 </head>
@@ -391,20 +476,49 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
     <button class="add-big" id="openPicker">+ Add exercise</button>
   </main>
 
+  <main id="cardioView" hidden>
+    <h1 class="page-title">Cardio</h1>
+    <div class="cday" style="margin-top:0">This week</div>
+    <div class="stats three" id="cardioStats"></div>
+    <div class="cardio-actions">
+      <button class="add-big" id="cardioImport">Import screenshot</button>
+      <button class="btn ghost" id="cardioAdd">+ Add session</button>
+    </div>
+    <p class="hint" id="cardioHint">Works with Apple Fitness, Apple Watch, Strava, Garmin and most workout summaries. You check the numbers before anything is saved.</p>
+    <button class="link" id="cardioPaste">Paste a copied workout</button>
+    <div id="cardioList"></div>
+  </main>
+
+  <main id="mobView" hidden>
+    <div class="day">
+      <button class="icon-btn" id="mobPrev" aria-label="Previous day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <h1 id="mobTitle">Today</h1>
+      <button class="icon-btn" id="mobNext" aria-label="Next day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      <div class="sub" id="mobSub"></div>
+    </div>
+    <button class="start-routine" id="mobStart" hidden>Start routine</button>
+    <div class="mob-actions">
+      <button class="add-big" id="mobAdd">+ Add stretch</button>
+      <button class="btn ghost" id="mobRoutines">Routines</button>
+    </div>
+    <div id="mobList"></div>
+  </main>
+
   <main id="bodyView" hidden>
     <h1 class="page-title">Body map</h1>
+    <div class="seg range" id="viewSeg" role="group" aria-label="Training type"><button data-view="all">All</button><button data-view="s">Strength</button><button data-view="c">Cardio</button><button data-view="m">Mobility</button></div>
     <div class="seg range" id="rangeSeg" role="group" aria-label="Time range"><button data-r="7">7 days</button><button data-r="14">14 days</button><button data-r="30">30 days</button></div>
     <section class="card">
       <div class="figs">
         <figure><div id="figFront"></div><figcaption>Front</figcaption></figure>
         <figure><div id="figBack"></div><figcaption>Back</figcaption></figure>
       </div>
-      <div class="legend">Not trained <span class="cell l0"></span>&nbsp; Less <span class="cell l1"></span><span class="cell l2"></span><span class="cell l3"></span><span class="cell l4"></span> More</div>
+      <div class="bl" id="bodyLegend"></div>
     </section>
     <section class="card" id="muscleDetail"></section>
     <section class="card">
       <h2>Muscle balance</h2>
-      <p class="note">Sets per muscle. Main muscles get full credit for a set, helper muscles get partial credit.</p>
+      <p class="note">Points per muscle. One point is a strength set, 10 minutes of cardio, or 1 minute of stretching. Helper muscles get partial credit.</p>
       <div id="balance"></div>
     </section>
   </main>
@@ -425,6 +539,18 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
       <h2>Workouts per week</h2>
       <p class="note">Last 12 weeks. The dashed line is your goal.</p>
       <div class="chart"><canvas id="chWeekly"></canvas></div>
+    </section>
+
+    <section class="card">
+      <h2>Weekly cardio</h2>
+      <p class="note">Minutes (bars) and miles (line), last 12 weeks</p>
+      <div class="chart"><canvas id="chCardio"></canvas></div>
+    </section>
+
+    <section class="card">
+      <h2>Weekly mobility</h2>
+      <p class="note">Minutes of stretching, last 12 weeks</p>
+      <div class="chart"><canvas id="chMob"></canvas></div>
     </section>
 
     <section class="card">
@@ -469,7 +595,13 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 <nav class="tabs" role="tablist">
   <div class="in">
     <button role="tab" aria-selected="true" data-tab="log">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/></svg>Log
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/></svg>Strength
+    </button>
+    <button role="tab" aria-selected="false" data-tab="cardio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"><path d="M2 12h4l3-7 4 14 3-7h6"/></svg>Cardio
+    </button>
+    <button role="tab" aria-selected="false" data-tab="mobility">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c9 0 15-6 15-16C10 5 5 11 5 20z"/><path d="M5 20l8-8"/></svg>Mobility
     </button>
     <button role="tab" aria-selected="false" data-tab="body">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.2"/><path d="M5 8.5l7 1.5 7-1.5M12 10v5M12 15l-3 6.5M12 15l3 6.5"/></svg>Body
@@ -546,6 +678,49 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
   </div>
 </div>
 
+<!-- mobility: stretch picker -->
+<div class="sheet" id="mobPicker" role="dialog" aria-modal="true" aria-labelledby="mobPickTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="mobPickTitle">Add stretch</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <input class="search" id="mobSearch" type="search" placeholder="Search stretches" autocomplete="off">
+    <div class="chips" id="mobChips"></div>
+    <div class="results" id="mobResults"></div>
+  </div>
+</div>
+<!-- mobility: routines -->
+<div class="sheet" id="mobRoutineSheet" role="dialog" aria-modal="true" aria-labelledby="mobRtTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="mobRtTitle">Routines</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="mobRoutineList" style="flex:1;overflow-y:auto"></div>
+    <button class="btn wide" id="mobSaveRoutine">Save this day as a routine</button>
+  </div>
+</div>
+<!-- mobility: guided player -->
+<div class="sheet" id="mobPlayer" role="dialog" aria-modal="true" aria-labelledby="plTitle">
+  <div class="scrim"></div>
+  <div class="panel short">
+    <div class="sheet-head"><h2 id="plTitle">Routine</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="plBody"></div>
+  </div>
+</div>
+
+<!-- cardio add / edit / import -->
+<div class="sheet" id="cardioSheet" role="dialog" aria-modal="true" aria-labelledby="cardioTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="sheet-head">
+      <h2 id="cardioTitle">Add session</h2>
+      <button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <p class="hint" id="cardioStatus" style="padding-top:0" aria-live="polite"></p>
+    <div id="cardioBody" style="flex:1;overflow-y:auto;margin:0 -4px;padding:0 4px"></div>
+    <div class="cardio-foot" id="cardioFoot"></div>
+  </div>
+</div>
+<input type="file" id="shotFile" accept="image/*" multiple hidden>
+
 <!-- background photos -->
 <div class="sheet" id="photoSheet" role="dialog" aria-modal="true" aria-labelledby="photoTitle">
   <div class="scrim" data-close></div>
@@ -602,7 +777,7 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "1.8.0";
+const APP_VERSION = "2.0.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -728,7 +903,7 @@ const clone = o => JSON.parse(JSON.stringify(o));
 const filled = set => Object.keys(set).some(k => set[k] !== "" && set[k] != null);
 const entries = k => state.workouts[k] || [];
 function dayStats(k){
-  const s = {sets:0, vol:0, reps:0, secs:0, groups:{}, greps:{}};
+  const s = {sets:0, ssets:0, vol:0, reps:0, secs:0, cmin:0, cmi:0, msec:0, groups:{}, greps:{}};
   entries(k).forEach(e => {
     const bw = e.type === "s" && isBW(e.name, e.type);
     e.sets.forEach(st => {
@@ -736,6 +911,9 @@ function dayStats(k){
       s.sets++;
       s.groups[e.group] = (s.groups[e.group] || 0) + 1;
       if (e.type === "t") s.secs += parseSec(st.sec);
+      if (e.type === "s" || e.type === "t") s.ssets++;
+      if (e.type === "m") s.msec += parseSec(st.sec);
+      if (e.type === "c"){ s.cmin += num(st.min); s.cmi += toMiles(num(st.dist), e.du); }
       if (e.type === "s"){
         const r = num(st.r);
         s.reps += r; s.greps[e.group] = (s.greps[e.group] || 0) + r;
@@ -746,6 +924,8 @@ function dayStats(k){
   return s;
 }
 const isWorkoutDay = k => dayStats(k).sets > 0;
+const UNIT_MI = {mi:1, km:0.621371, yd:1/1760, m:1/1609.344};
+const toMiles = (d, u) => d * (UNIT_MI[u || "mi"] || 1);
 const workoutDays = () => Object.keys(state.workouts).filter(isWorkoutDay).sort();
 const blankSet = type => type === "c" ? {min:"", dist:""} : type === "t" ? {sec:""} : {w:"", r:""};
 function lastTime(name, before){
@@ -794,7 +974,7 @@ function prInfo(e, day){
 function prCountSince(since){
   const best = {}, metric = {}; let count = 0;
   workoutDays().forEach(k => entries(k).forEach(e => {
-    const sets = e.sets.filter(filled); if (!sets.length) return;
+    const sets = e.sets.filter(filled); if (!sets.length || e.type === "m") return;
     metric[e.name] = metric[e.name] || metricFor(e.name, e.type);
     const top = Math.max(...sets.map(metric[e.name].f));
     if (e.name in best && top > best[e.name] && k >= since) count++;
@@ -804,7 +984,7 @@ function prCountSince(since){
 }
 const toasted = {};
 function updatePR(i, announce){
-  const e = entries(curDate)[i], card = document.querySelectorAll(".ex")[i];
+  const e = entries(curDate)[i], card = document.querySelector(`.ex[data-idx="${i}"]`);
   if (!e || !card) return;
   const pr = prInfo(e, curDate);
   card.querySelectorAll(".set:not(.head) .n").forEach((n, j) => {
@@ -820,11 +1000,13 @@ function updatePR(i, announce){
 
 /* ---------- LOG VIEW ---------- */
 function renderDaySub(){
-  const s = dayStats(curDate), n = entries(curDate).length, parts = [];
+  const s = dayStats(curDate), n = entries(curDate).filter(e => e.type !== "c" && e.type !== "m").length, parts = [];
   if (n) parts.push(n + (n === 1 ? " exercise" : " exercises"));
   if (s.sets) parts.push(s.sets + (s.sets === 1 ? " set" : " sets"));
   if (s.reps) parts.push(fmtN(s.reps) + " reps");
   if (s.secs) parts.push(fmtSec(s.secs) + " held");
+  if (s.cmin) parts.push(fmtHMS(s.cmin*60) + " cardio");
+  if (s.msec) parts.push(fmtHMS(s.msec) + " mobility");
   if (s.vol) parts.push(fmtN(s.vol) + " " + state.unit);
   if (state.dur && state.dur[curDate]) parts.push(fmtDur(state.dur[curDate]));
   let html = esc(parts.join(", "));
@@ -832,7 +1014,7 @@ function renderDaySub(){
   $("#daySub").innerHTML = html;
   const gt = $("#goToday"); if (gt) gt.onclick = () => { curDate = today(); renderLog(); };
 }
-function lastWorkoutBefore(k){ return workoutDays().filter(d => d < k).pop(); }
+function lastWorkoutBefore(k){ return workoutDays().filter(d => d < k && entries(d).some(e => e.type !== "c" && e.type !== "m" && e.sets.some(filled))).pop(); }
 
 const ICON_TIMER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>';
 const ICON_PLATE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/></svg>';
@@ -863,10 +1045,11 @@ function renderLog(){
   renderNudge();
 
   const list = entries(curDate), u = state.unit;
-  $("#dayTools").innerHTML = list.length ? `<button class="pill" id="toolTpl">${ICON_TPL}Templates</button>` : "";
+  const strength = list.filter(e => e.type !== "c" && e.type !== "m").length;
+  $("#dayTools").innerHTML = strength ? `<button class="pill" id="toolTpl">${ICON_TPL}Templates</button>` : "";
   const tt = $("#toolTpl"); if (tt) tt.onclick = openTemplates;
 
-  if (!list.length){
+  if (!strength){
     const prev = lastWorkoutBefore(curDate);
     let quick = "";
     if (prev){
@@ -887,6 +1070,7 @@ function renderLog(){
     b: '<div class="set one head"><span></span><span>Reps</span><span></span></div>'
   };
   $("#exList").innerHTML = list.map((e, i) => {
+    if (e.type === "c" || e.type === "m") return "";   /* cardio and mobility have their own tabs */
     const prev = lastTime(e.name, curDate);
     const bw = isBW(e.name, e.type);
     const chips = (e.type === "s" || e.type === "t") && e.group !== "Mobility";
@@ -897,7 +1081,7 @@ function renderLog(){
     const noteHtml = openNote === e.name
       ? `<textarea class="note-edit" data-note="${esc(e.name)}" placeholder="Grip, seat setting, how it felt…" aria-label="Note for ${esc(e.name)}">${esc(note)}</textarea>`
       : note ? `<button class="ex-note" data-act="note" data-i="${i}">${esc(note)}</button>` : "";
-    const card = `<article class="ex${cls}" style="--c:var(${GVAR[e.group] || "--mobility"})">
+    const card = `<article class="ex${cls}" data-idx="${i}" style="--c:var(${GVAR[e.group] || "--mobility"})">
       <header><div><h3>${esc(e.name)}</h3><span class="tag">${esc(e.group)}</span>${modeBtn}${inSS ? '<span class="ss-tag">Superset</span>' : ""}</div>
         <span class="btns"><button class="icon-btn" data-act="note" data-i="${i}" aria-label="${note ? "Edit" : "Add"} note for ${esc(e.name)}">${ICON_PEN}</button>
         <button class="icon-btn" data-act="del-ex" data-i="${i}" aria-label="Remove ${esc(e.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></header>
@@ -907,13 +1091,13 @@ function renderLog(){
       <div class="row"><button class="link" data-act="add-set" data-i="${i}">+ Add set</button>
         <span class="right">${e.type === "s" && !bw ? `<button class="link" data-act="plates" data-i="${i}">${ICON_PLATE}Plates</button>` : ""}<button class="link" data-act="rest">${ICON_TIMER}Rest</button></span></div>
     </article>`;
-    const link = i < list.length - 1
+    const link = i < list.length - 1 && list[i+1].type !== "c" && list[i+1].type !== "m"
       ? `<button class="ss-link${e.ss ? " on" : ""}" data-act="link" data-i="${i}" aria-pressed="${!!e.ss}" aria-label="${e.ss ? "Unlink" : "Link"} ${esc(e.name)} and ${esc(list[i+1].name)} as a superset">${ICON_CHAIN}${e.ss ? "Superset" : "Make superset"}</button>` : "";
     return card + link;
   }).join("");
   const ta = document.querySelector(".note-edit");
   if (ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
-  list.forEach((_, i) => updatePR(i, false));
+  list.forEach((e, i) => { if (e.type !== "c" && e.type !== "m") updatePR(i, false); });
 }
 $("#exList").addEventListener("input", ev => {
   const el = ev.target;
@@ -994,7 +1178,7 @@ function setsFor(name, type, fallback){
   return f;
 }
 function repeatDay(k){
-  state.workouts[curDate] = entries(k).filter(e => e.sets.some(filled)).map(e => ({name:e.name, group:e.group, type:e.type, ss:!!e.ss, sets:clone(e.sets.filter(filled))}));
+  state.workouts[curDate] = entries(curDate).filter(e => e.type === "c" || e.type === "m").concat(entries(k).filter(e => e.type !== "c" && e.type !== "m" && e.sets.some(filled)).map(e => ({name:e.name, group:e.group, type:e.type, ss:!!e.ss, sets:clone(e.sets.filter(filled))})));
   const L = state.workouts[curDate]; if (L.length) L[L.length-1].ss = false;
   save(); renderLog(); toast("Copied. Beat the numbers."); checkMilestones();
 }
@@ -1008,7 +1192,7 @@ document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => closeSh
 document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".sheet.open").forEach(closeSheet); });
 
 function renderChips(){
-  $("#chips").innerHTML = ["All","Recent"].concat(GROUPS).map(g => `<button class="chip" aria-pressed="${g === filterGroup}" data-g="${esc(g)}">${esc(g)}</button>`).join("");
+  $("#chips").innerHTML = ["All","Recent"].concat(GROUPS.filter(g => g !== "Cardio" && g !== "Mobility")).map(g => `<button class="chip" aria-pressed="${g === filterGroup}" data-g="${esc(g)}">${esc(g)}</button>`).join("");
 }
 function recentNames(){
   const seen = {}, out = [];
@@ -1018,8 +1202,8 @@ function recentNames(){
 function renderResults(){
   const raw = $("#search").value.trim(), q = raw.toLowerCase();
   let pool = filterGroup === "Recent"
-    ? recentNames().map(n => byName[n.toLowerCase()]).filter(Boolean)
-    : catalog.filter(e => filterGroup === "All" || e.group === filterGroup);
+    ? recentNames().map(n => byName[n.toLowerCase()]).filter(x => x && x.type !== "c" && x.group !== "Mobility")
+    : catalog.filter(e => e.type !== "c" && e.group !== "Mobility" && (filterGroup === "All" || e.group === filterGroup));
   if (q){
     const words = q.split(/\s+/);
     pool = pool.filter(e => { const n = e.name.toLowerCase(); return words.every(w => n.includes(w)); });
@@ -1029,7 +1213,7 @@ function renderResults(){
   let html = "";
   if (q && !byName[q]){
     const def = GROUPS.includes(filterGroup) ? filterGroup : "Full body";
-    html += `<div class="custom"><p>Add “${esc(raw)}” as a new exercise</p><div class="ctl"><select id="customGroup" aria-label="Muscle group">${GROUPS.map(g => `<option${g === def ? " selected" : ""}>${g}</option>`).join("")}</select><button class="btn" id="addCustom">Add</button></div></div>`;
+    html += `<div class="custom"><p>Add “${esc(raw)}” as a new exercise</p><div class="ctl"><select id="customGroup" aria-label="Muscle group">${GROUPS.filter(g => g !== "Cardio" && g !== "Mobility").map(g => `<option${g === def ? " selected" : ""}>${g}</option>`).join("")}</select><button class="btn" id="addCustom">Add</button></div></div>`;
   }
   if (!shown.length && !q) html += `<p class="hint">${filterGroup === "Recent" ? "Exercises you log will show up here." : "No exercises in this group."}</p>`;
   html += shown.map(e => `<button class="res" data-name="${esc(e.name)}" style="--c:var(${GVAR[e.group]})"><span class="nm">${esc(e.name)}</span><span class="meta">${esc(e.group)}</span></button>`).join("");
@@ -1037,7 +1221,7 @@ function renderResults(){
   $("#results").innerHTML = html;
   const ac = $("#addCustom");
   if (ac) ac.onclick = () => {
-    const g = $("#customGroup").value, type = g === "Cardio" ? "c" : g === "Mobility" || isTimedName(raw) ? "t" : "s";
+    const g = $("#customGroup").value, type = isTimedName(raw) ? "t" : "s";
     state.custom.push({name:raw, group:g, type});
     addToCatalog(raw, g, type);
     addExercise(byName[q]);
@@ -1094,7 +1278,7 @@ $("#saveTpl").onclick = () => {
   const def = dateOf(curDate).toLocaleDateString(undefined, {weekday:"long"}) + " workout";
   const name = (prompt("Name this template (for example, Push day)", def) || "").trim();
   if (!name) return;
-  const items = entries(curDate).map(e => ({name:e.name, group:e.group, type:e.type, ss:!!e.ss, sets:clone(e.sets.filter(filled).length ? e.sets.filter(filled) : e.sets)}));
+  const items = entries(curDate).filter(e => e.type !== "c" && e.type !== "m").map(e => ({name:e.name, group:e.group, type:e.type, ss:!!e.ss, sets:clone(e.sets.filter(filled).length ? e.sets.filter(filled) : e.sets)}));
   const existing = state.templates.findIndex(t => t.name.toLowerCase() === name.toLowerCase());
   if (existing >= 0){ if (!confirm("Replace the existing " + name + " template?")) return; state.templates[existing].items = items; }
   else state.templates.push({name, items});
@@ -1306,7 +1490,7 @@ setInterval(clockTick, 250);
 
 /* ---------- keep the screen on while a timer runs ---------- */
 let wakeLock = null, wakePending = false;
-const wantAwake = () => clockRunning() || !!timer.iv || !!hold.iv;
+const wantAwake = () => clockRunning() || !!timer.iv || !!hold.iv || !!(typeof player !== "undefined" && player.iv);
 async function syncWake(){
   if (wantAwake() && document.visibilityState === "visible"){
     if (!wakeLock && !wakePending && "wakeLock" in navigator){
@@ -1556,13 +1740,18 @@ function renderStats(){
   let streak = 0, k = set[t] ? t : addDays(t,-1);
   while (set[k]){ streak++; k = addDays(k,-1); }
   const since = addDays(t,-29);
-  let reps = 0; days.forEach(d => { if (d >= since) reps += dayStats(d).reps; });
+  let reps = 0; const cardio30 = {min:0, mi:0}, mob30 = {sec:0, days:0};
+  days.forEach(d => { if (d >= since){ const x = dayStats(d); reps += x.reps; cardio30.min += x.cmin; cardio30.mi += x.cmi; mob30.sec += x.msec; if (x.msec) mob30.days++; } });
   const repStr = reps >= 100000 ? Math.round(reps/1000) + "k" : fmtN(reps);
   $("#stats").innerHTML =
     `<div class="stat"><b>${streak}</b><span>day streak</span></div>` +
     `<div class="stat"><b>${days.length}</b><span>total workouts</span></div>` +
     `<div class="stat"><b>${prCountSince(since)}</b><span>PRs, 30 days</span></div>` +
-    `<div class="stat"><b>${repStr}</b><span>reps, 30 days</span></div>`;
+    `<div class="stat"><b>${repStr}</b><span>reps, 30 days</span></div>` +
+    `<div class="stat"><b>${cardio30.min >= 600 ? Math.round(cardio30.min/60) + "h" : fmtHMS(cardio30.min*60)}</b><span>cardio, 30 days</span></div>` +
+    `<div class="stat"><b>${Math.round(cardio30.mi*10)/10}</b><span>miles, 30 days</span></div>` +
+    `<div class="stat"><b>${fmtHMS(mob30.sec)}</b><span>mobility, 30 days</span></div>` +
+    `<div class="stat"><b>${mob30.days}</b><span>stretch days, 30 days</span></div>`;
 }
 
 function renderHeat(){
@@ -1573,7 +1762,7 @@ function renderHeat(){
     months += `<span>${m !== lastM ? dateOf(wkStart).toLocaleDateString(undefined,{month:"short"}) : ""}</span>`;
     lastM = m;
     for (let d=0; d<7; d++){
-      const k = addDays(wkStart, d), s = dayStats(k).sets;
+      const k = addDays(wkStart, d), ds = dayStats(k), s = Math.round(ds.ssets + ds.cmin/10 + ds.msec/120);
       const lvl = s === 0 ? "" : s <= 5 ? "l1" : s <= 12 ? "l2" : s <= 20 ? "l3" : "l4";
       if (k > t) cells += '<span class="cell future"></span>';
       else cells += `<button class="cell ${lvl}${k === t ? " today" : ""}" data-k="${k}" title="${shortDate(k)}${s ? ": " + s + " sets" : ""}" aria-label="${shortDate(k)}, ${s ? s + " sets" : "no workout"}"></button>`;
@@ -1616,6 +1805,23 @@ function renderDuration(){
   const ds = [{data:mins, backgroundColor:c, borderRadius:6, maxBarThickness:28, order:1}];
   if (mins.length > 1) ds.push({type:"line", data:mins.map(() => avg), borderColor:css("--ink"), borderDash:[6,5], borderWidth:1.5, pointRadius:0, pointHitRadius:0, order:0});
   mkChart("chDur", {type:"bar", data:{labels:ks.map(shortDate), datasets:ds}, options:o});
+}
+function renderCardioChart(){
+  const b = weekBuckets(12), o = baseOpts();
+  workoutDays().forEach(k => b.forEach(x => { if (k >= x.start && k <= x.end){ const d = dayStats(k); x.cmin = (x.cmin || 0) + d.cmin; x.cmi = (x.cmi || 0) + d.cmi; } }));
+  o.scales.y1 = {position:"right", beginAtZero:true, grid:{display:false}, border:{display:false}, ticks:{precision:0}};
+  o.plugins.tooltip.displayColors = true;
+  o.plugins.tooltip.callbacks = {title: i => "Week of " + i[0].label, label: i => i.dataset.yAxisID === "y1" ? (Math.round(i.raw*10)/10) + " mi" : fmtHMS(i.raw*60)};
+  mkChart("chCardio", {type:"bar", data:{labels:b.map(x => x.label), datasets:[
+    {type:"line", label:"Miles", data:b.map(x => Math.round((x.cmi || 0)*10)/10), yAxisID:"y1", borderColor:css("--ink"), backgroundColor:css("--ink"), pointRadius:3, borderWidth:2, tension:.3, order:0},
+    {label:"Minutes", data:b.map(x => Math.round(x.cmin || 0)), backgroundColor:css("--accent"), borderRadius:2, maxBarThickness:28, order:1}
+  ]}, options:o});
+}
+function renderMobChart(){
+  const b = weekBuckets(12), o = baseOpts();
+  workoutDays().forEach(k => b.forEach(x => { if (k >= x.start && k <= x.end) x.msec = (x.msec || 0) + dayStats(k).msec; }));
+  o.plugins.tooltip.callbacks = {title: i => "Week of " + i[0].label, label: i => fmtHMS(i.raw*60)};
+  mkChart("chMob", {type:"bar", data:{labels:b.map(x => x.label), datasets:[{data:b.map(x => Math.round((x.msec || 0)/60*10)/10), backgroundColor:css("--mob"), borderRadius:2, maxBarThickness:28}]}, options:o});
 }
 function renderVolume(){
   const b = weekBuckets(12), o = baseOpts();
@@ -1661,10 +1867,10 @@ function renderExChart(){
     ds.push(line("Minutes", hist.map(h => sets(h).reduce((a,s) => a+num(s.min), 0)), acc));
     ds.push(line("Miles", hist.map(h => sets(h).reduce((a,s) => a+num(s.dist), 0)), sec, true));
     legend();
-  } else if (type === "t"){
+  } else if (type === "t" || type === "m"){
     const side = PER_SIDE_RE.test(name) ? " per side" : "";
     ds.push(line("Longest set (sec)", hist.map(h => Math.max(...sets(h).map(s => parseSec(s.sec)))), acc));
-    if (!isBW(name, "t") && hist.some(h => sets(h).some(s => num(s.w) > 0))){
+    if (type === "t" && !isBW(name, "t") && hist.some(h => sets(h).some(s => num(s.w) > 0))){
       $("#exNote").textContent = `Longest set in seconds${side}, and heaviest weight (${state.unit})`;
       ds.push(Object.assign(line("Heaviest weight", hist.map(h => Math.max(...sets(h).map(s => num(s.w)))), sec, true), {yAxisID:"y1"}));
       o.scales.y1 = {position:"right", beginAtZero:true, grid:{display:false}, border:{display:false}, ticks:{precision:0}};
@@ -1697,8 +1903,668 @@ $("#exSelect").onchange = renderExChart;
 function renderProgress(){
   renderGoal(); renderStats(); renderHeat();
   if (!window.Chart){ document.querySelectorAll(".chart").forEach(c => c.innerHTML = '<p class="hint">Charts need an internet connection the first time the app loads.</p>'); return; }
-  renderWeekly(); renderExSelect(); renderExChart(); renderSplit(); renderDuration(); renderVolume();
+  renderWeekly(); renderCardioChart(); renderMobChart(); renderExSelect(); renderExChart(); renderSplit(); renderDuration(); renderVolume();
 }
+
+/* ---------- CARDIO ---------- */
+/* name, default distance unit, how to show speed */
+const CARDIO_TYPES = [
+  ["Road Running","mi","pace"],["Trail Running","mi","pace"],["Treadmill","mi","pace"],["Walking","mi","pace"],["Hiking","mi","pace"],
+  ["Cycling","mi","speed"],["Mountain Biking","mi","speed"],["Stationary Bike","mi","speed"],
+  ["Swimming","yd","swim"],["Open Water Swim","yd","swim"],["Rowing","m","split"],
+  ["Soccer","mi",""],["Basketball","mi",""],["Tennis","mi",""],["Pickleball","mi",""],["Golf","mi",""],
+  ["Elliptical","mi",""],["Stair Climber","mi",""],["Jump Rope","mi",""],["HIIT","mi",""],
+  ["Skiing","mi",""],["Kayaking","mi","speed"],["Climbing","mi",""]
+];
+const cardioInfo = name => CARDIO_TYPES.find(t => t[0] === name) || [name, /swim/i.test(name) ? "yd" : /row/i.test(name) ? "m" : "mi", /run|walk|hik|treadmill/i.test(name) ? "pace" : /cycl|bike|ride/i.test(name) ? "speed" : /swim/i.test(name) ? "swim" : ""];
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+function fmtHMS(sec){
+  sec = Math.round(sec); const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s2 = sec%60;
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(s2).padStart(2,"0")}` : `${m}:${String(s2).padStart(2,"0")}`;
+}
+function paceText(name, min, dist, unit){
+  if (!min || !dist) return "";
+  const kind = cardioInfo(name)[2], sec = min*60;
+  if (kind === "pace") return fmtHMS(sec/dist) + `<small> /${unit}</small>`;
+  if (kind === "speed") return (Math.round(dist/(min/60)*10)/10) + `<small> ${unit === "km" ? "km/h" : "mph"}</small>`;
+  if (kind === "swim" || kind === "split"){ const per = unit === "mi" ? dist*1760 : unit === "km" ? dist*1000 : dist; return fmtHMS(sec/(per/100)) + `<small> /100${unit === "m" || unit === "km" ? "m" : "yd"}</small>`; }
+  return "";
+}
+function cardioSessions(){
+  const out = []; let dirty = false;
+  Object.keys(state.workouts).sort().reverse().forEach(k => entries(k).forEach(e => {
+    if (e.type !== "c" || !e.sets.some(filled)) return;
+    if (!e.id){ e.id = uid(); dirty = true; }
+    out.push({k, e});
+  }));
+  if (dirty) save();
+  return out;
+}
+let cardioLimit = 40;
+function renderCardio(){
+  const all = cardioSessions(), t = today(), mon = mondayOf(t);
+  let n = 0, min = 0, mi = 0;
+  all.forEach(({k, e}) => { if (k >= mon){ n++; e.sets.forEach(st => { min += num(st.min); mi += toMiles(num(st.dist), e.du); }); } });
+  $("#cardioStats").innerHTML =
+    `<div class="stat"><b>${n}</b><span>sessions</span></div>` +
+    `<div class="stat"><b>${fmtHMS(min*60)}</b><span>time</span></div>` +
+    `<div class="stat"><b>${Math.round(mi*10)/10}</b><span>miles</span></div>`;
+  if (!all.length){
+    $("#cardioList").innerHTML = '<div class="empty"><strong>No cardio yet</strong>Import a workout screenshot, or add a session by hand.</div>';
+    return;
+  }
+  let html = "", lastDay = "";
+  all.slice(0, cardioLimit).forEach(({k, e}) => {
+    if (k !== lastDay){
+      lastDay = k;
+      html += `<div class="cday">${k === t ? "Today" : k === addDays(t,-1) ? "Yesterday" : dateOf(k).toLocaleDateString(undefined,{weekday:"short", month:"short", day:"numeric"})}</div>`;
+    }
+    const st = e.sets.find(filled) || {}, u = e.du || "mi";
+    const bits = [num(st.min) ? fmtHMS(num(st.min)*60) : "", num(st.dist) ? `${num(st.dist)} ${u}` : ""].filter(Boolean).join(" · ");
+    html += `<button class="crow" data-id="${e.id}"><span><b>${esc(e.name)}</b><small>${bits || "Tap to add details"}</small></span><span class="pace">${paceText(e.name, num(st.min), num(st.dist), u)}</span></button>`;
+  });
+  if (all.length > cardioLimit) html += `<button class="btn ghost wide" id="cardioMore">Show more</button>`;
+  $("#cardioList").innerHTML = html;
+  const more = $("#cardioMore"); if (more) more.onclick = () => { cardioLimit += 40; renderCardio(); };
+}
+
+/* ----- the add / edit / import sheet ----- */
+let cardioDrafts = [], cardioMode = "add";
+function lastCardioName(){ const s = cardioSessions()[0]; return s ? s.e.name : "Road Running"; }
+function blankDraft(extra){
+  const name = lastCardioName();
+  return Object.assign({activity:name, custom:"", date:today(), sec:0, dist:"", unit:cardioInfo(name)[1], inc:true}, extra || {});
+}
+function activityOptions(sel){
+  const names = CARDIO_TYPES.map(t => t[0]);
+  cardioSessions().forEach(({e}) => { if (!names.includes(e.name)) names.push(e.name); });
+  if (sel && !names.includes(sel) && sel !== "__other") names.push(sel);
+  return names.map(n => `<option${n === sel ? " selected" : ""}>${esc(n)}</option>`).join("") + `<option value="__other"${sel === "__other" ? " selected" : ""}>Other…</option>`;
+}
+function renderCardioSheet(){
+  $("#cardioTitle").textContent = cardioMode === "edit" ? "Edit session" : cardioMode === "import" ? "Check and save" : "Add session";
+  $("#cardioBody").innerHTML = cardioDrafts.map((d, k) => {
+    const h = Math.floor(d.sec/3600), m = Math.floor(d.sec%3600/60), sc = Math.round(d.sec%60);
+    const missing = cardioMode === "import" && (!d.sec || !d.dist) ? `<p class="warn">${!d.sec && !d.dist ? "Couldn't find the time or distance. Enter them below." : !d.sec ? "Couldn't find the time. Enter it below." : "No distance found. Add it if there was one."}</p>` : "";
+    return `<div class="cform" data-k="${k}">
+      ${d.thumb ? `<img class="shot" src="${d.thumb}" alt="Screenshot ${k+1}">` : ""}
+      ${missing}
+      <label class="fl"><span>Activity</span><select data-f="activity">${activityOptions(d.activity)}</select></label>
+      ${d.activity === "__other" ? `<label class="fl"><span>Activity name</span><input type="text" data-f="custom" value="${esc(d.custom)}" placeholder="e.g. Ultimate frisbee"></label>` : ""}
+      <label class="fl"><span>Date</span><input type="date" data-f="date" value="${d.date}" max="${today()}"></label>
+      <div class="fl"><span>Duration</span><div class="hms">
+        <input data-f="h" inputmode="numeric" placeholder="0" aria-label="Hours" value="${h || ""}"><b>h</b>
+        <input data-f="m" inputmode="numeric" placeholder="0" aria-label="Minutes" value="${d.sec ? m : ""}"><b>m</b>
+        <input data-f="s" inputmode="numeric" placeholder="0" aria-label="Seconds" value="${sc || ""}"><b>s</b></div></div>
+      <div class="fl"><span>Distance</span><div class="distrow">
+        <input data-f="dist" inputmode="decimal" placeholder="0" aria-label="Distance" value="${esc(d.dist)}">
+        <div class="seg" role="group" aria-label="Distance unit">${["mi","km","yd","m"].map(u => `<button type="button" data-unit="${u}" aria-pressed="${u === d.unit}">${u}</button>`).join("")}</div></div></div>
+      ${cardioMode === "import" && cardioDrafts.length > 1 ? `<label class="inc"><input type="checkbox" data-f="inc"${d.inc ? " checked" : ""}> Save this one</label>` : ""}
+    </div>`;
+  }).join("");
+  const count = cardioDrafts.filter(d => d.inc).length;
+  $("#cardioFoot").innerHTML = (cardioMode === "edit" ? `<button class="btn ghost" id="cardioDelete">Delete</button>` : "") +
+    `<button class="btn" id="cardioSave"${cardioDrafts.length ? "" : " disabled"}>${cardioMode === "import" && cardioDrafts.length > 1 ? `Save ${count} ${count === 1 ? "session" : "sessions"}` : "Save"}</button>`;
+  $("#cardioSave").onclick = saveCardio;
+  const del = $("#cardioDelete"); if (del) del.onclick = deleteCardio;
+}
+function openCardioSheet(mode, drafts){
+  cardioMode = mode; cardioDrafts = drafts; $("#cardioStatus").textContent = "";
+  renderCardioSheet(); openSheet($("#cardioSheet"));
+}
+$("#cardioBody").addEventListener("input", e => {
+  const f = e.target.dataset.f; if (!f) return;
+  const d = cardioDrafts[+e.target.closest(".cform").dataset.k];
+  if (["h","m","s"].includes(f)){
+    const box = e.target.closest(".hms");
+    const v = x => num(box.querySelector(`[data-f="${x}"]`).value);
+    d.sec = v("h")*3600 + v("m")*60 + v("s");
+  } else if (f === "inc"){ d.inc = e.target.checked; renderCardioSheet(); }
+  else d[f] = e.target.value;
+});
+$("#cardioBody").addEventListener("change", e => {
+  if (e.target.dataset.f !== "activity") return;
+  const d = cardioDrafts[+e.target.closest(".cform").dataset.k];
+  d.activity = e.target.value;
+  if (d.activity !== "__other" && !d.dist) d.unit = cardioInfo(d.activity)[1];
+  renderCardioSheet();
+});
+$("#cardioBody").addEventListener("click", e => {
+  const b = e.target.closest("[data-unit]"); if (!b) return;
+  cardioDrafts[+b.closest(".cform").dataset.k].unit = b.dataset.unit; renderCardioSheet();
+});
+function findCardio(id){
+  for (const k in state.workouts){ const i = state.workouts[k].findIndex(e => e.id === id); if (i >= 0) return {k, i}; }
+  return null;
+}
+function removeCardio(id){
+  const f = findCardio(id); if (!f) return;
+  state.workouts[f.k].splice(f.i, 1);
+  if (!state.workouts[f.k].length) delete state.workouts[f.k];
+}
+function saveCardio(){
+  const keep = cardioDrafts.filter(d => d.inc);
+  for (const d of keep){
+    const name = d.activity === "__other" ? d.custom.trim() : d.activity;
+    if (!name){ toast("Give the activity a name"); return; }
+    if (!d.sec && !num(d.dist)){ toast("Add a duration or distance"); return; }
+  }
+  let last = null;
+  keep.forEach(d => {
+    const name = d.activity === "__other" ? d.custom.trim() : d.activity;
+    const date = d.date && d.date <= today() ? d.date : today();
+    if (d.id) removeCardio(d.id);
+    const entry = {id: d.id || uid(), name, group:"Cardio", type:"c", du:d.unit, src:d.src || "manual",
+      sets:[{min: d.sec ? String(Math.round(d.sec/60*100)/100) : "", dist: num(d.dist) ? String(num(d.dist)) : ""}]};
+    (state.workouts[date] = state.workouts[date] || []).push(entry);
+    last = entry;
+  });
+  save(); closeSheet($("#cardioSheet")); renderCardio(); checkMilestones();
+  if (keep.length > 1) toast(`Saved ${keep.length} sessions.`);
+  else if (last){ const st = last.sets[0]; toast(`Saved. ${last.name}${num(st.dist) ? ", " + num(st.dist) + " " + last.du : ""}.`); }
+}
+function deleteCardio(){
+  const d = cardioDrafts[0]; if (!d || !d.id) return;
+  if (!confirm("Delete this session?")) return;
+  removeCardio(d.id); save(); closeSheet($("#cardioSheet")); renderCardio(); toast("Deleted.");
+}
+$("#cardioAdd").onclick = () => openCardioSheet("add", [blankDraft()]);
+$("#cardioList").addEventListener("click", e => {
+  const row = e.target.closest(".crow"); if (!row) return;
+  const f = findCardio(row.dataset.id); if (!f) return;
+  const en = state.workouts[f.k][f.i], st = en.sets.find(filled) || {};
+  const known = CARDIO_TYPES.some(t => t[0] === en.name) || cardioSessions().some(x => x.e.name === en.name);
+  openCardioSheet("edit", [{id:en.id, activity: known ? en.name : "__other", custom:en.name, date:f.k, sec:Math.round(num(st.min)*60), dist:st.dist || "", unit:en.du || "mi", inc:true, src:en.src}]);
+});
+
+/* ----- reading workout screenshots, on the phone ----- */
+let tessLoading = null;
+function loadTesseract(){
+  if (window.Tesseract) return Promise.resolve();
+  if (!tessLoading) tessLoading = new Promise((res, rej) => {
+    const sc = document.createElement("script");
+    sc.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+    sc.onload = res; sc.onerror = () => { tessLoading = null; rej(new Error("load")); };
+    document.head.appendChild(sc);
+  });
+  return tessLoading;
+}
+function readImage(file){
+  return new Promise((res, rej) => { const img = new Image(), url = URL.createObjectURL(file); img.onload = () => res({img, url}); img.onerror = () => rej(new Error("img")); img.src = url; });
+}
+/* black-and-white, high contrast, dark text on light: what OCR reads best */
+async function prepShot(file){
+  const {img, url} = await readImage(file);
+  const sc = Math.min(2, 2400 / Math.max(img.width, img.height));
+  const w = Math.round(img.width*sc), h = Math.round(img.height*sc);
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const x = c.getContext("2d"); x.drawImage(img, 0, 0, w, h);
+  const d = x.getImageData(0, 0, w, h), p = d.data;
+  let sum = 0;
+  for (let i=0; i<p.length; i+=4){ const g = p[i]*.299 + p[i+1]*.587 + p[i+2]*.114; p[i] = g; sum += g; }
+  const dark = sum / (p.length/4) < 115;
+  for (let i=0; i<p.length; i+=4){ let g = p[i]; if (dark) g = 255 - g; g = Math.max(0, Math.min(255, (g-128)*1.5 + 128)); p[i] = p[i+1] = p[i+2] = g; }
+  x.putImageData(d, 0, 0);
+  const t = document.createElement("canvas"), ts = 480 / img.width;
+  t.width = 480; t.height = Math.round(img.height*ts);
+  t.getContext("2d").drawImage(img, 0, 0, t.width, t.height);
+  URL.revokeObjectURL(url);
+  return {canvas:c, thumb:t.toDataURL("image/jpeg", .6)};
+}
+const MONTHS = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+function toSeconds(str){
+  str = str.trim().toLowerCase();
+  if (/\d:\d/.test(str)){ const p = str.split(":").map(Number); return p.length === 3 ? p[0]*3600 + p[1]*60 + p[2] : p[0]*60 + p[1]; }
+  const h = /(\d+)\s*h/.exec(str), m = /(\d+)\s*(?:min(?:ute)?s?\b|m\b)/.exec(str), s2 = /(\d+)\s*s(?:ec(?:ond)?s?)?\b/.exec(str);
+  return (h ? +h[1]*3600 : 0) + (m ? +m[1]*60 : 0) + (s2 ? +s2[1] : 0);
+}
+function parseWorkoutText(raw, fileTime, skipFirst = true){
+  const text = raw.replace(/[|]/g, "l").replace(/[’‘`]/g, "'");
+  const lines = text.split(/\n+/).map(l => l.trim()).filter(Boolean);
+  const body = (skipFirst ? lines.slice(1) : lines).join("\n");   /* screenshots: skip the status bar clock */
+  const lower = text.toLowerCase();
+
+  /* activity */
+  const ACTS = [
+    [/trail\s*run/, "Trail Running"], [/indoor\s*run|treadmill/, "Treadmill"], [/outdoor\s*run|road\s*run|\brun(ning)?\b/, "Road Running"],
+    [/hik(e|ing)/, "Hiking"], [/walk/, "Walking"], [/mountain\s*bik/, "Mountain Biking"], [/indoor\s*cycl|stationary|spin/, "Stationary Bike"],
+    [/cycl|\bride\b|\bbike\b|biking/, "Cycling"], [/open\s*water/, "Open Water Swim"], [/swim|pool/, "Swimming"], [/soccer|football/, "Soccer"],
+    [/rowing|rower/, "Rowing"], [/elliptical/, "Elliptical"], [/stair/, "Stair Climber"], [/hiit|high intensity/, "HIIT"], [/pickleball/, "Pickleball"],
+    [/tennis/, "Tennis"], [/basketball/, "Basketball"], [/golf/, "Golf"], [/jump\s*rope/, "Jump Rope"], [/ski(ing)?\b/, "Skiing"],
+    [/kayak|paddl/, "Kayaking"], [/climb/, "Climbing"]
+  ];
+  const act = ACTS.find(([re]) => re.test(lower));
+
+  /* duration: labeled first, then h:mm:ss, then the longest m:ss */
+  let sec = 0;
+  const MIN = "\\d+\\s*(?:min(?:ute)?s?|m)\\b", SEC = "\\d+\\s*(?:sec(?:ond)?s?|s)\\b";
+  const DUR = "((?:\\d{1,2}:)?\\d{1,2}:\\d{2}|\\d+\\s*(?:hours?|hrs?|h)\\b,?\\s*(?:" + MIN + ",?\\s*)?(?:" + SEC + ")?|" + MIN + ",?\\s*(?:" + SEC + ")?)";
+  const lab = new RegExp("(?:workout\\s*time|elapsed\\s*time|moving\\s*time|total\\s*time|duration|\\btime)\\s*[:\\-]?\\s*" + DUR, "i").exec(body);
+  if (lab) sec = toSeconds(lab[1]);
+  if (!sec){ const hms = /\b(\d{1,2}:\d{2}:\d{2})\b/.exec(body); if (hms) sec = toSeconds(hms[1]); }
+  if (!sec){
+    const re = /(?<!['"\d])(\d{1,3}:\d{2})(?!\s*(?:am|pm|\/|'|"))/gi; let m, best = 0;
+    while ((m = re.exec(body))) best = Math.max(best, toSeconds(m[1]));
+    sec = best;
+  }
+
+  /* distance: labeled first, then a number followed by a unit (never a pace like 9'45"/mi) */
+  let dist = "", unit = act ? cardioInfo(act[1])[1] : "mi";
+  const NUM = "(\\d{1,3}(?:,\\d{3})+|\\d+(?:[.,]\\d{1,3})?)";
+  const normUnit = u => /^(mi|mile|ml|m1)/i.test(u) ? "mi" : /^k/i.test(u) ? "km" : /^y/i.test(u) ? "yd" : "m";
+  const labD = new RegExp("distance\\s*[:\\-]?\\s*" + NUM + "\\s*(mi(?:les?)?|ml|m1|km|kilomet\\w*|yds?|yards?|met\\w*|m)\\b", "i").exec(body);
+  const anyD = new RegExp("(?<![\\/'\"\\d.,])" + NUM + "\\s*(mi(?:les?)?|ml|km|kilomet\\w*|yds?|yards?|meters?)\\b(?!\\s*\\/)", "i").exec(body);
+  const dm = labD || anyD;
+  if (dm){
+    unit = normUnit(dm[2]);
+    const n = dm[1].includes(",") && /,\d{3}\b/.test(dm[1]) ? dm[1].replace(/,/g, "") : dm[1].replace(",", ".");
+    dist = String(parseFloat(n));
+  }
+
+  /* date: in the text if possible, otherwise when the screenshot was taken */
+  let date = "";
+  const t = new Date();
+  const md = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2})(?:,?\s+(\d{4}))?/i.exec(text);
+  const num3 = /\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/.exec(text);
+  if (/\byesterday\b/i.test(text)) date = addDays(today(), -1);
+  else if (md){
+    let y = md[3] ? +md[3] : t.getFullYear();
+    let d = new Date(y, MONTHS.indexOf(md[1].toLowerCase().slice(0,3)), +md[2]);
+    if (!md[3] && d > t) d = new Date(y-1, d.getMonth(), d.getDate());
+    date = keyOf(d);
+  } else if (num3){
+    let y = +num3[3]; if (y < 100) y += 2000;
+    date = keyOf(new Date(y, +num3[1]-1, +num3[2]));
+  } else if (/\btoday\b/i.test(text)) date = today();
+  else if (fileTime) date = keyOf(new Date(fileTime));
+  if (!date || date > today()) date = today();
+
+  return {activity: act ? act[1] : lastCardioName(), custom:"", date, sec, dist, unit, inc:true, src:"import"};
+}
+$("#cardioImport").onclick = () => $("#shotFile").click();
+/* text copied by the Apple Shortcut (or from any app) */
+$("#cardioPaste").onclick = async () => {
+  let text = "";
+  try { text = await navigator.clipboard.readText(); } catch(e){}
+  if (!text || !text.trim()) text = prompt("Paste the workout text here") || "";
+  if (!text.trim()) return;
+  const d = parseWorkoutText(text, null, false);
+  d.src = "paste";
+  openCardioSheet("import", [d]);
+  $("#cardioStatus").textContent = "Check the numbers, then save.";
+};
+$("#shotFile").addEventListener("change", async function(){
+  const files = [...this.files]; this.value = "";
+  if (!files.length) return;
+  openCardioSheet("import", []);
+  const status = t => { $("#cardioStatus").textContent = t; };
+  status("Getting the reader ready… the first time takes a few seconds.");
+  let worker = null, done = 0;
+  try {
+    await loadTesseract();
+    worker = await Tesseract.createWorker("eng");
+    for (const f of files){
+      status(`Reading screenshot ${done+1} of ${files.length}…`);
+      const {canvas, thumb} = await prepShot(f);
+      const {data} = await worker.recognize(canvas);
+      const d = parseWorkoutText(data.text || "", f.lastModified);
+      d.thumb = thumb;
+      cardioDrafts.push(d); done++;
+      renderCardioSheet();
+    }
+    status(files.length > 1 ? "Check each one, then save." : "Check the numbers, then save.");
+  } catch(err){
+    for (const f of files.slice(done)){
+      let thumb = ""; try { thumb = (await prepShot(f)).thumb; } catch(e){}
+      cardioDrafts.push(blankDraft({thumb, src:"import", date: f.lastModified ? keyOf(new Date(f.lastModified)) : today()}));
+    }
+    renderCardioSheet();
+    status("Couldn't read the text automatically (the reader needs an internet connection the first time). Fill in the details from the screenshot.");
+  } finally {
+    if (worker) try { await worker.terminate(); } catch(e){}
+  }
+});
+
+/* ----- Apple Shortcuts: open the app with ?add=cardio&activity=Running&min=32.5&dist=3.1&unit=mi&date=2026-09-27 ----- */
+function handleShortcutImport(){
+  const q = new URLSearchParams(location.search);
+  if (q.get("add") !== "cardio") return;
+  history.replaceState(null, "", location.pathname);
+  const name = q.get("activity") || lastCardioName();
+  const known = CARDIO_TYPES.some(t => t[0] === name);
+  showTab("cardio");
+  openCardioSheet("import", [{activity: known ? name : "__other", custom: known ? "" : name, date: /^\d{4}-\d{2}-\d{2}$/.test(q.get("date") || "") ? q.get("date") : today(),
+    sec: Math.round(num(q.get("min"))*60) || toSeconds(q.get("time") || "0"), dist: q.get("dist") || "", unit: ["mi","km","yd","m"].includes(q.get("unit")) ? q.get("unit") : cardioInfo(name)[1], inc:true, src:"shortcut"}]);
+}
+
+/* ---------- MOBILITY ---------- */
+/* name, area, per side (1/0), default hold in seconds, muscles it stretches */
+const MOB_CATALOG = [
+  ["Neck Side Stretch","Neck",1,30,{traps:1}],
+  ["Upper Trap Stretch","Neck",1,30,{traps:1}],
+  ["Levator Scapulae Stretch","Neck",1,30,{traps:.8}],
+  ["Cross-Body Shoulder Stretch","Shoulders",1,30,{rearDelts:1,sideDelts:.5}],
+  ["Sleeper Stretch","Shoulders",1,30,{rearDelts:1}],
+  ["Overhead Triceps Stretch","Shoulders",1,30,{triceps:1,lats:.4}],
+  ["Doorway Chest Stretch","Chest",0,45,{chest:1,frontDelts:.6}],
+  ["Behind-Back Clasp","Chest",0,30,{chest:.8,frontDelts:.8}],
+  ["Cat-Cow","Back",0,60,{midBack:.8,lowerBack:.8,abs:.3}],
+  ["Child's Pose","Back",0,60,{lats:.8,lowerBack:.6,glutes:.3}],
+  ["Cobra","Back",0,30,{abs:.8,lowerBack:.5}],
+  ["Sphinx","Back",0,45,{abs:.6,lowerBack:.5}],
+  ["Supine Spinal Twist","Back",1,45,{obliques:.8,lowerBack:.6,glutes:.4}],
+  ["Open Book","Back",1,30,{midBack:.8,chest:.5,obliques:.4}],
+  ["Thread the Needle","Back",1,30,{midBack:1,rearDelts:.5}],
+  ["Thoracic Extension (foam roller)","Back",0,60,{midBack:1}],
+  ["Lat Stretch","Back",1,30,{lats:1,triceps:.3}],
+  ["Hip Flexor Lunge Stretch","Hips",1,45,{quads:.8,glutes:.2}],
+  ["Couch Stretch","Hips",1,45,{quads:1}],
+  ["Pigeon Pose","Hips",1,60,{glutes:1,adductors:.3}],
+  ["90/90 Hold","Hips",1,45,{glutes:.9,adductors:.5}],
+  ["Figure-4 Stretch","Hips",1,45,{glutes:1}],
+  ["Butterfly Stretch","Hips",0,60,{adductors:1}],
+  ["Frog Stretch","Hips",0,60,{adductors:1,glutes:.3}],
+  ["Deep Squat Hold","Hips",0,60,{glutes:.6,adductors:.6,calves:.5}],
+  ["World's Greatest Stretch","Hips",1,30,{quads:.6,hamstrings:.5,midBack:.5,glutes:.4}],
+  ["Happy Baby","Hips",0,45,{adductors:.8,glutes:.6,lowerBack:.3}],
+  ["Standing Hamstring Stretch","Legs",1,30,{hamstrings:1}],
+  ["Lying Hamstring Stretch (strap)","Legs",1,45,{hamstrings:1,calves:.3}],
+  ["Seated Forward Fold","Legs",0,60,{hamstrings:1,lowerBack:.5}],
+  ["Pancake Stretch","Legs",0,60,{hamstrings:.8,adductors:.8}],
+  ["Standing Quad Stretch","Legs",1,30,{quads:1}],
+  ["Downward Dog","Legs",0,45,{hamstrings:.8,calves:.8,lats:.4}],
+  ["Wall Calf Stretch","Ankles",1,45,{calves:1}],
+  ["Soleus Stretch","Ankles",1,30,{calves:1}],
+  ["Ankle Dorsiflexion Rocks","Ankles",1,45,{calves:.8}],
+  ["Wrist Flexor Stretch","Wrists",1,30,{forearms:1}],
+  ["Wrist Extensor Stretch","Wrists",1,30,{forearms:1}],
+  ["Prayer Stretch","Wrists",0,30,{forearms:.8}],
+  ["Foam Roll: Quads","Foam roll",0,60,{quads:1}],
+  ["Foam Roll: Hamstrings","Foam roll",0,60,{hamstrings:1}],
+  ["Foam Roll: Calves","Foam roll",0,60,{calves:1}],
+  ["Foam Roll: Glutes","Foam roll",0,60,{glutes:1}],
+  ["Foam Roll: Upper Back","Foam roll",0,60,{midBack:1,traps:.4}],
+  ["Foam Roll: Lats","Foam roll",1,45,{lats:1}],
+  ["Yoga","Sessions",0,1800,{hamstrings:.4,glutes:.4,lats:.3,midBack:.3,quads:.3,frontDelts:.2,abs:.3}],
+  ["Pilates","Sessions",0,1800,{abs:.8,obliques:.5,glutes:.4,lowerBack:.3}],
+  ["Mobility Flow","Sessions",0,600,{glutes:.4,hamstrings:.4,midBack:.4,quads:.3,frontDelts:.2}],
+  ["Stretching Session","Sessions",0,900,{hamstrings:.4,quads:.3,glutes:.3,lats:.3,chest:.2}]
+];
+const MOB_AREAS = ["Neck","Shoulders","Chest","Back","Hips","Legs","Ankles","Wrists","Foam roll","Sessions"];
+const MOB_RULES = [
+  [/hamstring|forward fold/, {hamstrings:1}], [/hip flexor|couch/, {quads:.8}], [/pigeon|figure|glute|piriformis/, {glutes:1}],
+  [/quad/, {quads:1}], [/calf|soleus|ankle/, {calves:1}], [/chest|doorway|pec/, {chest:1,frontDelts:.5}],
+  [/shoulder|delt|sleeper/, {rearDelts:.8,sideDelts:.5}], [/tricep/, {triceps:1}], [/\blats?\b/, {lats:1}],
+  [/twist|oblique/, {obliques:1}], [/spine|thoracic|upper back|cat.?cow|open book/, {midBack:1}],
+  [/lower back|cobra|sphinx/, {lowerBack:.8}], [/neck|trap/, {traps:1}], [/wrist|forearm/, {forearms:1}],
+  [/groin|adductor|butterfly|frog/, {adductors:1}], [/yoga|stretch|flow|foam|mobility|pilates/, {hamstrings:.3,glutes:.3,midBack:.3,quads:.2,lats:.2}]
+];
+const STARTER_ROUTINES = [
+  {name:"Morning 10", items:[["Cat-Cow",60],["World's Greatest Stretch",30],["Hip Flexor Lunge Stretch",45],["Standing Hamstring Stretch",30],["Child's Pose",60],["Doorway Chest Stretch",45]]},
+  {name:"Hips & hamstrings", items:[["90/90 Hold",45],["Pigeon Pose",60],["Couch Stretch",45],["Seated Forward Fold",60],["Butterfly Stretch",60],["Deep Squat Hold",60]]},
+  {name:"Desk reset", items:[["Neck Side Stretch",30],["Doorway Chest Stretch",45],["Thread the Needle",30],["Open Book",30],["Wrist Flexor Stretch",30],["Hip Flexor Lunge Stretch",45]]},
+  {name:"Post-run", items:[["Standing Quad Stretch",30],["Wall Calf Stretch",45],["Standing Hamstring Stretch",30],["Figure-4 Stretch",45],["Hip Flexor Lunge Stretch",45],["Downward Dog",45]]},
+  {name:"Post-lift upper body", items:[["Cross-Body Shoulder Stretch",30],["Overhead Triceps Stretch",30],["Doorway Chest Stretch",45],["Lat Stretch",30],["Child's Pose",60],["Supine Spinal Twist",45]]}
+];
+const mobRow = name => MOB_CATALOG.find(r => r[0].toLowerCase() === String(name).toLowerCase());
+function mobInfo(name){
+  const r = mobRow(name);
+  if (r) return {area:r[1], side:!!r[2], hold:r[3]};
+  const remote = byName[String(name).toLowerCase()];
+  return {area: remote && remote.group === "Mobility" ? "Other" : "Other", side: PER_SIDE_RE.test(name) || /single|one.?leg|one.?arm/i.test(name), hold: /yoga|pilates|session|class|flow/i.test(name) ? 1200 : 30};
+}
+function newMobEntry(name, hold){
+  const i = mobInfo(name);
+  return {id:uid(), name, group:"Mobility", type:"m", side:i.side, target:hold || i.hold, rounds:1, sets:[]};
+}
+const mobEntries = k => entries(k).filter(e => e.type === "m");
+const holdsNeeded = e => (e.rounds || 1) * (e.side ? 2 : 1);
+let mobDate = today();
+
+/* move stretches logged the old way (timed strength) over to mobility */
+function migrateMobility(){
+  if (state.mobMigrated) return;
+  for (const k in state.workouts) state.workouts[k].forEach(e => {
+    if (e.group !== "Mobility" || e.type === "m") return;
+    const i = mobInfo(e.name), holds = e.sets.filter(filled).map(st => ({sec:String(parseSec(st.sec) || num(st.min)*60 || 0)}));
+    Object.assign(e, {type:"m", id:e.id || uid(), side:i.side, target: Math.max(i.hold, ...holds.map(h => num(h.sec)), 10), rounds: Math.max(1, i.side ? Math.ceil(holds.length/2) : holds.length), sets: holds});
+  });
+  state.mobMigrated = true; save();
+}
+
+function renderMobility(){
+  const t = today();
+  $("#mobTitle").textContent = mobDate === t ? "Today" : mobDate === addDays(t,-1) ? "Yesterday" : dateOf(mobDate).toLocaleDateString(undefined, {weekday:"short", month:"short", day:"numeric"});
+  $("#mobNext").disabled = mobDate >= t;
+  const list = mobEntries(mobDate);
+  let secs = 0, todo = 0;
+  list.forEach(e => { e.sets.filter(filled).forEach(st => secs += parseSec(st.sec)); todo += Math.max(0, holdsNeeded(e) - e.sets.filter(filled).length); });
+  const parts = [];
+  if (list.length) parts.push(`${list.length} ${list.length === 1 ? "stretch" : "stretches"}`);
+  if (secs) parts.push(fmtHMS(secs) + " held");
+  if (list.length) parts.push(todo ? `${todo} to go` : "all done");
+  $("#mobSub").innerHTML = esc(parts.join(" · ")) + (mobDate !== t ? '<button id="mobToday">Back to today</button>' : "");
+  const mt = $("#mobToday"); if (mt) mt.onclick = () => { mobDate = today(); renderMobility(); };
+  $("#mobStart").hidden = !todo;
+  $("#mobStart").textContent = list.some(e => e.sets.some(filled)) ? "Continue routine" : "Start routine";
+
+  if (!list.length){
+    $("#mobList").innerHTML = `<div class="empty"><strong>Nothing stretched yet</strong>Pick a routine to load, or add stretches one at a time.<div class="quick">${STARTER_ROUTINES.slice(0,3).map((r, i) => `<button class="btn ghost" data-starter="${i}">${esc(r.name)} · ${r.items.length} stretches</button>`).join("")}</div></div>`;
+    return;
+  }
+  $("#mobList").innerHTML = list.map(e => {
+    const done = e.sets.filter(filled), need = holdsNeeded(e), sess = e.target >= 300;
+    const sideOf = n => e.side ? (n % 2 === 0 ? "L" : "R") : "";
+    const chips = done.map((st, n) => `<span class="hold">${sideOf(n) ? sideOf(n) + " " : ""}${fmtHMS(parseSec(st.sec))}<button data-mact="rm" data-id="${e.id}" data-n="${n}" aria-label="Remove hold">×</button></span>`).join("")
+      + Array.from({length: Math.max(0, need - done.length)}, (_, n) => `<span class="hold todo">${sideOf(done.length + n) ? sideOf(done.length + n) + " " : ""}${fmtHMS(e.target)}</span>`).join("");
+    return `<article class="mob" data-id="${e.id}">
+      <header><div><h3>${esc(e.name)}</h3><span class="tag">${esc(mobInfo(e.name).area)}</span>
+        <button class="mode${e.side ? " bw" : ""}" data-mact="side" data-id="${e.id}" aria-label="${e.side ? "Per side. Switch to both sides at once" : "Both sides at once. Switch to per side"}">${e.side ? "Per side" : "Both sides"}</button></div>
+        <button class="icon-btn" data-mact="del" data-id="${e.id}" aria-label="Remove ${esc(e.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+      <div class="plan">
+        <span class="grp"><span class="lbl">Hold</span><button data-mact="t-" data-id="${e.id}" aria-label="Shorter">−</button><b>${fmtHMS(e.target)}</b><button data-mact="t+" data-id="${e.id}" aria-label="Longer">+</button></span>
+        ${sess ? "" : `<span class="grp"><span class="lbl">Rounds</span><button data-mact="r-" data-id="${e.id}" aria-label="Fewer rounds">−</button><b>${e.rounds || 1}</b><button data-mact="r+" data-id="${e.id}" aria-label="More rounds">+</button></span>`}
+      </div>
+      <div class="holds">${chips}</div>
+      <div class="row"><button class="link" data-mact="log" data-id="${e.id}">+ Log time</button>
+        ${done.length < need ? `<button class="go" data-mact="play" data-id="${e.id}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>${done.length ? "Next hold" : "Start"}</button>` : `<span class="lbl" style="font-family:var(--mono);font-size:12px;color:var(--mob);letter-spacing:.14em">DONE</span>`}</div>
+    </article>`;
+  }).join("");
+}
+function findMob(id){ return mobEntries(mobDate).find(e => e.id === id); }
+$("#mobList").addEventListener("click", e => {
+  const st = e.target.closest("[data-starter]");
+  if (st){ loadMobRoutine(STARTER_ROUTINES[+st.dataset.starter]); return; }
+  const b = e.target.closest("[data-mact]"); if (!b) return;
+  const en = findMob(b.dataset.id); if (!en) return;
+  const act = b.dataset.mact, step = en.target >= 300 ? 300 : 15;
+  if (act === "t+") en.target = Math.min(7200, en.target + step);
+  else if (act === "t-") en.target = Math.max(10, en.target - step);
+  else if (act === "r+") en.rounds = Math.min(10, (en.rounds || 1) + 1);
+  else if (act === "r-") en.rounds = Math.max(1, (en.rounds || 1) - 1);
+  else if (act === "side") en.side = !en.side;
+  else if (act === "rm"){ en.sets.splice(+b.dataset.n, 1); }
+  else if (act === "del"){
+    if (en.sets.some(filled) && !confirm("Remove " + en.name + "?")) return;
+    const L = state.workouts[mobDate]; L.splice(L.indexOf(en), 1); if (!L.length) delete state.workouts[mobDate];
+  }
+  else if (act === "log"){
+    const sess = en.target >= 300;
+    const v = prompt(sess ? "How many minutes?" : "How many seconds? (1:30 works too)", sess ? String(Math.round(en.target/60)) : String(en.target));
+    if (!v) return;
+    const secs = sess ? Math.round(num(v)*60) : parseSec(v);
+    if (!secs) return;
+    en.sets.push({sec:String(secs)});
+  }
+  else if (act === "play"){ startPlayer(buildSteps([en])); return; }
+  save(); renderMobility();
+  if (act === "log") checkMilestones();
+});
+$("#mobPrev").onclick = () => { mobDate = addDays(mobDate, -1); renderMobility(); };
+$("#mobNext").onclick = () => { if (mobDate < today()){ mobDate = addDays(mobDate, 1); renderMobility(); } };
+$("#mobStart").onclick = () => startPlayer(buildSteps(mobEntries(mobDate)));
+
+/* ----- stretch picker ----- */
+let mobFilter = "All";
+function mobRecent(){
+  const seen = {}, out = [];
+  Object.keys(state.workouts).sort().reverse().forEach(k => mobEntries(k).forEach(e => { if (!seen[e.name]){ seen[e.name] = 1; out.push(e.name); } }));
+  return out;
+}
+function renderMobPicker(){
+  $("#mobChips").innerHTML = ["All","Recent"].concat(MOB_AREAS).map(a => `<button class="chip" aria-pressed="${a === mobFilter}" data-a="${esc(a)}">${esc(a)}</button>`).join("");
+  const raw = $("#mobSearch").value.trim(), q = raw.toLowerCase();
+  let pool = MOB_CATALOG.map(r => ({name:r[0], area:r[1], side:r[2], hold:r[3]}));
+  catalog.filter(x => x.group === "Mobility" && !mobRow(x.name)).forEach(x => pool.push({name:x.name, area:"Other", side:0, hold:30}));
+  if (mobFilter === "Recent") pool = mobRecent().map(n => pool.find(p => p.name === n) || {name:n, area:mobInfo(n).area, side:mobInfo(n).side, hold:mobInfo(n).hold});
+  else if (mobFilter !== "All") pool = pool.filter(p => p.area === mobFilter);
+  if (q){ const w = q.split(/\s+/); pool = pool.filter(p => w.every(x => p.name.toLowerCase().includes(x))); }
+  let html = "";
+  if (q && !pool.some(p => p.name.toLowerCase() === q)) html += `<div class="custom"><p>Add “${esc(raw)}” as a new stretch</p><div class="ctl"><button class="btn" id="mobCustom">Add</button></div></div>`;
+  html += pool.slice(0, 80).map(p => `<button class="res" data-name="${esc(p.name)}" style="--c:var(--mob)"><span class="nm">${esc(p.name)}</span><span class="meta">${p.area === "Sessions" ? fmtHMS(p.hold) : (p.side ? "per side · " : "") + fmtHMS(p.hold)}</span></button>`).join("");
+  if (!pool.length && !q) html += '<p class="hint">Nothing here yet.</p>';
+  $("#mobResults").innerHTML = html;
+  const c = $("#mobCustom"); if (c) c.onclick = () => addMobStretch(raw);
+}
+function addMobStretch(name){
+  (state.workouts[mobDate] = state.workouts[mobDate] || []).push(newMobEntry(name));
+  save(); closeSheet($("#mobPicker")); renderMobility();
+}
+$("#mobAdd").onclick = () => { $("#mobSearch").value = ""; mobFilter = mobRecent().length ? "Recent" : "All"; renderMobPicker(); openSheet($("#mobPicker")); };
+$("#mobSearch").addEventListener("input", () => { if (mobFilter === "Recent") mobFilter = "All"; renderMobPicker(); });
+$("#mobChips").addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b){ mobFilter = b.dataset.a; renderMobPicker(); } });
+$("#mobResults").addEventListener("click", e => { const b = e.target.closest(".res"); if (b) addMobStretch(b.dataset.name); });
+
+/* ----- routines ----- */
+function loadMobRoutine(r){
+  const L = state.workouts[mobDate] = state.workouts[mobDate] || [];
+  r.items.forEach(it => {
+    const name = Array.isArray(it) ? it[0] : it.name;
+    if (L.some(e => e.type === "m" && e.name === name)) return;
+    const en = newMobEntry(name, Array.isArray(it) ? it[1] : it.target);
+    if (!Array.isArray(it)){ en.side = it.side; en.rounds = it.rounds || 1; }
+    L.push(en);
+  });
+  save(); closeSheet($("#mobRoutineSheet")); renderMobility(); toast(r.name + " loaded. Tap Start routine.");
+}
+function renderMobRoutines(){
+  const saved = state.mobRoutines || [];
+  const row = (r, i, starter) => `<div class="rt"><div>${starter ? '<span class="star">Starter</span>' : ""}<b>${esc(r.name)}</b><small>${r.items.map(x => Array.isArray(x) ? x[0] : x.name).join(", ")}</small></div>
+    <button class="btn" data-load="${starter ? "s" : "u"}${i}">Load</button>${starter ? "" : `<button class="icon-btn" data-delr="${i}" aria-label="Delete ${esc(r.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`}</div>`;
+  $("#mobRoutineList").innerHTML = saved.map((r, i) => row(r, i, false)).join("") + STARTER_ROUTINES.map((r, i) => row(r, i, true)).join("");
+  $("#mobSaveRoutine").hidden = !mobEntries(mobDate).length;
+}
+$("#mobRoutines").onclick = () => { renderMobRoutines(); openSheet($("#mobRoutineSheet")); };
+$("#mobRoutineList").addEventListener("click", e => {
+  const l = e.target.closest("[data-load]"), d = e.target.closest("[data-delr]");
+  if (l){ const k = l.dataset.load; loadMobRoutine(k[0] === "s" ? STARTER_ROUTINES[+k.slice(1)] : state.mobRoutines[+k.slice(1)]); }
+  else if (d){ const r = state.mobRoutines[+d.dataset.delr]; if (confirm("Delete " + r.name + "?")){ state.mobRoutines.splice(+d.dataset.delr, 1); save(); renderMobRoutines(); } }
+});
+$("#mobSaveRoutine").onclick = () => {
+  const name = (prompt("Name this routine", "My routine") || "").trim(); if (!name) return;
+  state.mobRoutines = state.mobRoutines || [];
+  const items = mobEntries(mobDate).map(e => ({name:e.name, target:e.target, side:e.side, rounds:e.rounds || 1}));
+  const i = state.mobRoutines.findIndex(r => r.name.toLowerCase() === name.toLowerCase());
+  if (i >= 0) state.mobRoutines[i].items = items; else state.mobRoutines.unshift({name, items});
+  save(); renderMobRoutines(); toast("Routine saved.");
+};
+
+/* ----- guided player: counts down every hold, switches sides, moves on by itself ----- */
+const player = {steps:[], i:0, phase:"", end:0, left:0, iv:null, lastBeep:-1, date:null, held:0};
+function buildSteps(list){
+  const steps = [];
+  list.forEach(e => {
+    const sides = e.side ? ["L","R"] : [""];
+    const total = holdsNeeded(e), done = e.sets.filter(filled).length;
+    for (let n = done; n < total; n++) steps.push({id:e.id, name:e.name, side:sides[n % sides.length], sec:e.target});
+  });
+  return steps;
+}
+function startPlayer(steps){
+  if (!steps.length){ toast("All done. Add a round or a stretch."); return; }
+  ensureAudio();
+  Object.assign(player, {steps, i:0, date:mobDate, held:0});
+  openSheet($("#mobPlayer"));
+  playerReady(5);
+  clearInterval(player.iv); player.iv = setInterval(playerTick, 200);
+  syncWake();
+}
+function playerReady(sec){ player.phase = "ready"; player.end = Date.now() + sec*1000; player.lastBeep = -1; renderPlayer(); }
+function playerHold(){ player.phase = "hold"; player.end = Date.now() + player.steps[player.i].sec*1000; player.lastBeep = -1; tones(880, 1); buzz([120]); renderPlayer(); }
+function playerTick(){
+  if (player.phase !== "ready" && player.phase !== "hold") return;
+  const left = Math.max(0, Math.ceil((player.end - Date.now())/1000));
+  const st = player.steps[player.i];
+  $("#plTime").textContent = fmtHMS(left);
+  const total = player.phase === "hold" ? st.sec : 5;
+  $("#plBar").style.width = (player.phase === "hold" ? 100 - 100*left/total : 0) + "%";
+  if (left <= 3 && left > 0 && left !== player.lastBeep){ player.lastBeep = left; tones(player.phase === "hold" ? 700 : 600, 1); }
+  if (left <= 0){ if (player.phase === "ready") playerHold(); else playerDone(st.sec); }
+}
+function recordHold(step, secs){
+  const e = (state.workouts[player.date] || []).find(x => x.id === step.id);
+  if (e){ e.sets.push({sec:String(Math.round(secs))}); player.held += secs; save(); }
+}
+function playerDone(secs){
+  const step = player.steps[player.i];
+  recordHold(step, secs);
+  tones(988, 2, .2); buzz([180,120,180]);
+  player.i++;
+  if (player.i >= player.steps.length) return finishPlayer();
+  const next = player.steps[player.i];
+  playerReady(next.id === step.id ? 3 : 8);   /* quick switch for the other side, a breather between stretches */
+}
+function finishPlayer(){
+  clearInterval(player.iv); player.iv = null; player.phase = "done";
+  renderPlayer(); syncWake();
+  if (player.date === mobDate) renderMobility();
+  checkMilestones();
+}
+function renderPlayer(){
+  const p = player, st = p.steps[p.i], nx = p.steps[p.i + 1];
+  const sideTxt = s => s === "L" ? "Left side" : s === "R" ? "Right side" : "";
+  if (p.phase === "done"){
+    $("#plBody").innerHTML = `<div class="player"><div class="pl-step">ROUTINE COMPLETE</div><h3 class="pl-name">Done<span class="dot">.</span></h3>
+      <div class="pl-side">${fmtHMS(p.held)} of mobility</div><div class="pl-ctrl" style="grid-template-columns:1fr"><button class="btn" data-close-player>Close</button></div></div>`;
+    return;
+  }
+  const paused = p.phase === "paused";
+  $("#plBody").innerHTML = `<div class="player">
+    <div class="pl-step">${p.i + 1} / ${p.steps.length}</div>
+    <h3 class="pl-name">${esc(st.name)}</h3>
+    <div class="pl-side">${sideTxt(st.side)}</div>
+    <button class="pl-time${p.phase === "ready" ? " ready" : ""}" id="plTime" aria-label="${p.phase === "ready" ? "Start now" : "Time left"}">${fmtHMS(paused ? p.left : Math.max(0, Math.ceil((p.end - Date.now())/1000)))}</button>
+    <div class="pl-bar"><i id="plBar" style="width:0%"></i></div>
+    <div class="pl-phase">${paused ? "Paused" : p.phase === "ready" ? "Get ready · tap the time to start now" : "Hold"}</div>
+    <div class="pl-next">${nx ? "Next: " + esc(nx.name) + (nx.side ? " · " + sideTxt(nx.side).toLowerCase() : "") : "Last one"}</div>
+    <div class="pl-ctrl"><button class="btn ghost" id="plPause">${paused ? "Resume" : "Pause"}</button><button class="btn ghost" id="plSkip">Skip</button><button class="btn ghost" id="plEnd">End</button></div>
+  </div>`;
+}
+$("#plBody").addEventListener("click", e => {
+  const p = player;
+  if (e.target.closest("[data-close-player]")){ closeSheet($("#mobPlayer")); return; }
+  if (e.target.closest("#plTime") && p.phase === "ready"){ playerHold(); return; }
+  if (e.target.closest("#plPause")){
+    if (p.phase === "paused"){ p.phase = p.was; p.end = Date.now() + p.left*1000; }
+    else if (p.phase === "ready" || p.phase === "hold"){ p.was = p.phase; p.left = Math.max(0, Math.ceil((p.end - Date.now())/1000)); p.phase = "paused"; }
+    renderPlayer(); return;
+  }
+  if (e.target.closest("#plSkip")){
+    const st = p.steps[p.i];
+    const heldFor = p.phase === "hold" ? st.sec - Math.max(0, (p.end - Date.now())/1000) : p.phase === "paused" && p.was === "hold" ? st.sec - p.left : 0;
+    if (heldFor >= 5) recordHold(st, heldFor);
+    p.i++;
+    if (p.i >= p.steps.length) finishPlayer(); else playerReady(3);
+    return;
+  }
+  if (e.target.closest("#plEnd")){
+    const st = p.steps[p.i];
+    if (p.phase === "hold"){ const heldFor = st.sec - Math.max(0, (p.end - Date.now())/1000); if (heldFor >= 5) recordHold(st, heldFor); }
+    finishPlayer(); return;
+  }
+});
+/* closing the sheet mid-routine ends it cleanly */
+document.querySelectorAll("#mobPlayer [data-close]").forEach(b => b.addEventListener("click", () => { if (player.iv) finishPlayer(); }));
 
 /* ---------- BODY MAP ---------- */
 const MUSCLE_NAMES = {chest:"Chest", frontDelts:"Front shoulders", sideDelts:"Side shoulders", rearDelts:"Rear shoulders", traps:"Traps", biceps:"Biceps", triceps:"Triceps", forearms:"Forearms", abs:"Abs", obliques:"Obliques", lats:"Lats", midBack:"Upper back", lowerBack:"Lower back", glutes:"Glutes", quads:"Quads", hamstrings:"Hamstrings", adductors:"Inner thighs", calves:"Calves"};
@@ -1706,6 +2572,14 @@ const REMOTE_M = {chest:{chest:1}, lats:{lats:1}, "middle back":{midBack:1}, "lo
 /* first match wins, so specific patterns come first */
 const RULES = [
   [/leg curl|hamstring curl|nordic/, {hamstrings:1}],
+  [/soccer|football|rugby/, {quads:.6,hamstrings:.5,calves:.5,glutes:.4,adductors:.3}],
+  [/basketball|volleyball/, {quads:.5,calves:.5,glutes:.4,frontDelts:.2}],
+  [/tennis|pickleball|squash|racquet|badminton/, {quads:.4,calves:.4,frontDelts:.3,obliques:.3,forearms:.3}],
+  [/golf/, {obliques:.5,glutes:.3,forearms:.3,calves:.2}],
+  [/kayak|paddle|canoe/, {lats:.5,midBack:.4,frontDelts:.3,obliques:.3}],
+  [/climb|boulder/, {forearms:1,lats:.7,biceps:.4}],
+  [/ski|snowboard/, {quads:.8,glutes:.4,calves:.3}],
+  [/hiit|circuit|crossfit/, {quads:.4,glutes:.3,abs:.3,frontDelts:.2}],
   [/dead hang|flexed.?arm hang/, {forearms:1,lats:.6,biceps:.3}],
   [/wall sit|split squat hold/, {quads:1,glutes:.4}],
   [/waiter/, {frontDelts:.8,sideDelts:.6,traps:.5,abs:.4,obliques:.4}],
@@ -1753,9 +2627,15 @@ const RULES = [
 ];
 const GROUP_M = {"Chest":{chest:1}, "Back":{lats:.8,midBack:.8}, "Shoulders":{frontDelts:.7,sideDelts:.7,rearDelts:.4}, "Arms":{biceps:.7,triceps:.7}, "Legs":{quads:.8,hamstrings:.6,glutes:.6}, "Core":{abs:1,obliques:.5}, "Full body":{quads:.4,glutes:.4,frontDelts:.3,abs:.3}, "Cardio":{quads:.3,calves:.3}, "Mobility":{}};
 function musclesFor(e){
-  if (muscleCache[e.name]) return muscleCache[e.name];
+  const ck = (e.type === "m" ? "m:" : "") + e.name;
+  if (muscleCache[ck]) return muscleCache[ck];
   const n = e.name.toLowerCase();
   let m = null;
+  if (e.type === "m"){
+    const r = mobRow(e.name);
+    m = r ? r[4] : (MOB_RULES.find(([re]) => re.test(n)) || [0, {}])[1];
+    return muscleCache[ck] = m;
+  }
   for (const [re, map] of RULES) if (re.test(n)){ m = map; break; }
   if (!m){
     const c = byName[n];
@@ -1767,28 +2647,34 @@ function musclesFor(e){
     }
   }
   if (!m) m = GROUP_M[e.group] || {};
-  return muscleCache[e.name] = m;
+  return muscleCache[ck] = m;
 }
+const TYPE_OF = e => e.type === "c" ? "c" : e.type === "m" ? "m" : "s";
+const TYPE_COL = {s:"var(--str)", c:"var(--car)", m:"var(--mob)"};
+const TYPE_NAME = {s:"Strength", c:"Cardio", m:"Mobility"};
 function bodyScores(range){
-  const since = addDays(today(), -(range-1)), sc = {}, reps = {}, last = {}, ex = {};
-  Object.keys(MUSCLE_NAMES).forEach(k => { sc[k] = 0; reps[k] = 0; ex[k] = {}; });
+  const since = addDays(today(), -(range-1)), sc = {}, last = {}, ex = {};
+  Object.keys(MUSCLE_NAMES).forEach(k => { sc[k] = {s:0, c:0, m:0}; ex[k] = {}; });
   workoutDays().forEach(k => entries(k).forEach(e => {
     const sets = e.sets.filter(filled); if (!sets.length) return;
+    const t = TYPE_OF(e);
     const r = e.type === "s" ? sets.reduce((a,x) => a + num(x.r), 0) : 0;
+    const secs = e.type === "c" ? sets.reduce((a,x) => a + num(x.min), 0)*60 : (e.type === "m" || e.type === "t") ? sets.reduce((a,x) => a + parseSec(x.sec), 0) : 0;
+    /* one point = a strength set, 10 minutes of cardio, or 1 minute of stretching */
+    const n = t === "c" ? Math.max(1, secs/600) : t === "m" ? Math.max(.5, secs/60) : sets.length;
     const m = musclesFor(e);
     for (const mk in m){
       if (!(mk in sc)) continue;
       if (m[mk] >= .5 && (!last[mk] || k > last[mk])) last[mk] = k;
       if (k < since) continue;
-      sc[mk] += sets.length * m[mk];
+      sc[mk][t] += n * m[mk];
       if (m[mk] >= .5){
-        reps[mk] += r;
-        const x = ex[mk][e.name] || (ex[mk][e.name] = {sets:0, reps:0, main:m[mk] >= 1});
-        x.sets += sets.length; x.reps += r;
+        const x = ex[mk][e.name] || (ex[mk][e.name] = {t, sets:0, reps:0, secs:0});
+        x.sets += sets.length; x.reps += r; x.secs += secs;
       }
     }
   }));
-  return {sc, reps, last, ex};
+  return {sc, last, ex};
 }
 
 /* Stylized figure, drawn as the left half and mirrored. 200 x 372 units. */
@@ -1823,47 +2709,59 @@ const FIG = {
   ]
 };
 let selMuscle = null;
-function muscleFill(v, max){
-  return v > 0 ? `color-mix(in srgb, var(--accent) ${Math.round(25 + 75*v/max)}%, var(--field))` : "color-mix(in srgb, var(--mute) 28%, var(--field))";
-}
-function figSVG(side, sc, max){
+const NEUTRAL = "color-mix(in srgb, var(--mute) 28%, var(--field))";
+function figSVG(side, fillOf){
   const half = `<g class="base">${FIG_BASE}</g>` + FIG[side].map(([m, shape]) =>
-    `<g class="mus${m === selMuscle ? " sel" : ""}" data-m="${m}" style="fill:${muscleFill(sc[m], max)}"><title>${MUSCLE_NAMES[m]}</title>${shape}</g>`).join("");
+    `<g class="mus${m === selMuscle ? " sel" : ""}" data-m="${m}" style="fill:${fillOf(m)}"><title>${MUSCLE_NAMES[m]}</title>${shape}</g>`).join("");
   return `<svg class="fig" viewBox="0 0 200 372" role="img" aria-label="${side === "front" ? "Front" : "Back"} of body, shaded by training">
     <g class="base">${FIG_HEAD}</g><g>${half}</g><g transform="matrix(-1 0 0 1 200 0)">${half}</g></svg>`;
 }
 function renderBody(){
-  const range = state.bodyRange || 7, data = bodyScores(range), sc = data.sc;
-  const max = Math.max(1, ...Object.values(sc));
-  const order = Object.keys(MUSCLE_NAMES).sort((a,b) => sc[b] - sc[a]);
+  const range = state.bodyRange || 7, view = state.bodyView || "all", data = bodyScores(range), sc = data.sc;
+  const val = k => view === "all" ? sc[k].s + sc[k].c + sc[k].m : sc[k][view];
+  const dom = k => ["s","c","m"].reduce((a, t) => sc[k][t] > sc[k][a] ? t : a, "s");
+  const max = Math.max(1, ...Object.keys(sc).map(val));
+  const fillOf = k => { const v = val(k); if (!v) return NEUTRAL; return `color-mix(in srgb, ${TYPE_COL[view === "all" ? dom(k) : view]} ${Math.round(25 + 75*v/max)}%, var(--field))`; };
+  const order = Object.keys(MUSCLE_NAMES).sort((a,b) => val(b) - val(a));
   if (!selMuscle || !(selMuscle in MUSCLE_NAMES)) selMuscle = order[0];
   document.querySelectorAll("#rangeSeg button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.r === range));
-  $("#figFront").innerHTML = figSVG("front", sc, max);
-  $("#figBack").innerHTML = figSVG("back", sc, max);
+  document.querySelectorAll("#viewSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === view));
+  $("#figFront").innerHTML = figSVG("front", fillOf);
+  $("#figBack").innerHTML = figSVG("back", fillOf);
+  $("#bodyLegend").innerHTML = view === "all"
+    ? `<span><i style="background:${NEUTRAL}"></i>None</span>` + ["s","c","m"].map(t => `<span><i style="background:${TYPE_COL[t]}"></i>${TYPE_NAME[t]}</span>`).join("") + "<span>Deeper = more</span>"
+    : `<span><i style="background:${NEUTRAL}"></i>None</span><span>Less</span>` + [30,55,80,100].map(p => `<i style="background:color-mix(in srgb, ${TYPE_COL[view]} ${p}%, var(--field));margin:0"></i>`).join("") + "<span>More</span>";
 
-  const m = selMuscle, v = sc[m];
-  const exs = Object.entries(data.ex[m]).sort((a,b) => b[1].sets - a[1].sets).slice(0,5);
-  const lastTxt = data.last[m] ? "Last trained " + (data.last[m] === today() ? "today" : shortDate(data.last[m])) : "No workouts logged for this muscle yet";
+  const m = selMuscle, exs = Object.entries(data.ex[m]).filter(([,x]) => view === "all" || x.t === view).sort((a,b) => (b[1].sets + b[1].secs/60) - (a[1].sets + a[1].secs/60)).slice(0,6);
+  const lastTxt = data.last[m] ? "Last worked " + (data.last[m] === today() ? "today" : shortDate(data.last[m])) : "Nothing logged for this muscle yet";
+  const typeTotals = {s:0, c:0, m:0};
+  Object.values(data.ex[m]).forEach(x => { typeTotals[x.t] += x.t === "s" ? x.sets : x.secs; });
+  const typeLabel = t => t === "s" ? `${typeTotals.s} ${typeTotals.s === 1 ? "set" : "sets"}` : fmtHMS(typeTotals[t]);
+  const tmax = Math.max(.001, sc[m].s, sc[m].c, sc[m].m);
   $("#muscleDetail").innerHTML = `<div class="md-head"><div><h2>${MUSCLE_NAMES[m]}</h2><p class="note" style="margin:2px 0 0">${lastTxt}</p></div>
-    <div class="md-num">${Math.round(v*10)/10}<small>sets, ${range} days</small></div></div>
-    ${exs.length ? `<ul class="md-ex">${exs.map(([n,x]) => `<li><span>${esc(n)}</span><span>${x.sets} ${x.sets === 1 ? "set" : "sets"}${x.reps ? ", " + fmtN(x.reps) + " reps" : ""}</span></li>`).join("")}</ul>`
+    <div class="md-num">${Math.round(val(m)*10)/10}<small>points, ${range} days</small></div></div>
+    <div class="md-types">${["s","c","m"].filter(t => view === "all" || t === view).map(t => `<div><span>${TYPE_NAME[t]}</span><span class="tr"><i style="width:${Math.round(100*sc[m][t]/tmax)}%;background:${TYPE_COL[t]}"></i></span><span>${sc[m][t] ? typeLabel(t) : "–"}</span></div>`).join("")}</div>
+    ${exs.length ? `<ul class="md-ex">${exs.map(([n,x]) => `<li style="--dc:${TYPE_COL[x.t]}"><span>${esc(n)}</span><span>${x.t === "s" ? x.sets + " " + (x.sets === 1 ? "set" : "sets") + (x.reps ? ", " + fmtN(x.reps) + " reps" : "") : fmtHMS(x.secs) + (x.t === "c" ? " cardio" : " held")}</span></li>`).join("")}</ul>`
       : `<p class="hint" style="padding-bottom:0">Nothing hit this muscle in the last ${range} days.</p>`}`;
 
   $("#balance").innerHTML = order.map(k => {
-    const val = sc[k], pct = Math.round(100*val/max);
-    return `<button class="bal${val ? "" : " zero"}${k === selMuscle ? " sel" : ""}" data-m="${k}"><span>${MUSCLE_NAMES[k]}</span><span class="track"><span class="fillbar" style="display:block;width:${pct}%"></span></span><span class="v">${val ? Math.round(val*10)/10 : "–"}</span></button>`;
+    const v = val(k);
+    const segs = (view === "all" ? ["s","c","m"] : [view]).map(t => `<span class="seg-${t}" style="width:${(100*sc[k][t]/max).toFixed(1)}%"></span>`).join("");
+    return `<button class="bal${v ? "" : " zero"}${k === selMuscle ? " sel" : ""}" data-m="${k}"><span>${MUSCLE_NAMES[k]}</span><span class="track">${segs}</span><span class="v">${v ? Math.round(v*10)/10 : "–"}</span></button>`;
   }).join("");
 }
 $("#bodyView").addEventListener("click", e => {
   const r = e.target.closest("[data-r]");
   if (r){ state.bodyRange = +r.dataset.r; save(); selMuscle = null; renderBody(); return; }
+  const v = e.target.closest("[data-view]");
+  if (v){ state.bodyView = v.dataset.view; save(); selMuscle = null; renderBody(); return; }
   const m = e.target.closest("[data-m]");
   if (m){ selMuscle = m.dataset.m; renderBody(); if (m.closest(".fig")) $("#muscleDetail").scrollIntoView({behavior:"smooth", block:"nearest"}); }
 });
 
 /* ---------- BACKGROUND PHOTOS (stored on this device only) ---------- */
 const PHOTO_KEY = "liftlog.photos";
-const PHOTO_TABS = [["log","Log"],["body","Body"],["progress","Progress"]];
+const PHOTO_TABS = [["log","Strength"],["cardio","Cardio"],["mobility","Mobility"],["body","Body"],["progress","Progress"]];
 let photos = {};
 try { photos = JSON.parse(localStorage.getItem(PHOTO_KEY)) || {}; } catch(e){ photos = {}; }
 let currentTab = "log", photoTarget = null;
@@ -1951,8 +2849,10 @@ function showTab(tab){
   $("#logView").hidden = tab !== "log";
   $("#progressView").hidden = tab !== "progress";
   $("#bodyView").hidden = tab !== "body";
+  $("#cardioView").hidden = tab !== "cardio";
+  $("#mobView").hidden = tab !== "mobility";
   window.scrollTo(0,0);
-  if (tab === "progress") renderProgress(); else if (tab === "body") renderBody(); else renderLog();
+  if (tab === "progress") renderProgress(); else if (tab === "body") renderBody(); else if (tab === "cardio") renderCardio(); else if (tab === "mobility") renderMobility(); else renderLog();
   applyBg(tab);
 }
 document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => showTab(b.dataset.tab));
@@ -2079,7 +2979,9 @@ if (!state.celebrated) checkMilestones(true);
 applyAudioSession();
 loadRemote(false);
 migrateTimed();
+migrateMobility();
 renderLog();
+handleShortcutImport();
 applyBg("log");
 resetBeepMark(); renderClock(); syncWake();
 })();
