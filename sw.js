@@ -1,6 +1,6 @@
 // Tally offline support + automatic updates.
 // The version below changes with every release so phones pick up the new files.
-const VERSION = "liftlog-2.1.2";
+const VERSION = "liftlog-2.2.0";
 const CORE = [
   "./", "./index.html", "./manifest.json",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png",

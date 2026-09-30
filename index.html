@@ -388,7 +388,7 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .cardio-foot .btn{flex:1;padding:14px}
 
 /* ===== mobility + three training types ===== */
-:root{--str:#B38B2D;--car:#A3262A;--mob:#4E9A6B}
+:root{--str:#B38B2D;--car:#922532;--mob:#4E9A6B}
 .tabs button{font-size:9.5px;letter-spacing:.08em;padding-left:0;padding-right:0}
 .mob{border:1px solid var(--line);background:var(--surface);padding:14px 12px 8px 14px;display:grid;gap:10px}
 .mob header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
@@ -466,6 +466,29 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .pl-time{font-size:min(26vw,108px)}
 .pl-up{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--mob);text-transform:uppercase;min-height:14px}
 
+/* tally marks */
+.tally{display:block;height:22px;width:auto;overflow:visible}
+.heat .months span,.heat .cell{width:20px}
+.heat .cell{height:20px}
+.cell.tl{display:flex;align-items:center;justify-content:center;gap:2px;background:var(--field)}
+.cell.tl i{display:block;width:3px;height:12px}
+.cell.tl.has{border-color:color-mix(in srgb,var(--ink) 18%,transparent)}
+.tl-legend{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:12px;margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--mute)}
+.tl-legend span{display:inline-flex;align-items:center;gap:6px}
+.tl-legend i{display:inline-block;width:3px;height:12px}
+.tallies{display:flex;flex-direction:column;margin-top:6px}
+.trow{display:grid;grid-template-columns:64px 1fr 34px;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.trow:first-child{border-top:0}
+.trow .wk{font-family:var(--mono);font-size:12px;color:var(--mute);letter-spacing:.04em}
+.trow.cur .wk{color:var(--ink)}
+.trow b{font-family:var(--mono);font-size:15px;text-align:right;color:var(--mute);font-weight:500}
+.trow b.met{color:var(--str)}
+.trow .none{font-family:var(--mono);color:var(--line)}
+.goal .g-tally{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:96px}
+.goal .g-tally .tally{height:46px}
+.goal .g-tally b{font-family:var(--mono);font-size:22px;font-weight:600}
+/* keep scrolling content from showing behind the iPhone status bar */
+body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;pointer-events:none}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -557,15 +580,15 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 
     <section class="card">
       <h2>Workout days</h2>
-      <p class="note">Last 18 weeks. Tap a day to open it.</p>
+      <p class="note">One mark for each kind of workout that day. Tap a day to open it.</p>
       <div class="heat" id="heat"></div>
-      <div class="legend">Fewer sets <span class="cell"></span><span class="cell l1"></span><span class="cell l2"></span><span class="cell l3"></span><span class="cell l4"></span> More</div>
+      <div class="tl-legend"><span><i style="background:var(--str)"></i>Strength</span><span><i style="background:var(--car)"></i>Cardio</span><span><i style="background:var(--mob)"></i>Mobility</span></div>
     </section>
 
     <section class="card">
       <h2>Workouts per week</h2>
-      <p class="note">Last 12 weeks. The dashed line is your goal.</p>
-      <div class="chart"><canvas id="chWeekly"></canvas></div>
+      <p class="note">One mark per workout day, colored by what you did most. Faint marks are what's left to hit your goal.</p>
+      <div class="tallies" id="weekTally"></div>
     </section>
 
     <section class="card">
@@ -804,7 +827,7 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "2.1.2";
+const APP_VERSION = "2.2.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -1772,6 +1795,26 @@ function baseOpts(){
   };
 }
 
+/* ----- tally marks ----- */
+const TYPE_VAR = {s:"var(--str)", c:"var(--car)", m:"var(--mob)"};
+function dayTypes(ds){ const t = []; if (ds.ssets) t.push("s"); if (ds.cmin) t.push("c"); if (ds.msec) t.push("m"); return t; }
+function dayMain(ds){ const pts = {s:ds.ssets, c:ds.cmin/10, m:ds.msec/60}; let best = "s", v = -1; for (const k in pts) if (pts[k] > v){ v = pts[k]; best = k; } return best; }
+/* cols: one color per mark. ghost: faint marks to show what's left. Every 5th mark slashes across the four before it. */
+function tallySVG(cols, ghost = 0){
+  const H = 24, BW = 4, GAP = 8, GG = 13;
+  const marks = cols.map(c => ({c, g:0})).concat(Array.from({length:ghost}, () => ({c:"var(--line)", g:1})));
+  if (!marks.length) return "";
+  let x = 0, out = "";
+  for (let i = 0; i < marks.length; i += 5){
+    const grp = marks.slice(i, i + 5), x0 = x, n = Math.min(grp.length, 4);
+    grp.slice(0, 4).forEach((m, j) => out += `<rect x="${x0 + j*GAP}" y="0" width="${BW}" height="${H}" fill="${m.c}"${m.g ? ' opacity=".9"' : ""}/>`);
+    if (grp[4]) out += `<line x1="${x0 - 4}" y1="${H*.82}" x2="${x0 + 3*GAP + BW + 4}" y2="${H*.18}" stroke="${grp[4].c}" stroke-width="${BW}"/>`;
+    x = x0 + (n - 1)*GAP + BW + GG;
+  }
+  const w = x - GG;
+  return `<svg class="tally" viewBox="-5 -1 ${w + 10} ${H + 2}" width="${w + 10}" height="${H + 2}" aria-hidden="true">${out}</svg>`;
+}
+
 function renderGoal(){
   const days = workoutDays(), mon = mondayOf(today());
   const done = days.filter(d => d >= mon).length, goal = state.goal;
@@ -1784,10 +1827,11 @@ function renderGoal(){
   const left = goal - done;
   const dayOfWeek = (new Date().getDay()+6)%7, daysLeft = 7 - dayOfWeek;
   const head = done >= goal ? (done > goal ? "Goal beaten" : "Goal reached") : left === 1 ? "1 workout to go" : `${left} workouts to go`;
-  let sub = done >= goal ? `${done} workouts this week. Nice work.` : `${daysLeft} ${daysLeft === 1 ? "day" : "days"} left this week`;
+  let sub = done >= goal ? `${done} workouts this week. Nice work.` : `${daysLeft} ${daysLeft === 1 ? "day" : "days"} left this week.`;
   const gs = goalStreak();
   if (gs.n >= 2) sub += ` ${gs.n}-week goal streak.`;
-  $("#goal").innerHTML = `<svg viewBox="0 0 120 120" role="img" aria-label="${done} of ${goal} workouts this week">${arcs}<text x="60" y="62" text-anchor="middle" class="ring-num">${done}/${goal}</text><text x="60" y="82" text-anchor="middle" class="ring-sub">this week</text></svg>
+  const wkCols = days.filter(d => d >= mon).map(d => TYPE_VAR[dayMain(dayStats(d))]);
+  $("#goal").innerHTML = `<div class="g-tally" role="img" aria-label="${done} of ${goal} workouts this week">${tallySVG(wkCols, Math.max(0, goal - done))}<b>${done}/${goal}</b></div>
     <div><h2>${head}</h2><p>${sub}</p><button class="link" id="changeGoal">Change goal</button></div>`;
   $("#changeGoal").onclick = openSettings;
 }
@@ -1820,10 +1864,10 @@ function renderHeat(){
     months += `<span>${m !== lastM ? dateOf(wkStart).toLocaleDateString(undefined,{month:"short"}) : ""}</span>`;
     lastM = m;
     for (let d=0; d<7; d++){
-      const k = addDays(wkStart, d), ds = dayStats(k), s = Math.round(ds.ssets + ds.cmin/10 + ds.msec/120);
-      const lvl = s === 0 ? "" : s <= 5 ? "l1" : s <= 12 ? "l2" : s <= 20 ? "l3" : "l4";
+      const k = addDays(wkStart, d), ds = dayStats(k), ty = dayTypes(ds);
+      const words = ty.map(x => ({s:"strength", c:"cardio", m:"mobility"})[x]).join(", ");
       if (k > t) cells += '<span class="cell future"></span>';
-      else cells += `<button class="cell ${lvl}${k === t ? " today" : ""}" data-k="${k}" title="${shortDate(k)}${s ? ": " + s + " sets" : ""}" aria-label="${shortDate(k)}, ${s ? s + " sets" : "no workout"}"></button>`;
+      else cells += `<button class="cell tl${ty.length ? " has" : ""}${k === t ? " today" : ""}" data-k="${k}" title="${shortDate(k)}${ty.length ? ": " + words : ""}" aria-label="${shortDate(k)}, ${ty.length ? words : "no workout"}">${ty.map(x => `<i style="background:${TYPE_VAR[x]}"></i>`).join("")}</button>`;
     }
   }
   $("#heat").innerHTML = `<div class="months">${months}</div><div class="grid">${cells}</div>`;
@@ -1846,13 +1890,17 @@ function weekBuckets(n){
   return out;
 }
 function renderWeekly(){
-  const b = weekBuckets(12), o = baseOpts(), acc = css("--accent"), goal = state.goal;
-  o.scales.y.suggestedMax = Math.max(5, goal + 1);
-  o.plugins.tooltip.callbacks = {title: i => "Week of " + i[0].label, label: i => i.dataset.type === "line" ? "Goal: " + goal : i.raw + (i.raw === 1 ? " workout" : " workouts")};
-  mkChart("chWeekly", {type:"bar", data:{labels:b.map(x => x.label), datasets:[
-    {type:"line", data:b.map(() => goal), borderColor:css("--ink"), borderDash:[6,5], borderWidth:1.5, pointRadius:0, pointHitRadius:0, order:0},
-    {data:b.map(x => x.days), backgroundColor:b.map(x => x.days >= goal ? acc : acc + "66"), borderRadius:6, maxBarThickness:28, order:1}
-  ]}, options:o});
+  const goal = state.goal, mon = mondayOf(today()), all = workoutDays(), first = all[0];
+  const rows = [];
+  for (let i = 0; i < 12; i++){
+    const st = addDays(mon, -i*7), en = addDays(st, 6);
+    if (i >= 4 && (!first || en < first)) break;   /* don't pad with weeks before you started */
+    const ks = all.filter(k => k >= st && k <= en), cur = i === 0;
+    const cols = ks.map(k => TYPE_VAR[dayMain(dayStats(k))]);
+    const marks = tallySVG(cols, cur ? Math.max(0, goal - ks.length) : 0);
+    rows.push(`<div class="trow${cur ? " cur" : ""}"><span class="wk">${cur ? "THIS WK" : shortDate(st).toUpperCase()}</span><div>${marks || '<span class="none">—</span>'}</div><b class="${ks.length >= goal ? "met" : ""}">${ks.length}</b></div>`);
+  }
+  $("#weekTally").innerHTML = rows.join("");
 }
 function renderDuration(){
   const ks = durSessions().slice(-12), o = baseOpts(), c = css("--shoulders");
@@ -1959,9 +2007,9 @@ function renderExChart(){
 $("#exSelect").onchange = renderExChart;
 
 function renderProgress(){
-  renderGoal(); renderStats(); renderHeat();
+  renderGoal(); renderStats(); renderHeat(); renderWeekly();   /* tallies work offline */
   if (!window.Chart){ document.querySelectorAll(".chart").forEach(c => c.innerHTML = '<p class="hint">Charts need an internet connection the first time the app loads.</p>'); return; }
-  renderWeekly(); renderCardioChart(); renderMobChart(); renderExSelect(); renderExChart(); renderSplit(); renderDuration(); renderVolume();
+  renderCardioChart(); renderMobChart(); renderExSelect(); renderExChart(); renderSplit(); renderDuration(); renderVolume();
 }
 
 /* ---------- CARDIO ---------- */
