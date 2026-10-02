@@ -590,6 +590,9 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
 .cam-reps{position:absolute;top:8px;right:14px;font-family:var(--mono);font-weight:700;font-size:min(26vw,108px);line-height:1;color:var(--ink);text-shadow:0 2px 14px rgba(0,0,0,.8)}
 .cam-reps.pop{animation:camPop .35s ease-out}
 @keyframes camPop{0%{transform:scale(1.25);color:var(--str)}100%{transform:scale(1)}}
+.cam-depth{position:absolute;left:10px;top:12%;bottom:12%;width:10px;background:rgba(242,239,232,.18);border-radius:5px;overflow:hidden}
+.cam-depth i{position:absolute;left:0;right:0;top:0;height:0;background:var(--ink);transition:height .1s}
+.cam-depth.deep i{background:var(--str)}
 .cam-msg{font-family:var(--mono);font-size:14px;text-align:center;min-height:40px;margin:12px 0 8px;color:var(--ink)}
 .cam-ctrl{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:8px}
 .cam-ctrl .btn{padding:14px 6px}
@@ -939,7 +942,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
   <div class="panel">
     <div class="sheet-head"><h2 id="camTitle">Rep counter</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="cam-name" id="camName"></div>
-    <div class="cam-view"><video id="camVideo" playsinline muted autoplay></video><canvas id="camCanvas"></canvas><div class="cam-reps" id="camReps" aria-live="polite">0</div></div>
+    <div class="cam-view"><video id="camVideo" playsinline muted autoplay></video><canvas id="camCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="camReps" aria-live="polite">0</div></div>
     <p class="cam-msg" id="camMsg"></p>
     <div class="cam-ctrl"><button class="btn ghost" id="camFlip">Flip</button><button class="btn ghost" id="camReset">Reset</button><button class="btn" id="camSave" disabled>Save</button></div>
     <p class="note cam-note">Counting happens on your phone. Video is never saved or sent anywhere.</p>
@@ -1040,7 +1043,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "3.0.1";
+const APP_VERSION = "3.0.2";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -3919,60 +3922,69 @@ function angleAt(a, b, c){
   const cos = (ab[0]*cb[0] + ab[1]*cb[1]) / (Math.hypot(...ab) * Math.hypot(...cb) || 1);
   return Math.acos(Math.max(-1, Math.min(1, cos))) * 180 / Math.PI;
 }
-function newCounter(){ return {reps:0, phase:"setup", ang:null, minAng:180, lastRep:0, msg:"Get in view", side:null, seen:0, view:null, d:null, top:0, ar:.75}; }
+function newCounter(){ return {reps:0, phase:"setup", ang:null, angTop:0, lastRep:0, msg:"Get in view", side:null, seen:0, view:null, y:null, topY:null, scale:null, ar:.75}; }
 /* lm: 33 MediaPipe landmarks (x, y in 0..1, visibility 0..1). t: milliseconds.
-   Works two ways: facing the phone (tracks how far your shoulders drop toward your hands)
-   or side on (tracks your elbow angle). */
+   Main signal: how far your shoulders drop and come back up, measured against your own size
+   (shoulder width facing the phone, arm length side on). Hands don't need to be visible.
+   Side on, the elbow angle can also confirm a rep. */
 function pushupStep(c, lm, t){
-  if (!lm || lm.length < 29){ c.msg = "Can't see you. Step back so your head, shoulders and hands are in view."; c.seen = 0; return false; }
-  const ar = c.ar || .75;                                  /* video width / height, so distances are in real proportions */
+  if (!lm || lm.length < 29){ c.msg = "Can't see you. Prop the phone a few feet away so your head and shoulders are in view."; c.seen = 0; return false; }
+  const ar = c.ar || .75;
   const vis = p => (p && (p.visibility ?? 1)) || 0;
   const P = k => ({x: lm[k].x * ar, y: lm[k].y, v: vis(lm[k])});
-  const [lS, rS, lE, rE, lW, rW, lH, rH] = [11, 12, 13, 14, 15, 16, 23, 24].map(P);
+  const [nose, lS, rS, lE, rE, lW, rW, lH, rH] = [0, 11, 12, 13, 14, 15, 16, 23, 24].map(P);
   const sw = Math.hypot(lS.x - rS.x, lS.y - rS.y);
-  const frontOK = lS.v > .6 && rS.v > .6 && lW.v > .45 && rW.v > .45 && sw > .07;
-  const sideScore = s => s === "L" ? lS.v + lE.v + lW.v : rS.v + rE.v + rW.v;
-  /* pick a view and stick with it unless it clearly stops working */
+  const frontOK = lS.v > .5 && rS.v > .5 && sw > .06;
+  const sideScore = q => q === "L" ? lS.v + lE.v + lW.v : rS.v + rE.v + rW.v;
   let view = c.view;
-  if (!view || (view === "front" && !frontOK) || (view === "side" && frontOK && sideScore(c.side || "L") < 2)) view = frontOK ? "front" : "side";
-  if (view !== c.view){ c.view = view; c.phase = "setup"; c.seen = 0; c.d = null; c.ang = null; c.top = 0; }
+  if (!view || (view === "front" && !frontOK) || (view === "side" && frontOK && sw > .1)) view = frontOK ? "front" : "side";
+  if (view !== c.view){ Object.assign(c, {view, phase:"setup", seen:0, topY:null, scale:null, ang:null, angTop:0}); }
 
+  let y, scale, need, upright = false, angRep = false;
   if (view === "front"){
-    const sm = {x:(lS.x + rS.x)/2, y:(lS.y + rS.y)/2}, wm = {y:(lW.y + rW.y)/2};
-    const hipV = (lH.v + rH.v) / 2, hipDrop = ((lH.y + rH.y)/2 - sm.y) / sw;
-    /* standing or kneeling upright: hips show up well below your shoulders */
-    if (hipV > .6 && hipDrop > 1.05){ c.msg = "Get into a plank facing the phone."; c.phase = "setup"; c.seen = 0; return false; }
-    if (wm.y < sm.y){ c.msg = "Put your hands down under your shoulders."; c.phase = "setup"; c.seen = 0; return false; }
-    const raw = (wm.y - sm.y) / sw;                        /* shoulder-to-hand drop, in shoulder widths */
-    c.d = c.d == null ? raw : c.d * .5 + raw * .5;
-    c.top = Math.max(c.d, (c.top || 0) - .004);            /* your "arms straight" height, slowly forgets */
-    c.seen++;
-    if (c.phase === "setup"){ if (c.seen > 4 && c.top > .7){ c.phase = "up"; c.msg = "Go down"; } else c.msg = "Straighten your arms to start"; return false; }
-    if (c.phase === "up"){ if (c.d < c.top * .62){ c.phase = "down"; c.msg = "Push up"; } else c.msg = "Go down"; return false; }
-    if (c.phase === "down"){
-      if (c.d > c.top * .86 && t - c.lastRep > 350){ c.reps++; c.lastRep = t; c.phase = "up"; c.msg = "Good"; return true; }
-      c.msg = "Push up";
+    const hipV = (lH.v + rH.v) / 2, hipDrop = ((lH.y + rH.y)/2 - (lS.y + rS.y)/2) / sw;
+    if (hipV > .65 && hipDrop > 1.05) upright = true;                    /* standing or kneeling tall */
+    const wrV = (lW.v + rW.v) / 2 > .5;
+    if (wrV && (lW.y + rW.y)/2 < (lS.y + rS.y)/2) upright = true;       /* hands above shoulders: not a pushup */
+    y = (lS.y + rS.y) / 2; scale = sw; need = .45;
+  } else {
+    const q = c.side && sideScore(c.side) > 1.4 ? c.side : (sideScore("L") >= sideScore("R") ? "L" : "R");
+    c.side = q;
+    const sh = q === "L" ? lS : rS, el = q === "L" ? lE : rE, wr = q === "L" ? lW : rW, hp = q === "L" ? lH : rH;
+    if (sh.v < .5){ c.msg = "Can't see your shoulders. Prop the phone a few feet away."; c.seen = 0; return false; }
+    if (hp.v > .4){ const ang = Math.abs(Math.atan2(hp.y - sh.y, hp.x - sh.x) * 180 / Math.PI); if (Math.min(ang, 180 - ang) > 50) upright = true; }
+    const armOK = el.v > .5 && wr.v > .5;
+    const arm = armOK ? Math.hypot(sh.x - el.x, sh.y - el.y) + Math.hypot(el.x - wr.x, el.y - wr.y) : 0;
+    const torso = hp.v > .4 ? Math.hypot(sh.x - hp.x, sh.y - hp.y) : 0;
+    y = sh.y; scale = arm || torso * .9; need = .28;
+    if (!scale){ c.msg = "Can't see your arms. Face the phone, or turn side on with your arm in view."; c.seen = 0; return false; }
+    if (armOK){                                                          /* elbow angle, adapted to the camera angle */
+      const raw = angleAt(sh, el, wr);
+      c.ang = c.ang == null ? raw : c.ang * .45 + raw * .55;
+      c.angTop = Math.max(c.ang, (c.angTop || 0) - .15);
     }
+  }
+  if (upright){ c.msg = view === "front" ? "Get into a plank facing the phone." : "Get into a plank, side on to the phone."; c.phase = "setup"; c.seen = 0; c.topY = null; return false; }
+
+  c.y = c.y == null ? y : c.y * .5 + y * .5;
+  if (c.phase !== "down") c.scale = c.scale == null ? scale : c.scale * .9 + scale * .1;
+  /* your top position: follows you up instantly, drifts down slowly only while you're at the top, frozen during a rep */
+  if (c.topY == null) c.topY = c.y;
+  else if (c.phase === "down") c.topY = Math.min(c.topY, c.y);
+  else c.topY = Math.min(c.y, c.topY + (c.y - c.topY < need * .5 * (c.scale || scale) ? .002 * (c.scale || scale) : 0));
+  const drop = (c.y - c.topY) / (c.scale || scale);                        /* in shoulder widths / arm lengths */
+  c.depth = Math.max(0, Math.min(1, drop / need));
+  c.seen++;
+  if (c.phase === "setup"){ if (c.seen > 4){ c.phase = "up"; c.msg = "Go down"; } else c.msg = "Hold the top for a second"; return false; }
+  const angDown = c.ang != null && c.angTop > 140 && c.ang < c.angTop - 55;
+  const angUp = c.ang != null && c.ang > c.angTop - 18;
+  if (c.phase === "up"){
+    if (drop > need || angDown){ c.phase = "down"; c.msg = "Push up"; }
+    else c.msg = drop > need * .5 ? "Lower" : "Go down";
     return false;
   }
-
-  /* side on */
-  const sides = {L:[11, 13, 15, 23, 27], R:[12, 14, 16, 24, 28]};
-  const s = c.side && sideScore(c.side) > 1.5 ? c.side : (sideScore("L") >= sideScore("R") ? "L" : "R");
-  c.side = s;
-  const [sh, el, wr, hp] = sides[s].map(P);
-  if (sh.v < .5 || el.v < .5 || wr.v < .5){ c.msg = "Can't see your arms. Face the phone or turn side on, with your hands in view."; c.seen = 0; return false; }
-  const body = hp.v > .4 ? Math.abs(Math.atan2(hp.y - sh.y, hp.x - sh.x) * 180 / Math.PI) : 90;
-  const flat = Math.min(body, 180 - body) < 40;
-  const raw = angleAt(sh, el, wr);
-  c.ang = c.ang == null ? raw : c.ang * .45 + raw * .55;
-  if (!flat){ c.msg = "Get into a plank, facing the phone or side on."; c.phase = "setup"; c.seen = 0; return false; }
-  c.seen++;
-  if (c.phase === "setup"){ if (c.ang > 150 && c.seen > 3){ c.phase = "up"; c.msg = "Go down"; } else c.msg = "Straighten your arms to start"; return false; }
-  if (c.phase === "up"){ if (c.ang < 100){ c.phase = "down"; c.minAng = c.ang; c.msg = "Push up"; } else c.msg = c.ang < 130 ? "Lower" : "Go down"; return false; }
   if (c.phase === "down"){
-    c.minAng = Math.min(c.minAng, c.ang);
-    if (c.ang > 150 && t - c.lastRep > 350){ c.reps++; c.lastRep = t; c.phase = "up"; c.msg = "Good"; return true; }
+    if ((drop < need * .35 || (angUp && drop < need * .7)) && t - c.lastRep > 400){ c.reps++; c.lastRep = t; c.phase = "up"; c.msg = "Good"; return true; }
     c.msg = "Push up";
   }
   return false;
@@ -3997,7 +4009,7 @@ async function camRun(els, onRep){
   if (cam.els !== els || !cam.stream) return;
   cam.active = true; window.__camOn = true; syncWake();
   cam.c.ar = (v.videoWidth && v.videoHeight) ? v.videoWidth / v.videoHeight : .75;
-  camMsg("Prop the phone up in front of you or to your side, with your head, shoulders and hands in view.");
+  camMsg("Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
   const loop = () => {
     if (!cam.active || cam.els !== els) return;
     if (v.readyState >= 2 && v.currentTime !== cam.lastT){
@@ -4006,7 +4018,10 @@ async function camRun(els, onRep){
       let pts = null;
       try { const r = lm.detectForVideo(v, t); pts = r && r.landmarks && r.landmarks[0]; } catch(err){}
       const rep = pushupStep(cam.c, pts, t);
+      if (screen.orientation && /landscape/.test(screen.orientation.type || "") && (v.videoHeight > v.videoWidth)) cam.c.msg = "Turn the phone upright. The counter needs a portrait picture.";
       drawPose(pts);
+      const dp = v.parentElement && v.parentElement.querySelector(".cam-depth i");
+      if (dp){ dp.style.height = Math.round((cam.c.phase === "setup" ? 0 : cam.c.depth || 0) * 100) + "%"; dp.parentElement.classList.toggle("deep", cam.c.phase === "down"); }
       if (rep){ tones(880, 1); buzz([60]); if (cam.onRep) cam.onRep(cam.c.reps); }
       camMsg(cam.c.msg);
     }
@@ -4302,7 +4317,7 @@ function wpRender(){
     const head = `<h3 class="pl-name">${esc(e.name)}</h3><div class="pl-side">${j >= 0 ? `Set ${j + 1} of ${n}` : `${doneN} ${doneN === 1 ? "set" : "sets"} done`}${target && wp.phase === "set" ? ` · ${target}` : ""}</div>`;
     const cam = usesCam(e) && wp.phase === "set";
     const media = cam
-      ? `<div class="cam-view wo-cam"><video id="woVideo" playsinline muted autoplay></video><canvas id="woCanvas"></canvas><div class="cam-reps" id="woCount">${wp.reps}</div></div><p class="cam-msg" id="woCamMsg">Starting the camera…</p>`
+      ? `<div class="cam-view wo-cam"><video id="woVideo" playsinline muted autoplay></video><canvas id="woCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="woCount">${wp.reps}</div></div><p class="cam-msg" id="woCamMsg">Starting the camera…</p>`
       : `<div class="wo-fig${wp.phase === "rest" ? " dim" : ""}">${FIG_SVG}</div>`;
     if (wp.phase === "set"){
       const stepper = (k, label, val, unit) => `<div class="wo-step"><span>${label}</span><div class="stepper"><button data-wo="${k}-" aria-label="Less">−</button><b>${val}${unit || ""}</b><button data-wo="${k}+" aria-label="More">+</button></div></div>`;
