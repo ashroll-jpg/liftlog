@@ -1,6 +1,6 @@
 // Tally offline support + automatic updates.
 // The version below changes with every release so phones pick up the new files.
-const VERSION = "liftlog-3.0.2";
+const VERSION = "liftlog-3.1.0";
 const KEEP = "tally-models";   // big downloads (rep counter, screenshot reader) survive app updates
 const CORE = [
   "./", "./index.html", "./manifest.json",
