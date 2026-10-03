@@ -57,7 +57,7 @@ button{cursor:pointer}
 body.timing .wrap{padding-bottom:180px}
 
 /* top bar */
-.top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0 6px;position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:color-mix(in srgb,var(--bg) 78%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 -60px 0 60px color-mix(in srgb,var(--bg) 78%,transparent)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0 6px;position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:color-mix(in srgb,var(--bg) 78%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 -60px 0 60px color-mix(in srgb,var(--bg) 78%,transparent),0 0 0 100vmax color-mix(in srgb,var(--bg) 78%,transparent);clip-path:inset(-200px -100vmax 0 -100vmax)}
 .clock{display:flex;align-items:center;gap:4px;margin-left:auto}
 .clock-main{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:4px;padding:6px 14px 6px 10px;font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1;min-width:98px}
 .clock-main svg{width:18px;height:18px;flex-shrink:0}
@@ -745,6 +745,40 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
 .ex-pick{display:flex;gap:8px;align-items:center}
 .ex-pick select{flex:1;min-width:0}
 .dens-key{font-size:12px;margin-top:8px}
+@media (min-width:760px){
+  #woPlayer .panel{top:0;bottom:0;left:0;right:0;transform:none;max-width:none;width:100%;height:100%;border-radius:0;padding:calc(env(safe-area-inset-top,0px) + 14px) 28px calc(env(safe-area-inset-bottom,0px) + 14px)}
+  #woPlayer .sheet-head{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);right:16px;margin:0;z-index:3}
+  #woPlayer .sheet-head h2{display:none}
+  .wo-top{padding-right:56px}
+  .wo-clock span{font-size:13px}
+  .wo-clock b{font-size:clamp(64px,9vw,132px);line-height:.95;letter-spacing:-.02em}
+  .wo-end{padding:14px 20px;font-size:15px}
+  .wo-chip{font-size:15px;padding:10px 14px}
+  .wo-main > .pl-name{font-size:clamp(30px,4.2vw,60px)}
+  .wo-main > .pl-side{font-size:clamp(15px,1.6vw,22px)}
+  .wo-step > span{font-size:14px}
+  .wo-step .stepper b{font-size:clamp(48px,6vw,84px);min-width:1.8em}
+  .wo-step .stepper button{width:76px;height:76px;font-size:36px}
+  .wo-settime{font-size:18px}
+  .wo-settime b{font-size:30px}
+  .wo-actions .finish-btn{padding:26px;font-size:24px}
+  .wo-row3 .btn{padding:20px 6px;font-size:18px}
+  .wo-nav .btn{padding:18px 6px;font-size:17px}
+  .wo-main .pl-time{font-size:clamp(96px,14vw,200px)}
+  .wo-main .cam-reps{font-size:clamp(120px,22vh,260px);top:10px;right:22px}
+  .wo-main .cam-depth{width:30px;left:16px;top:5%;bottom:5%;border-radius:15px;background:rgba(242,239,232,.22)}
+  .wo-main .cam-msg{font-size:20px}
+  .wo-cam{min-height:40vh}
+}
+@media (min-width:900px) and (orientation:landscape){
+  .wo-main{grid-template-columns:1.65fr 1fr;gap:6px 36px}
+  .wo-media{position:relative}
+  .wo-media .wo-cam{height:calc(100dvh - 420px);max-height:none;min-height:300px;max-width:none}
+  .wo-media .cam-msg{position:absolute;left:0;right:0;bottom:34px;margin:0;padding:22px 16px 12px;min-height:0;background:linear-gradient(transparent,rgba(0,0,0,.8));z-index:1}
+  .wo-media .wo-camlinks{margin:6px 0 0}
+  .wo-media .wo-fig{width:min(calc(100dvh - 340px),520px)}
+  .wo-main > .wo-fig,.wo-main > .wo-cam{max-width:none}
+}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1151,7 +1185,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "3.5.0";
+const APP_VERSION = "3.5.1";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -4322,10 +4356,23 @@ function migrateSess(k){
     }
     orphans.forEach(e => e.sid = tgt.id);
   }
+  /* only one session can be open; fold extra drafts (e.g. from two devices) into it */
+  const opens = S.filter(s => !s.end);
+  if (opens.length > 1){
+    const keep = opens.find(s => s.start) || opens[0];
+    opens.forEach(o => { if (o === keep) return; str.forEach(e => { if (e.sid === o.id) e.sid = keep.id; }); });
+    S = S.filter(s => s.end || s === keep);
+  }
+  /* identical copies of the same exercise in one session are sync leftovers: keep one */
+  const seen = new Set(), dupes = [];
+  str.forEach(e => { const key = e.sid + "|" + JSON.stringify([e.name, e.sets]); if (seen.has(key)) dupes.push(e); else seen.add(key); });
+  if (dupes.length){ state.workouts[k] = list.filter(e => !dupes.includes(e)); }
+  const changed = opens.length > 1 || dupes.length;
   /* ended sessions that lost all their exercises disappear */
-  state.sessions[k] = S.filter(s => !s.end || str.some(e => e.sid === s.id));
+  const str2 = (state.workouts[k] || []).filter(isStr);
+  state.sessions[k] = S.filter(s => !s.end || str2.some(e => e.sid === s.id));
   if (!state.sessions[k].length) delete state.sessions[k];
-  if (orphans.length) save();
+  if (orphans.length || changed) save();
 }
 function sessList(k){ migrateSess(k); return (state.sessions || {})[k] || []; }
 function ensureOpen(k){
@@ -4423,6 +4470,7 @@ const undoneJ = e => e.sets.findIndex(s => !s.done);
 const usesCam = e => e.type === "s" && !!camKind(e.name) && !(state.camOff || {})[camKind(e.name)];
 function openWoPlayer(){
   const r = runningSess(); if (!r) return;
+  if (!(r.s.start > 1e12)){ r.s.start = Date.now(); save(); }
   Object.assign(wp, {open:true, k:r.k, sid:r.s.id});
   const order = wpOrder(), list = wpList();
   const first = order.find(i => undoneJ(list[i]) >= 0);
@@ -4497,7 +4545,7 @@ function wpAddSet(idx){
   delete ns.done; delete ns.t; e.sets.push(ns); save(); wpEnter(idx);
 }
 function wpTick(){
-  const s = wpSess(); if (!s){ closeWoPlayer(); return; }
+  const s = wpSess(); if (!s || !s.start || s.end){ closeWoPlayer(); return; }
   const now = Date.now(), T = id => document.getElementById(id);
   if (T("woSess")) T("woSess").textContent = fmtClock(now - s.start);
   if (wp.phase === "set"){
@@ -4618,7 +4666,8 @@ function mergeDay(L, R){
   const sess = {};
   [...((R && R.s) || []), ...((L && L.s) || [])].forEach(s => {
     const o = sess[s.id];
-    if (!o || (s.end && !o.end) || ((s.end || 0) > (o.end || 0))) sess[s.id] = s;
+    const rank = x => (x.end ? 2e13 + (x.end || 0) : 0) + (x.start ? 1e13 : 0);
+    if (!o || rank(s) > rank(o)) sess[s.id] = s;
   });
   out.s = Object.values(sess);
   const score = e => e.sets.filter(x => x.done || filled(x)).length;
@@ -4692,7 +4741,7 @@ async function pullRemote(){
   const txt = f.truncated ? await (await fetch(f.raw_url, {cache:"no-store"})).text() : f.content;
   try { return JSON.parse(txt); } catch(e){ return null; }
 }
-const playersBusy = () => (typeof wp !== "undefined" && wp.open) || (typeof player !== "undefined" && player.iv);
+const playersBusy = () => (typeof wp !== "undefined" && wp.open) || (typeof player !== "undefined" && player.iv) || !!runningSess();
 async function syncNow(manual){
   if (!syncCfg.token) return;
   if (syncBusy){ syncAgain = true; return; }
