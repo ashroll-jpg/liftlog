@@ -1,10 +1,10 @@
 // Tally offline support + automatic updates.
 // The version below changes with every release so phones pick up the new files.
-const VERSION = "liftlog-3.1.0";
+const VERSION = "liftlog-3.5.0";
 const KEEP = "tally-models";   // big downloads (rep counter, screenshot reader) survive app updates
 const CORE = [
   "./", "./index.html", "./manifest.json",
-  "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png",
+  "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./bg.jpg",
   "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"
 ];
 
@@ -23,6 +23,9 @@ self.addEventListener("fetch", e => {
 
   // Update checks always go straight to the network.
   if (url.searchParams.has("fresh")) return;
+
+  // Sync talks to GitHub live. Never serve it from the cache.
+  if (url.hostname === "api.github.com" || url.hostname === "gist.githubusercontent.com") return;
 
   // Rep counter and screenshot reader files: download once, keep across updates.
   if (/storage\.googleapis\.com\/mediapipe-models|cdn\.jsdelivr\.net\/npm\/(@mediapipe|tesseract)/.test(req.url)){

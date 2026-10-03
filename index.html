@@ -672,6 +672,79 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
 .wo-nav .btn:disabled{opacity:.35}
 .pl-fig .wt{fill:var(--str)}
 
+.mob-goal{margin-top:10px}
+.mob-goal .g-tally b{color:var(--mob)}
+#mobGoalLine{display:flex;justify-content:center;margin-top:8px}
+.mg-row{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:var(--mute)}
+.mg-row .tally{height:18px}
+.mg-row b{color:var(--mob);font-size:14px;font-weight:600}
+.wo-media,.wo-ctl{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px}
+.wo-ctl{flex:1}
+.wo-media .wo-cam{width:100%}
+.pl-fig,.wo-fig .pl-fig{aspect-ratio:1 / 1}
+/* ---------- iPad and larger screens ---------- */
+@media (min-width:760px){
+  .sheet .panel{top:50%;bottom:auto;transform:translateY(-50%);border-radius:12px;max-width:620px;height:min(82vh,780px)}
+  .sheet .panel.short{height:auto;max-height:82vh}
+  #woPlayer .panel,#mobPlayer .panel,#ivPlayer .panel,#camSheet .panel{max-width:760px;height:min(92vh,980px)}
+  .cam-tips{left:50%;right:auto;width:min(520px,calc(100vw - 32px));transform:translateX(-50%)}
+  .toast{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  .wo-fig{width:min(34vh,260px)}
+  .wo-cam{min-height:36vh}
+  .pl-fig{width:min(34vh,280px)}
+}
+@media (min-width:900px){
+  .wrap{max-width:1120px;padding-left:28px;padding-right:28px}
+  .tabs .in{max-width:820px}
+  #logView,#cardioView,#mobilityView{max-width:760px;margin:0 auto}
+  /* Progress: two columns */
+  #progressView:not([hidden]){display:grid;grid-template-columns:1fr 1fr;gap:0 18px;align-items:start}
+  #progressView > .page-title,#progressView > .recap,#progressView > .stats,#progressView > .card:nth-of-type(4){grid-column:1 / -1}
+  #progressView > .goal{margin-top:0;height:100%}
+  #progressView > .mob-goal{margin-top:0}
+  #progressView .stats{grid-template-columns:repeat(4,1fr)}
+  /* Body map: map on the left, details on the right */
+  #bodyView:not([hidden]){display:grid;grid-template-columns:1.1fr 1fr;gap:0 18px;align-items:start}
+  #bodyView > .page-title,#bodyView > #recovery{grid-column:1 / -1}
+  .body-l{position:sticky;top:76px}
+  /* players: picture on the left, controls on the right, when there's room */
+  #woPlayer .panel,#mobPlayer .panel,#ivPlayer .panel,#camSheet .panel{max-width:1040px}
+}
+@media (min-width:900px) and (orientation:landscape){
+  .wo-main{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto 1fr;gap:4px 32px;align-items:center}
+  .wo-main > .pl-name,.wo-main > .pl-side,.wo-main > .wo-center{grid-column:1 / -1}
+  .wo-main > .wo-actions{grid-column:1 / -1;max-width:520px;justify-self:center}
+  .wo-media{grid-column:1;grid-row:3;align-self:center}
+  .wo-ctl{grid-column:2;grid-row:3;align-self:center;flex:0}
+  .wo-media .wo-fig{width:min(46vh,340px)}
+  .wo-media .wo-cam{flex:none;height:min(46vh,460px);max-height:none}
+  #mobPlayer .player{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:row dense;gap:4px 28px;align-content:center;justify-items:center}
+  #mobPlayer .player > *{grid-column:2}
+  #mobPlayer .player > .pl-fig{grid-column:1;grid-row:1 / span 9;width:min(52vh,360px);aspect-ratio:1 / 1}
+  #mobPlayer .player > .pl-bar,#mobPlayer .player > .pl-ctrl{width:100%}
+}
+.sync-on{display:flex;align-items:center;gap:14px}
+.sync-setup{padding:4px 0 16px;border-bottom:1px solid var(--line);font-size:14px;color:var(--mute)}
+.sync-setup ol{margin:0 0 10px;padding-left:20px;display:flex;flex-direction:column;gap:10px;color:var(--ink)}
+.sync-setup a{color:var(--str)}
+.sync-setup small{display:block;font-size:12px;line-height:1.4}
+.sync-in{display:flex;gap:8px;margin-top:8px}
+.sync-in input{flex:1;min-width:0;background:var(--field);border:1px solid var(--line);color:var(--ink);border-radius:4px;padding:10px;font-family:var(--mono);font-size:14px}
+.ex-title{cursor:pointer}
+.ex-title::after{content:" ›";color:var(--mute);font-weight:400}
+.exd-scroll{overflow-y:auto;flex:1;min-height:0;padding-bottom:10px}
+.exd-tag{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:0 0 12px}
+.exd-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 10px}
+.exd-stats div{border-top:1px solid var(--line);padding-top:8px;min-width:0}
+.exd-stats b{display:block;font-family:var(--mono);font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exd-stats span{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.04em}
+.exd-h{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin:20px 0 8px;font-weight:500}
+.exd-row{display:grid;grid-template-columns:62px 1fr auto;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-family:var(--mono);font-size:13px;align-items:center}
+.exd-row span:first-child{color:var(--mute)}
+.exd-row .pr{font-size:10px;letter-spacing:.12em;background:var(--str);color:#0E0E0E;padding:2px 5px}
+.ex-pick{display:flex;gap:8px;align-items:center}
+.ex-pick select{flex:1;min-width:0}
+.dens-key{font-size:12px;margin-top:8px}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -729,6 +802,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
       <h1 id="mobTitle">Today</h1>
       <button class="icon-btn" id="mobNext" aria-label="Next day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
       <div class="sub" id="mobSub"></div>
+      <div id="mobGoalLine"></div>
     </div>
     <div class="loaded" id="mobLoaded"></div>
     <div id="mobHero"></div>
@@ -742,6 +816,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
   <main id="bodyView" hidden>
     <h1 class="page-title">Body map</h1>
     <section class="card" id="recovery" hidden></section>
+    <div class="body-l">
     <div class="seg range" id="viewSeg" role="group" aria-label="Training type"><button data-view="all">All</button><button data-view="s">Strength</button><button data-view="c">Cardio</button><button data-view="m">Mobility</button></div>
     <div class="seg range" id="rangeSeg" role="group" aria-label="Time range"><button data-r="30">30 days</button><button data-r="60">60 days</button><button data-r="90">90 days</button></div>
     <section class="card">
@@ -751,17 +826,21 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
       </div>
       <div class="bl" id="bodyLegend"></div>
     </section>
+    </div>
+    <div class="body-r">
     <section class="card" id="muscleDetail"></section>
     <section class="card">
       <h2>Muscle balance</h2>
       <p class="note">Points per muscle. One point is a strength set, 10 minutes of cardio, or 1 minute of stretching. Helper muscles get partial credit.</p>
       <div id="balance"></div>
     </section>
+    </div>
   </main>
 
   <main id="progressView" hidden>
     <h1 class="page-title">Progress</h1>
     <section class="goal" id="goal"></section>
+    <section class="goal mob-goal" id="mobGoalCard"></section>
     <section class="card recap" id="recapProg"></section>
     <div class="stats" id="stats"></div>
 
@@ -776,6 +855,13 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
       <h2>Workouts per week</h2>
       <p class="note">One mark per workout day, colored by what you did most. Faint marks are what's left to hit your goal.</p>
       <div class="tallies" id="weekTally"></div>
+    </section>
+
+    <section class="card">
+      <h2>Training density</h2>
+      <p class="note" id="densityNote"></p>
+      <div class="chart"><canvas id="chDensity"></canvas></div>
+      <p class="note dens-key">Bars: reps of work per week (holds count 1 per 5 seconds). Line: reps per minute in timed sessions. The same work packed into fewer, faster sessions reads denser.</p>
     </section>
 
     <section class="card">
@@ -799,7 +885,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
     <section class="card">
       <h2>Exercise progress</h2>
       <p class="note" id="exNote">Best set per session</p>
-      <select id="exSelect" aria-label="Choose exercise"></select>
+      <div class="ex-pick"><select id="exSelect" aria-label="Choose exercise"></select><button class="btn ghost" id="exDetailBtn">Details</button></div>
       <div class="chart tall"><canvas id="chEx"></canvas></div>
     </section>
 
@@ -899,8 +985,9 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
       <h2 id="settingsTitle">Settings</h2>
       <button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
-    <div class="setting"><p>Weekly goal<small>Workouts per week</small></p><div class="stepper"><button id="goalDown" aria-label="Lower goal">−</button><b id="goalVal">3</b><button id="goalUp" aria-label="Raise goal">+</button></div></div>
-    <div class="setting"><p>Background photos<small id="photoStatus">Faded black-and-white photos behind each tab</small></p><button class="btn ghost" id="openPhotos">Set up</button></div>
+    <div class="setting"><p>Weekly goal<small>Strength and cardio days per week</small></p><div class="stepper"><button id="goalDown" aria-label="Lower goal">−</button><b id="goalVal">3</b><button id="goalUp" aria-label="Raise goal">+</button></div></div>
+    <div class="setting"><p>Mobility goal<small>Stretch days per week</small></p><div class="stepper"><button id="mobGoalDown" aria-label="Lower mobility goal">−</button><b id="mobGoalVal">3</b><button id="mobGoalUp" aria-label="Raise mobility goal">+</button></div></div>
+    <div class="setting" hidden><p>Background photos<small id="photoStatus">Faded black-and-white photos behind each tab</small></p><button class="btn ghost" id="openPhotos">Set up</button></div>
     <div class="setting"><p>Workout reminders<small id="remStatus">Add alerts to your phone's calendar</small></p><button class="btn ghost" id="openRem">Set up</button></div>
     <div class="setting" hidden><p>Workout timer beeps<small id="awakeStatus">Keeps your screen on while running</small></p><div class="seg" id="beepSeg"><button data-b="0">Off</button><button data-b="30">30s</button><button data-b="60">1 min</button></div></div>
     <div class="setting"><p>Vibrate with beeps<small id="vibStatus">Buzzes at each interval</small></p><div class="seg" id="vibSeg"><button data-v="0">Off</button><button data-v="1">On</button></div></div>
@@ -910,6 +997,15 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
     <div class="setting"><p>Weight unit</p><div class="seg" id="unitSeg"><button data-u="lb">lb</button><button data-u="kg">kg</button></div></div>
     <div class="setting"><p>Back up your log<small>Your data lives in this browser. Save a backup file now and then.</small></p><button class="btn ghost" id="exportBtn">Export</button></div>
     <div class="setting"><p>Restore from backup<small>Replaces what's on this device.</small></p><button class="btn ghost" id="importBtn">Import</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
+    <div class="setting sync-row"><p>Sync between devices<small id="syncStatus"></small></p><div id="syncOn" class="sync-on" hidden><button class="btn ghost" id="syncNowBtn">Sync now</button><button class="link" id="syncOff">Turn off</button></div></div>
+    <div class="sync-setup" id="syncSetup">
+      <ol>
+        <li><a href="https://github.com/settings/tokens/new?scopes=gist&amp;description=Tally%20sync" target="_blank" rel="noopener">Create a GitHub token</a>. It opens with only <b>gist</b> checked. Set Expiration to <b>No expiration</b>, tap <b>Generate token</b>, and copy it.</li>
+        <li>Paste it here and tap Connect.<div class="sync-in"><input id="syncToken" type="password" placeholder="ghp_…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="GitHub token"><button class="btn" id="syncConnect">Connect</button></div></li>
+        <li>Do the same on your other device. Use the same token, or make a second one.</li>
+      </ol>
+      <small>The token can only read and write gists. Your log is saved to a secret gist in your GitHub account, unlisted but not encrypted. The token stays on this device.</small>
+    </div>
     <div class="setting"><p>Tally <span class="version" id="versionLabel"></span><small id="updateStatus">Updates install automatically when you open the app</small></p><button class="btn ghost" id="checkUpdate">Check now</button></div>
     <div class="setting"><p>Exercise catalog<small id="catStatus"></small><small id="offlineStatus"></small></p><button class="btn ghost" id="reloadCat">Refresh</button></div>
   </div>
@@ -935,6 +1031,13 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
   </div>
 </div>
 <!-- mobility: guided player -->
+<div class="sheet" id="exdSheet" role="dialog" aria-modal="true" aria-labelledby="exdTitle">
+  <div class="scrim"></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="exdTitle">Exercise</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="exd-scroll" id="exdBody"></div>
+  </div>
+</div>
 <div class="sheet" id="woPlayer" role="dialog" aria-modal="true" aria-labelledby="woTitle">
   <div class="scrim"></div>
   <div class="panel">
@@ -1048,14 +1151,14 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "3.1.0";
+const APP_VERSION = "3.5.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
   get(k){ try { return localStorage.getItem(k); } catch(e){ return mem[k] || null; } },
   set(k,v){ try { localStorage.setItem(k,v); } catch(e){ mem[k] = v; } }
 };
-const DEFAULTS = {workouts:{}, custom:[], templates:[], unit:"lb", goal:3, rest:90, autoRest:false, bar:null, beepEvery:30, clock:{start:null, acc:0}, dur:{}, notes:{}, reminders:{days:[1,3,5], time:"18:00", alert:15, set:false}, nudgeOff:null, celebrated:null, mode:{}, vibrate:true, silentBeep:false, bodyRange:30, finished:{}, sessions:{}, recapSeen:"", typeOver:{}, timedMigrated:false, photoOp:0.16, photoFocus:{}};
+const DEFAULTS = {workouts:{}, custom:[], templates:[], unit:"lb", goal:3, rest:90, autoRest:false, bar:null, beepEvery:30, clock:{start:null, acc:0}, dur:{}, notes:{}, reminders:{days:[1,3,5], time:"18:00", alert:15, set:false}, nudgeOff:null, celebrated:null, mode:{}, vibrate:true, silentBeep:false, bodyRange:30, finished:{}, sessions:{}, mobGoal:3, recapSeen:"", typeOver:{}, timedMigrated:false, photoOp:0.16, photoFocus:{}};
 function load(){
   try { const s = JSON.parse(store.get(KEY)); if (s && s.workouts) return Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), s); } catch(e){}
   return JSON.parse(JSON.stringify(DEFAULTS));
@@ -1063,7 +1166,7 @@ function load(){
 let state = load();
 /* one-time safety copy before workouts become sessions */
 try { if (store.get(KEY) && !store.get(KEY + ".pre3")) store.set(KEY + ".pre3", store.get(KEY)); } catch(e){}
-function save(){ store.set(KEY, JSON.stringify(state)); }
+function save(){ store.set(KEY, JSON.stringify(state)); try { scheduleSync(); } catch(e){} }
 
 /* ---------- groups ---------- */
 const GROUPS = ["Chest","Back","Shoulders","Arms","Legs","Core","Full body","Cardio","Mobility"];
@@ -1203,6 +1306,11 @@ const isWorkoutDay = k => dayStats(k).sets > 0;
 const UNIT_MI = {mi:1, km:0.621371, yd:1/1760, m:1/1609.344};
 const toMiles = (d, u) => d * (UNIT_MI[u || "mi"] || 1);
 const workoutDays = () => Object.keys(state.workouts).filter(isWorkoutDay).sort();
+/* the workout goal counts strength and cardio only; stretching has its own goal */
+const isGoalDay = k => { const d = dayStats(k); return d.ssets > 0 || d.cmin > 0; };
+const goalDays = () => Object.keys(state.workouts).filter(isGoalDay).sort();
+const mobDays = () => Object.keys(state.workouts).filter(k => dayStats(k).msec > 0).sort();
+const dayMainSC = d => d.ssets >= d.cmin / 10 ? "s" : "c";
 const blankSet = type => type === "c" ? {min:"", dist:""} : type === "t" ? {sec:""} : {w:"", r:""};
 function lastTime(name, before){
   const keys = Object.keys(state.workouts).filter(k => k < before).sort().reverse();
@@ -1377,7 +1485,7 @@ function renderLog(){
       ? `<textarea class="note-edit" data-note="${esc(e.name)}" placeholder="Grip, seat setting, how it felt…" aria-label="Note for ${esc(e.name)}">${esc(note)}</textarea>`
       : note ? `<button class="ex-note" data-act="note" data-i="${i}">${esc(note)}</button>` : "";
     const c = `<article class="ex${cls}" data-idx="${i}" style="--c:var(${GVAR[e.group] || "--mobility"})">
-      <header><div><h3>${esc(e.name)}</h3><span class="tag">${esc(e.group)}</span>${modeBtn}${inSS ? '<span class="ss-tag">Superset</span>' : ""}</div>
+      <header><div><h3 class="ex-title" data-act="detail" data-i="${i}" role="button" tabindex="0" aria-label="${esc(e.name)} history">${esc(e.name)}</h3><span class="tag">${esc(e.group)}</span>${modeBtn}${inSS ? '<span class="ss-tag">Superset</span>' : ""}</div>
         <span class="btns"><button class="icon-btn" data-act="note" data-i="${i}" aria-label="${note ? "Edit" : "Add"} note for ${esc(e.name)}">${ICON_PEN}</button>
         <button class="icon-btn" data-act="del-ex" data-i="${i}" aria-label="Remove ${esc(e.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></header>
       ${noteHtml}
@@ -1477,6 +1585,7 @@ $("#exList").addEventListener("click", ev => {
   if (act === "repeat"){ repeatDay(b.dataset.k); return; }
   if (act === "tpls"){ openTemplates(); return; }
   if (act === "cam"){ openCam(i); return; }
+  if (act === "detail"){ if (e) openExDetail(e.name); return; }
   if (act === "reopen"){ delete state.finished[curDate]; finOpen.clear(); save(); renderLog(); return; }
   if (act === "unfold"){ finOpen.add(i); renderLog(); return; }
   if (act === "fold"){ finOpen.delete(i); renderLog(); return; }
@@ -1891,8 +2000,8 @@ const daysBetween = (a,b) => Math.round((dateOf(b) - dateOf(a)) / 86400000);
 function fmtTime(t){ const [h,m] = t.split(":").map(Number); return new Date(2000,0,1,h,m).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}); }
 function pickNudge(){
   const t = today();
-  if (curDate !== t || state.nudgeOff === t || isWorkoutDay(t)) return null;
-  const days = workoutDays(), goal = state.goal;
+  if (curDate !== t || state.nudgeOff === t || isGoalDay(t)) return null;
+  const days = goalDays(), goal = state.goal;
   if (!days.length) return {title:"First workout. Let's count it.", sub:"Tap Add exercise to start."};
   const done = days.filter(d => d >= mondayOf(t)).length, left = goal - done;
   const daysLeft = 7 - (new Date().getDay()+6)%7;
@@ -1984,8 +2093,8 @@ $("#remGoogle").onclick = () => {
 const TOTAL_MILESTONES = [1,10,25,50,75,100,150,200,250,300,400,500,750,1000];
 const STREAK_MILESTONES = [2,4,8,12,26,52];
 const TOTAL_LINES = {1:"Every streak starts with one.", 10:"Double digits. The habit is forming.", 25:"Twenty-five sessions of showing up.", 50:"Fifty workouts. That's real consistency.", 100:"A hundred workouts. Seriously impressive."};
-function goalStreak(){
-  const days = workoutDays(), goal = state.goal;
+function goalStreak(days, goal){
+  days = days || goalDays(); goal = goal || state.goal;
   const count = k => { const e = addDays(k,6); return days.filter(d => d >= k && d <= e).length; };
   let wk = mondayOf(today()), n = 0;
   const met = count(wk) >= goal;
@@ -1996,7 +2105,7 @@ function goalStreak(){
 }
 function checkMilestones(silent){
   const c = state.celebrated || (state.celebrated = {});
-  const total = workoutDays().length;
+  const total = goalDays().length;
   let hit = null;
   TOTAL_MILESTONES.forEach(m => {
     if (total >= m && !c["t"+m]){ c["t"+m] = 1; hit = {big:m, title: m === 1 ? "First workout logged" : m + " workouts logged", sub: TOTAL_LINES[m] || "That's a lot of showing up."}; }
@@ -2099,7 +2208,7 @@ function tallySVG(cols, ghost = 0){
 }
 
 function renderGoal(){
-  const days = workoutDays(), mon = mondayOf(today());
+  const days = goalDays(), mon = mondayOf(today());
   const done = days.filter(d => d >= mon).length, goal = state.goal;
   const R = 46, C = 2*Math.PI*R, gap = goal > 1 ? 7 : 0, seg = C/goal - gap;
   let arcs = "";
@@ -2113,20 +2222,35 @@ function renderGoal(){
   let sub = done >= goal ? `${done} workouts this week. Nice work.` : `${daysLeft} ${daysLeft === 1 ? "day" : "days"} left this week.`;
   const gs = goalStreak();
   if (gs.n >= 2) sub += ` ${gs.n}-week goal streak.`;
-  const wkCols = days.filter(d => d >= mon).map(d => TYPE_VAR[dayMain(dayStats(d))]);
+  const wkCols = days.filter(d => d >= mon).map(d => TYPE_VAR[dayMainSC(dayStats(d))]);
   $("#goal").innerHTML = `<div class="g-tally" role="img" aria-label="${done} of ${goal} workouts this week">${tallySVG(wkCols, Math.max(0, goal - done))}<b>${done}/${goal}</b></div>
     <div><h2>${head}</h2><p>${sub}</p><button class="link" id="changeGoal">Change goal</button></div>`;
   $("#changeGoal").onclick = openSettings;
+  renderMobGoal();
+}
+/* separate stretching goal: stretch days per week */
+function mobGoalHTML(compact){
+  const mon = mondayOf(today()), g = state.mobGoal || 3, done = mobDays().filter(d => d >= mon).length;
+  const cols = Array.from({length:done}, () => "var(--mob)");
+  const gs = goalStreak(mobDays(), g);
+  const head = done >= g ? "Stretch goal reached" : `${g - done} stretch ${g - done === 1 ? "day" : "days"} to go`;
+  const sub = (done >= g ? `${done} stretch days this week.` : "Mobility has its own goal. It doesn't count toward workouts.") + (gs.n >= 2 ? ` ${gs.n}-week streak.` : "");
+  if (compact) return `<div class="mg-row" role="img" aria-label="${done} of ${g} stretch days this week">${tallySVG(cols, Math.max(0, g - done))}<b>${done}/${g}</b><span>stretch days this week</span></div>`;
+  return `<div class="g-tally" role="img" aria-label="${done} of ${g} stretch days this week">${tallySVG(cols, Math.max(0, g - done))}<b>${done}/${g}</b></div>
+    <div><h2>${head}</h2><p>${esc(sub)}</p><button class="link" id="changeMobGoal">Change goal</button></div>`;
+}
+function renderMobGoal(){
+  const box = $("#mobGoalCard"); if (box){ box.innerHTML = mobGoalHTML(false); $("#changeMobGoal").onclick = openSettings; }
 }
 
 function renderStats(){
-  const days = workoutDays(), t = today(), set = {};
+  const days = goalDays(), t = today(), set = {};
   days.forEach(k => set[k] = 1);
   let streak = 0, k = set[t] ? t : addDays(t,-1);
   while (set[k]){ streak++; k = addDays(k,-1); }
   const since = addDays(t,-29);
   let reps = 0; const cardio30 = {min:0, mi:0}, mob30 = {sec:0, days:0};
-  days.forEach(d => { if (d >= since){ const x = dayStats(d); reps += x.reps; cardio30.min += x.cmin; cardio30.mi += x.cmi; mob30.sec += x.msec; if (x.msec) mob30.days++; } });
+  workoutDays().forEach(d => { if (d >= since){ const x = dayStats(d); reps += x.reps; cardio30.min += x.cmin; cardio30.mi += x.cmi; mob30.sec += x.msec; if (x.msec) mob30.days++; } });
   const repStr = reps >= 100000 ? Math.round(reps/1000) + "k" : fmtN(reps);
   $("#stats").innerHTML =
     `<div class="stat"><b>${streak}</b><span>day streak</span></div>` +
@@ -2173,13 +2297,13 @@ function weekBuckets(n){
   return out;
 }
 function renderWeekly(){
-  const goal = state.goal, mon = mondayOf(today()), all = workoutDays(), first = all[0];
+  const goal = state.goal, mon = mondayOf(today()), all = goalDays(), first = all[0];
   const rows = [];
   for (let i = 0; i < 12; i++){
     const st = addDays(mon, -i*7), en = addDays(st, 6);
     if (i >= 4 && (!first || en < first)) break;   /* don't pad with weeks before you started */
     const ks = all.filter(k => k >= st && k <= en), cur = i === 0;
-    const cols = ks.map(k => TYPE_VAR[dayMain(dayStats(k))]);
+    const cols = ks.map(k => TYPE_VAR[dayMainSC(dayStats(k))]);
     const marks = tallySVG(cols, cur ? Math.max(0, goal - ks.length) : 0);
     rows.push(`<div class="trow${cur ? " cur" : ""}"><span class="wk">${cur ? "THIS WK" : shortDate(st).toUpperCase()}</span><div>${marks || '<span class="none">—</span>'}</div><b class="${ks.length >= goal ? "met" : ""}">${ks.length}</b></div>`);
   }
@@ -2233,7 +2357,7 @@ function renderSplit(){
   $("#splitLegend").innerHTML = gs.length ? gs.map(g => `<span style="--c:var(${GVAR[g]})">${g} ${tot[g]}</span>`).join("") : '<span style="--c:var(--line)">Log some sets to see your split</span>';
 }
 function exerciseHistory(name){
-  return workoutDays().map(k => { const e = entries(k).find(x => x.name === name); return e && e.sets.some(filled) ? {date:k, entry:e} : null; }).filter(Boolean);
+  return workoutDays().map(k => { const es = entries(k).filter(x => x.name === name && x.sets.some(filled)); if (!es.length) return null; return {date:k, entry: es.length === 1 ? es[0] : Object.assign({}, es[0], {sets: es.flatMap(x => x.sets)})}; }).filter(Boolean);
 }
 function renderExSelect(){
   const count = {};
@@ -2290,9 +2414,9 @@ function renderExChart(){
 $("#exSelect").onchange = renderExChart;
 
 function renderProgress(){
-  renderGoal(); renderRecaps(); renderStats(); renderHeat(); renderWeekly();   /* tallies work offline */
+  renderGoal(); renderRecaps(); renderStats(); renderHeat(); renderWeekly(); renderDensity(); renderExSelect();   /* these work offline */
   if (!window.Chart){ document.querySelectorAll(".chart").forEach(c => c.innerHTML = '<p class="hint">Charts need an internet connection the first time the app loads.</p>'); return; }
-  renderCardioChart(); renderMobChart(); renderExSelect(); renderExChart(); renderSplit(); renderDuration(); renderVolume();
+  renderDensity(); renderCardioChart(); renderMobChart(); renderExSelect(); renderExChart(); renderSplit(); renderDuration(); renderVolume();
 }
 
 /* ---------- CARDIO ---------- */
@@ -2349,7 +2473,7 @@ function renderCardio(){
       html += `<div class="cday">${k === t ? "Today" : k === addDays(t,-1) ? "Yesterday" : dateOf(k).toLocaleDateString(undefined,{weekday:"short", month:"short", day:"numeric"})}</div>`;
     }
     const st = e.sets.find(filled) || {}, u = e.du || "mi";
-    const bits = [num(st.min) ? fmtHMS(num(st.min)*60) : "", num(st.dist) ? `${num(st.dist)} ${u}` : "", e.cal ? e.cal + " cal" : "", e.hr ? e.hr + " bpm" : ""].filter(Boolean).join(" · ");
+    const bits = [num(st.min) ? fmtHMS(num(st.min)*60) : "", num(st.dist) ? `${num(st.dist)} ${u}` : "", e.cal ? e.cal + " cal" : "", e.hr ? e.hr + " bpm" : "", cardioMin(e) ? `${effortWord(cardioFactor(e))} · load ${Math.round(cardioLoad(e))}` : ""].filter(Boolean).join(" · ");
     html += `<button class="crow" data-id="${e.id}"><span><b>${esc(e.name)}</b><small>${bits || "Tap to add details"}</small></span><span class="pace">${paceText(e.name, num(st.min), num(st.dist), u)}</span></button>`;
   });
   if (all.length > cardioLimit) html += `<button class="btn ghost wide" id="cardioMore">Show more</button>`;
@@ -2390,6 +2514,7 @@ function renderCardioSheet(){
         <div class="seg" role="group" aria-label="Distance unit">${["mi","km","yd","m"].map(u => `<button type="button" data-unit="${u}" aria-pressed="${u === d.unit}">${u}</button>`).join("")}</div></div></div>
       <div class="two"><label class="fl"><span>Active calories</span><input data-f="cal" inputmode="numeric" placeholder="–" aria-label="Active calories" value="${esc(d.cal || "")}"></label>
         <label class="fl"><span>Avg heart rate</span><input data-f="hr" inputmode="numeric" placeholder="–" aria-label="Average heart rate" value="${esc(d.hr || "")}"></label></div>
+      <label class="fl"><span>Effort, 1 to 10 (optional)</span><input data-f="effort" inputmode="numeric" placeholder="Apple Watch shows this" aria-label="Effort from 1 to 10" value="${esc(d.effort || "")}"></label>
       ${d.dup ? `<p class="dup">Looks like this one's already saved, so it's unchecked.</p>` : ""}
       ${cardioMode === "import" && (cardioDrafts.length > 1 || d.dup) ? `<label class="inc"><input type="checkbox" data-f="inc"${d.inc ? " checked" : ""}> Save this one</label>` : ""}
     </div>`;
@@ -2450,6 +2575,7 @@ function saveCardio(){
       sets:[{min: d.sec ? String(Math.round(d.sec/60*100)/100) : "", dist: num(d.dist) ? String(num(d.dist)) : ""}]};
     if (num(d.cal)) entry.cal = Math.round(num(d.cal));
     if (num(d.hr)) entry.hr = Math.round(num(d.hr));
+    if (num(d.effort)) entry.effort = Math.max(1, Math.min(10, Math.round(num(d.effort))));
     (state.workouts[date] = state.workouts[date] || []).push(entry);
     last = entry;
   });
@@ -2468,7 +2594,7 @@ $("#cardioList").addEventListener("click", e => {
   const f = findCardio(row.dataset.id); if (!f) return;
   const en = state.workouts[f.k][f.i], st = en.sets.find(filled) || {};
   const known = CARDIO_TYPES.some(t => t[0] === en.name) || cardioSessions().some(x => x.e.name === en.name);
-  openCardioSheet("edit", [{id:en.id, activity: known ? en.name : "__other", custom:en.name, date:f.k, sec:Math.round(num(st.min)*60), dist:st.dist || "", unit:en.du || "mi", cal:en.cal || "", hr:en.hr || "", inc:true, src:en.src}]);
+  openCardioSheet("edit", [{id:en.id, activity: known ? en.name : "__other", custom:en.name, date:f.k, sec:Math.round(num(st.min)*60), dist:st.dist || "", unit:en.du || "mi", cal:en.cal || "", hr:en.hr || "", effort:en.effort || "", inc:true, src:en.src}]);
 });
 
 /* ----- reading workout screenshots, on the phone ----- */
@@ -2583,7 +2709,9 @@ function parseWorkoutText(raw, fileTime, skipFirst = true){
   const cal = calM ? parseInt(calM[1].replace(/[Oo]/g, "0").replace(/,/g, ""), 10) || 0 : 0;
   const hrM = /(?:avg\.?|average)\s*heart\s*rate[\s\S]{0,60}?(\d{2,3})\s*bpm/i.exec(body) || /(\d{2,3})\s*bpm/i.exec(body);
   const hr = hrM && +hrM[1] >= 40 && +hrM[1] <= 230 ? +hrM[1] : 0;
-  return {activity: act ? act[1] : lastCardioName(), custom:"", date, sec, dist, unit, cal: cal || "", hr: hr || "", inc:true, src:"import"};
+  const efM = /effort[^\n]{0,8}\n?\s*(\d{1,2})\s*(easy|moderate|hard|all\s*out)/i.exec(body);
+  const effort = efM && +efM[1] >= 1 && +efM[1] <= 10 ? +efM[1] : 0;
+  return {activity: act ? act[1] : lastCardioName(), custom:"", date, sec, dist, unit, cal: cal || "", hr: hr || "", effort: effort || "", inc:true, src:"import"};
 }
 /* skip screenshots you've already imported */
 function markDup(d){
@@ -2767,6 +2895,7 @@ function renderMobility(){
   if (secs) parts.push(fmtHMS(secs) + " held");
   if (list.length) parts.push(todo ? `${todo} to go` : "all done");
   $("#mobSub").innerHTML = esc(parts.join(" · ")) + (mobDate !== t ? '<button id="mobToday">Back to today</button>' : "");
+  $("#mobGoalLine").innerHTML = mobGoalHTML(true);
   const mt = $("#mobToday"); if (mt) mt.onclick = () => { mobDate = today(); renderMobility(); };
   $("#mobLoaded").innerHTML = loadedChips(list, "data-unload");
   document.querySelectorAll("#mobLoaded [data-unload]").forEach(b => b.onclick = () => removeLoaded(mobDate, b.dataset.unload, b.dataset.label, renderMobility));
@@ -3085,7 +3214,7 @@ Object.assign(ANIMS, {
     B:{el:[102,84],er:[102,84],hl:[104,108],hr:[104,108]}}
 });
 const STR_MAP = [
-  [/push.?up|press.?up/,"pushup"],[/pull.?up|chin.?up|muscle.?up/,"pullup"],[/dead\s*hang|\bhang\b/,"hang"],[/split squat|lunge|step.?up/,"slunge"],
+  [/push.?up|press.?up/,"pushup"],[/jump|hops?\b|bound|skip|high knees|burpee/,"jack"],[/clamshell|band walk|bridge|hip thrust/,"bridge"],[/pallof|woodchop/,"press"],[/pull.?up|chin.?up|muscle.?up/,"pullup"],[/dead\s*hang|\bhang\b/,"hang"],[/split squat|lunge|step.?up/,"slunge"],
   [/squat|wall sit/,"squat"],[/\bdips?\b/,"dip"],[/plank|hollow|l-sit/,"plank"],[/carry|farmer|suitcase/,"carry"],[/\brow/,"row"],[/curl/,"curl"],
   [/press|overhead|raise/,"press"],[/sit.?up|crunch|v.?up|leg raise/,"situp"],[/bridge|hip thrust/,"bridge"],[/jumping jack|burpee|jump/,"jack"],
   [/deadlift|\brdl\b|hinge|good morning|swing/,"hinge"],[/calf/,"calfPumps"]
@@ -3224,7 +3353,7 @@ function renderPlayer(){
     <div class="pl-next">${nx ? "Next: " + esc(nx.name) + (nx.side ? " · " + sideTxt(nx.side).toLowerCase() : "") : "Last one"}</div>
     <div class="pl-ctrl"><button class="btn ghost" id="plPause">${paused ? "Resume" : "Pause"}</button><button class="btn ghost" id="plSkip">Skip</button><button class="btn ghost" id="plEnd">End</button></div>
   </div>`;
-  animSet(st.name, st.side);
+  animSet(st.name, st.side, $("#plBody"));
 }
 $("#plBody").addEventListener("click", e => {
   const p = player;
@@ -3257,6 +3386,8 @@ const MUSCLE_NAMES = {chest:"Chest", frontDelts:"Front shoulders", sideDelts:"Si
 const REMOTE_M = {chest:{chest:1}, lats:{lats:1}, "middle back":{midBack:1}, "lower back":{lowerBack:1}, traps:{traps:1}, neck:{traps:.5}, shoulders:{frontDelts:.8,sideDelts:.8}, biceps:{biceps:1}, triceps:{triceps:1}, forearms:{forearms:1}, quadriceps:{quads:1}, hamstrings:{hamstrings:1}, glutes:{glutes:1}, calves:{calves:1}, adductors:{adductors:1}, abductors:{glutes:.6}, abdominals:{abs:1,obliques:.5}};
 /* first match wins, so specific patterns come first */
 const RULES = [
+  [/clamshell|band walk|monster walk|hip airplane|fire hydrant|side.?lying leg/, {glutes:1, adductors:.3, quads:.2}],
+  [/pogo|a.?skips?|high knees|tuck jump|bounds?\b|hops?\b/, {calves:1, quads:.7, glutes:.5, hamstrings:.3}],
   [/leg curl|hamstring curl|nordic/, {hamstrings:1}],
   [/soccer|football|rugby/, {quads:.6,hamstrings:.5,calves:.5,glutes:.4,adductors:.3}],
   [/basketball|volleyball/, {quads:.5,calves:.5,glutes:.4,frontDelts:.2}],
@@ -3347,7 +3478,7 @@ function bodyScores(range){
     const r = e.type === "s" ? sets.reduce((a,x) => a + num(x.r), 0) : 0;
     const secs = e.type === "c" ? sets.reduce((a,x) => a + num(x.min), 0)*60 : (e.type === "m" || e.type === "t") ? sets.reduce((a,x) => a + parseSec(x.sec), 0) : 0;
     /* one point = a strength set, 10 minutes of cardio, or 1 minute of stretching */
-    const n = t === "c" ? Math.max(1, secs/600) : t === "m" ? Math.max(.5, secs/60) : sets.length;
+    const n = t === "c" ? Math.max(1, cardioLoad(e)/10) : t === "m" ? Math.max(.5, secs/60) : sets.length;
     const m = musclesFor(e);
     for (const mk in m){
       if (!(mk in sc)) continue;
@@ -3479,19 +3610,9 @@ const FOCUS_POS = {left:"22% 40%", center:"50% 40%", right:"78% 40%"};
 function applyBg(tab){
   currentTab = tab || currentTab;
   const el = $("#bgPhoto");
-  const key = photos[currentTab] ? currentTab : PHOTO_TABS.map(t => t[0]).find(k => photos[k]);
-  const op = state.photoOp ?? .16;
-  if (!key || !op){ el.classList.remove("show"); return; }
-  const src = photos[key];
-  if (el.dataset.src === key + src.length){ el.style.setProperty("--bg-op", op); el.classList.add("show"); return; }
-  el.classList.remove("show");
-  setTimeout(() => {
-    el.style.backgroundImage = `url("${src}")`;
-    el.style.backgroundPosition = FOCUS_POS[(state.photoFocus || {})[key] || "center"];
-    el.style.setProperty("--bg-op", op);
-    el.dataset.src = key + src.length;
-    requestAnimationFrame(() => el.classList.add("show"));
-  }, el.dataset.src ? 250 : 0);
+  if (el.dataset.src !== "builtin"){ el.style.backgroundImage = 'url("bg.jpg")'; el.style.backgroundPosition = "50% 34%"; el.dataset.src = "builtin"; }
+  el.style.setProperty("--bg-op", state.photoOp || .16);
+  el.classList.add("show");
 }
 function renderPhotoSheet(){
   $("#photoSlots").innerHTML = PHOTO_TABS.map(([k, label]) => {
@@ -3557,6 +3678,8 @@ function renderSettings(){
   $("#awakeStatus").textContent = "wakeLock" in navigator ? "Screen stays on while a timer runs" : "This browser can't keep the screen on. Try Safari or Chrome.";
   document.querySelectorAll("#autoSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.a === "1") === !!state.autoRest));
   $("#goalVal").textContent = state.goal;
+  renderSyncStatus();
+  $("#mobGoalVal").textContent = state.mobGoal || 3;
   $("#versionLabel").textContent = "version " + APP_VERSION;
   $("#photoStatus").textContent = photoStatusText();
   const r = state.reminders;
@@ -3576,6 +3699,8 @@ $("#beepSeg").addEventListener("click", e => { const b = e.target.closest("butto
 $("#autoSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.autoRest = b.dataset.a === "1"; save(); renderSettings(); });
 $("#goalDown").onclick = () => { state.goal = Math.max(1, state.goal-1); save(); renderSettings(); refreshViews(); };
 $("#goalUp").onclick = () => { state.goal = Math.min(7, state.goal+1); save(); renderSettings(); refreshViews(); };
+$("#mobGoalDown").onclick = () => { state.mobGoal = Math.max(1, (state.mobGoal || 3) - 1); save(); renderSettings(); refreshViews(); };
+$("#mobGoalUp").onclick = () => { state.mobGoal = Math.min(7, (state.mobGoal || 3) + 1); save(); renderSettings(); refreshViews(); };
 $("#exportBtn").onclick = () => {
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
   const a = document.createElement("a");
@@ -3672,7 +3797,7 @@ function recoveryStatus(){
   workoutDays().forEach(k => { if (k < since) return; entries(k).forEach(e => {
     if (e.type === "m") return;   /* stretching doesn't tire a muscle out */
     const sets = e.sets.filter(filled); if (!sets.length) return;
-    const pts = e.type === "c" ? sets.reduce((a, x) => a + num(x.min), 0) / 10 : sets.length;
+    const pts = e.type === "c" ? cardioLoad(e) / 10 : sets.length;
     const m = musclesFor(e);
     for (const mk in m){ if (m[mk] < .4) continue; if (!last[mk] || k > last[mk]) last[mk] = k; if (k >= y) load[mk] = (load[mk] || 0) + pts * m[mk]; }
   }); });
@@ -3701,23 +3826,26 @@ function renderRecovery(){
 /* ---------- WEEKLY RECAP ---------- */
 function weekRecap(mon){
   const end = addDays(mon, 6), days = workoutDays().filter(k => k >= mon && k <= end);
+  const gdays = days.filter(isGoalDay), mdays = days.filter(k => dayStats(k).msec > 0);
   const r = {mon, end, days, sets:0, reps:0, cmin:0, cmi:0, msec:0, hit:{}};
   days.forEach(k => {
     const d = dayStats(k); r.sets += d.ssets; r.reps += d.reps; r.cmin += d.cmin; r.cmi += d.cmi; r.msec += d.msec;
     entries(k).forEach(e => { if (e.type === "m" || !e.sets.some(filled)) return; const m = musclesFor(e); for (const mk in m) if (m[mk] >= .4) r.hit[mk] = 1; });
   });
-  r.prev = workoutDays().filter(k => k >= addDays(mon, -7) && k < mon).length;
+  r.prev = goalDays().filter(k => k >= addDays(mon, -7) && k < mon).length;
+  r.gdays = gdays; r.mdays = mdays;
   r.prs = prCountSince(mon, end);
   r.skipped = REGIONS.filter(([, ms]) => !ms.some(x => r.hit[x])).map(x => x[0]);
   return r;
 }
 function recapHTML(r, closable){
-  const goal = state.goal, n = r.days.length;
+  const goal = state.goal, n = r.gdays.length, mg = state.mobGoal || 3, mn = r.mdays.length;
   const range = `${dateOf(r.mon).getDate()} ${dateOf(r.mon).toLocaleDateString(undefined, {month:"short"})} – ${dateOf(r.end).getDate()} ${dateOf(r.end).toLocaleDateString(undefined, {month:"short"})}`;
-  const cols = r.days.map(k => TYPE_VAR[dayMain(dayStats(k))]);
+  const cols = r.gdays.map(k => TYPE_VAR[dayMainSC(dayStats(k))]);
   const stats = [
     r.sets ? [fmtN(r.sets), "sets"] : null, r.reps ? [fmtN(r.reps), "reps"] : null, r.prs ? [r.prs, r.prs === 1 ? "PR" : "PRs"] : null,
-    r.cmin ? [fmtHMS(r.cmin * 60), "cardio"] : null, r.cmi ? [Math.round(r.cmi * 10) / 10, "miles"] : null, r.msec ? [fmtHMS(r.msec), "mobility"] : null
+    r.cmin ? [fmtHMS(r.cmin * 60), "cardio"] : null, r.cmi ? [Math.round(r.cmi * 10) / 10, "miles"] : null, r.msec ? [fmtHMS(r.msec), "mobility"] : null,
+    [`${mn}/${mg}`, mn >= mg ? "stretch days · goal hit" : "stretch days"]
   ].filter(Boolean);
   const notes = [];
   if (!n) notes.push("No workouts. Fresh start this week.");
@@ -3727,7 +3855,7 @@ function recapHTML(r, closable){
     if (r.skipped.length && r.skipped.length < REGIONS.length) notes.push(`Nothing hit ${listWords(r.skipped.map(s => s.toLowerCase()))}.`);
   }
   return `<div class="rc-top"><span>Last week · ${range}</span>${closable ? '<button class="icon-btn" data-recap-close aria-label="Dismiss recap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' : ""}</div>
-    <div class="rc-main">${n ? tallySVG(cols) : ""}<b class="${n >= goal ? "met" : ""}">${n} of ${goal} ${goal === 1 ? "day" : "days"}${n >= goal ? " · goal hit" : ""}</b></div>
+    <div class="rc-main">${n ? tallySVG(cols) : ""}<b class="${n >= goal ? "met" : ""}">${n} of ${goal} workout ${goal === 1 ? "day" : "days"}${n >= goal ? " · goal hit" : ""}</b></div>
     ${stats.length ? `<div class="rc-stats">${stats.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join("")}</div>` : ""}
     <p class="rc-note">${esc(notes.join(" "))}</p>`;
 }
@@ -3903,7 +4031,7 @@ function anotherHTML(){
 const MP_VER = "0.10.14";
 const MP_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}`;
 const MP_MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
-const CAM_KINDS = [[/push.?ups?\b|press.?ups?\b/i, "pushup"], [/pull.?ups?\b|chin.?ups?\b|muscle.?ups?\b/i, "pullup"]];
+const CAM_KINDS = [[/push.?ups?\b|press.?ups?\b/i, "pushup"], [/pull.?ups?\b|chin.?ups?\b|muscle.?ups?\b/i, "pullup"], [/\bdips?\b/i, "dip"], [/squat/i, "squat"]];
 const camKind = name => { const m = CAM_KINDS.find(([re]) => re.test(name)); return m ? m[1] : null; };
 let poseLM = null, poseLoading = null;
 const cam = {active:false, stream:null, raf:0, i:-1, day:"", kind:"", facing:"user", lastT:-1, c:null, els:null, onRep:null};
@@ -4054,10 +4182,12 @@ function pullupStep(c, lm, t){
   }
   return false;
 }
-const CAM_STEP = {pushup: pushupStep, pullup: pullupStep};
+const CAM_STEP = {pushup: pushupStep, pullup: pullupStep, squat: (c, l, t) => squatStep(c, l, t), dip: (c, l, t) => dipStep(c, l, t)};
 /* where to put the phone, per exercise */
 const CAM_TIPS = {
   pushup: ["Phone upright, 4 to 6 feet in front of you, low and tilted up a little.", "Side on works too. Head and shoulders must stay in view.", "Hold the top for a second before your first rep."],
+  squat: ["Phone upright, 6 to 8 feet away, about waist high.", "In front of you or side on. Your whole body, feet included, should be in view.", "Stand tall for a second before your first rep."],
+  dip: ["Phone upright, 6 to 8 feet away. Side on is best.", "Shoulders, elbows and hips should stay in view at the top and the bottom.", "Start at the top with straight arms for a second."],
   pullup: ["Phone upright, 6 to 8 feet away. In front of you or behind you both work.", "Prop it about waist high and tilt it up so your elbows and shoulders stay in view at the bottom and the top. Hands on the bar can be out of frame.", "Doorway bar? Put the phone in the next room looking through the doorway. Tight on space? Side on works.", "Start from a dead hang for a second."]
 };
 function camTipsHTML(kind){
@@ -4085,7 +4215,7 @@ async function camRun(els, onRep, kind){
   if (cam.els !== els || !cam.stream) return;
   cam.active = true; window.__camOn = true; syncWake();
   cam.c.ar = (v.videoWidth && v.videoHeight) ? v.videoWidth / v.videoHeight : .75;
-  camMsg(cam.kind === "pullup" ? "Keep the phone upright, 6 to 8 feet away, tilted up toward the bar." : "Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
+  camMsg({pullup:"Keep the phone upright, 6 to 8 feet away, tilted up toward the bar.", squat:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", dip:"Keep the phone upright, 6 to 8 feet away. Side on works best."}[cam.kind] || "Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
   const loop = () => {
     if (!cam.active || cam.els !== els) return;
     if (v.readyState >= 2 && v.currentTime !== cam.lastT){
@@ -4307,6 +4437,7 @@ function closeWoPlayer(silent){
   wp.open = false; clearInterval(wp.iv); wp.iv = null; anim.free = false; animStop();
   if (wp.camOn){ stopCam(); wp.camOn = false; }
   closeSheet($("#woPlayer")); syncWake();
+  $("#woBody").innerHTML = "";   /* only one animated figure on the page at a time */
   if (!silent) renderLog();
 }
 function wpEnter(idx){
@@ -4410,15 +4541,15 @@ function wpRender(){
       const inputs = e.type === "t"
         ? `<div class="wo-hold"><button class="pl-time${wp.holdStart ? "" : " ready"}" data-wo="hold" id="woSet">${wp.holdStart ? fmtHMS(Math.floor((Date.now() - wp.holdStart) / 1000)) : "0:00"}</button><span class="pl-phase">${wp.holdStart ? "Holding · tap Done when you stop" : "Tap the time to start the hold"}${PER_SIDE_RE.test(e.name) ? " · per side" : ""}</span></div>${bw ? "" : stepper("w", "Weight", wp.w, " " + state.unit)}`
         : `${stepper("r", cam ? "Reps (counted for you)" : "Reps", wp.reps)}${bw ? "" : stepper("w", "Weight", wp.w, " " + state.unit)}<div class="wo-settime">Set time <b id="woSet">0:00</b></div>`;
-      mid = `${head}${media}${inputs}<div class="wo-actions"><button class="finish-btn" data-wo="done">Done · next set</button></div>`;
+      mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl">${inputs}<div class="wo-actions"><button class="finish-btn" data-wo="done">Done · next set</button></div></div>`;
     } else if (wp.phase === "rest"){
       const nxE = list[wp.after], nxJ = nxE ? undoneJ(nxE) : -1;
       const nxt = nxE ? (wp.after === wp.idx ? `Next: set ${nxJ + 1}` : `Next: ${esc(nxE.name)}`) : "";
-      mid = `${head}${media}<div class="wo-rest"><span class="iv-label rest">Rest</span><div class="pl-time" id="woRest">${fmtHMS(Math.max(0, Math.ceil((wp.restEnd - Date.now()) / 1000)))}</div><div class="pl-bar"><i id="woRestBar"></i></div><div class="pl-next">${nxt}</div></div>
+      mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl"><div class="wo-rest"><span class="iv-label rest">Rest</span><div class="pl-time" id="woRest">${fmtHMS(Math.max(0, Math.ceil((wp.restEnd - Date.now()) / 1000)))}</div><div class="pl-bar"><i id="woRestBar"></i></div><div class="pl-next">${nxt}</div></div>
         <div class="wo-row3"><button class="btn ghost" data-wo="rest-">−15s</button><button class="btn ghost" data-wo="rest+">+15s</button><button class="btn" data-wo="skiprest">Skip rest</button></div>
-        <button class="link wo-addset" data-wo="addset">+ Add another set of ${esc(e.name)}</button>`;
+        <button class="link wo-addset" data-wo="addset">+ Add another set of ${esc(e.name)}</button></div>`;
     } else if (wp.phase === "exdone"){
-      mid = `${head}${media}<div class="wo-actions"><button class="btn ghost wide" data-wo="addset">+ Add a set</button></div>`;
+      mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl"><div class="wo-actions"><button class="btn ghost wide" data-wo="addset">+ Add a set</button></div></div>`;
     }
   }
   const nav = `<div class="wo-nav"><button class="btn ghost" data-wo="prev"${pos <= 0 ? " disabled" : ""}>‹ Prev</button><button class="btn ghost" data-wo="next"${pos < 0 || pos >= order.length - 1 ? " disabled" : ""}>Next exercise ›</button></div>`;
@@ -4462,8 +4593,402 @@ $("#woBody").addEventListener("click", ev => {
 });
 document.querySelectorAll("#woPlayer [data-close]").forEach(b => b.addEventListener("click", () => closeWoPlayer()));
 
+/* =========================================================
+   SYNC through a private GitHub Gist.
+   The token and gist id stay on this device (never inside the synced data).
+   Merging is three-way against the last synced copy, day by day, so logging on
+   two devices before they sync combines instead of overwriting.
+   ========================================================= */
+const SYNC_KEY = "tally.sync", SYNC_BASE = "tally.sync.base", SYNC_FILE = "tally-data.json";
+const LOCAL_ONLY = ["clock"];                       /* never synced */
+let syncCfg = {}; try { syncCfg = JSON.parse(store.get(SYNC_KEY)) || {}; } catch(e){ syncCfg = {}; }
+const syncSaveCfg = () => store.set(SYNC_KEY, JSON.stringify(syncCfg));
+let syncBusy = false, syncTimer = 0, syncAgain = false, syncApplying = false;
+const ghHeaders = () => ({"Authorization": "Bearer " + syncCfg.token, "Accept": "application/vnd.github+json"});
+const J = x => JSON.stringify(x === undefined ? null : x);
+
+function syncPayload(st){
+  const o = {}; for (const k in st) if (!LOCAL_ONLY.includes(k)) o[k] = st[k];
+  return o;
+}
+/* a "day" is everything logged on that date: entries, sessions and workout length */
+function dayOf(st, k){ return (st.workouts || {})[k] || (st.sessions || {})[k] || (st.dur || {})[k] ? {w:(st.workouts || {})[k] || null, s:(st.sessions || {})[k] || null, d:(st.dur || {})[k] || null} : null; }
+function mergeDay(L, R){
+  const out = {w:[], s:[], d:Math.max((L && L.d) || 0, (R && R.d) || 0) || null};
+  const sess = {};
+  [...((R && R.s) || []), ...((L && L.s) || [])].forEach(s => {
+    const o = sess[s.id];
+    if (!o || (s.end && !o.end) || ((s.end || 0) > (o.end || 0))) sess[s.id] = s;
+  });
+  out.s = Object.values(sess);
+  const score = e => e.sets.filter(x => x.done || filled(x)).length;
+  out.w = ((R && R.w) || []).map(e => clone(e));
+  ((L && L.w) || []).forEach(e => {
+    if (e.sid){
+      const i = out.w.findIndex(x => x.sid === e.sid && x.name === e.name);
+      if (i < 0) out.w.push(clone(e)); else if (score(e) > score(out.w[i])) out.w[i] = clone(e);
+    } else if (!out.w.some(x => J(x) === J(e))) out.w.push(clone(e));
+  });
+  if (!out.w.length) out.w = null;
+  if (!out.s.length) out.s = null;
+  return out;
+}
+function mergeStates(L, R, B){
+  if (!R) return {merged:syncPayload(L), conflicts:0};
+  B = B || {};
+  const M = {}; let conflicts = 0;
+  const keys = new Set([...Object.keys(L), ...Object.keys(R)]);
+  ["workouts", "sessions", "dur"].forEach(k => keys.delete(k));
+  LOCAL_ONLY.forEach(k => keys.delete(k));
+  /* settings, templates, notes...: whoever changed it since the last sync wins; this device wins a tie */
+  const first = !Object.keys(B).length;
+  keys.forEach(k => {
+    if (first){
+      if (k === "templates" || k === "custom" || k === "mobRoutines"){ const a = clone(R[k] || []); (L[k] || []).forEach(x => { if (!a.some(y => y.name === x.name)) a.push(clone(x)); }); M[k] = a; }
+      else if (k === "notes" || k === "mode" || k === "typeOver") M[k] = Object.assign({}, clone(L[k] || {}), clone(R[k] || {}));
+      else M[k] = k in R ? clone(R[k]) : clone(L[k]);
+      return;
+    }
+    M[k] = J(L[k]) === J(B[k]) && k in R ? clone(R[k]) : clone(L[k]);
+  });
+  M.workouts = {}; M.sessions = {}; M.dur = {};
+  const days = new Set([...Object.keys(L.workouts || {}), ...Object.keys(L.sessions || {}), ...Object.keys(L.dur || {}),
+                        ...Object.keys(R.workouts || {}), ...Object.keys(R.sessions || {}), ...Object.keys(R.dur || {})]);
+  days.forEach(k => {
+    const l = dayOf(L, k), r = dayOf(R, k), b = dayOf(B, k);
+    let m;
+    if (J(l) === J(r)) m = l;
+    else if (J(l) === J(b)) m = r;                 /* only the other device changed it (or deleted it) */
+    else if (J(r) === J(b)) m = l;                 /* only this device changed it */
+    else { m = mergeDay(l, r); conflicts++; }      /* both changed: combine */
+    if (!m) return;
+    if (m.w) M.workouts[k] = clone(m.w);
+    if (m.s) M.sessions[k] = clone(m.s);
+    if (m.d) M.dur[k] = m.d;
+  });
+  return {merged:M, conflicts};
+}
+async function ghFetch(url, opts = {}){
+  const r = await fetch(url, Object.assign({cache:"no-store"}, opts, {headers:Object.assign(ghHeaders(), opts.headers || {})}));
+  if (r.status === 401) throw Object.assign(new Error("bad token"), {code:401});
+  if (!r.ok) throw Object.assign(new Error("GitHub " + r.status), {code:r.status});
+  return r;
+}
+async function findOrCreateGist(){
+  for (let page = 1; page <= 5; page++){
+    const list = await (await ghFetch(`https://api.github.com/gists?per_page=100&page=${page}`)).json();
+    const g = list.find(x => x.files && x.files[SYNC_FILE]);
+    if (g) return g.id;
+    if (list.length < 100) break;
+  }
+  const r = await ghFetch("https://api.github.com/gists", {method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({description:"Tally sync (workout log)", public:false, files:{[SYNC_FILE]:{content:JSON.stringify(syncPayload(state))}}})});
+  const g = await r.json(); syncCfg.created = true; return g.id;
+}
+async function pullRemote(){
+  const g = await (await ghFetch("https://api.github.com/gists/" + syncCfg.gistId)).json();
+  const f = g.files && g.files[SYNC_FILE];
+  if (!f) return null;
+  const txt = f.truncated ? await (await fetch(f.raw_url, {cache:"no-store"})).text() : f.content;
+  try { return JSON.parse(txt); } catch(e){ return null; }
+}
+const playersBusy = () => (typeof wp !== "undefined" && wp.open) || (typeof player !== "undefined" && player.iv);
+async function syncNow(manual){
+  if (!syncCfg.token) return;
+  if (syncBusy){ syncAgain = true; return; }
+  if (playersBusy() && !manual){ syncCfg.dirty = true; syncSaveCfg(); return; }   /* never reshuffle data mid-set */
+  if (!navigator.onLine){ syncCfg.dirty = true; syncCfg.status = "offline"; syncSaveCfg(); renderSyncStatus(); return; }
+  syncBusy = true; syncCfg.status = "syncing"; renderSyncStatus();
+  try {
+    if (!syncCfg.gistId){ syncCfg.gistId = await findOrCreateGist(); syncSaveCfg(); }
+    const remote = await pullRemote();
+    let base = null; try { base = JSON.parse(store.get(SYNC_BASE)); } catch(e){}
+    const {merged, conflicts} = mergeStates(state, remote, base);
+    if (J(merged) !== J(remote)){
+      await ghFetch("https://api.github.com/gists/" + syncCfg.gistId, {method:"PATCH", headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({files:{[SYNC_FILE]:{content:JSON.stringify(merged)}}})});
+    }
+    const changedHere = J(syncPayload(state)) !== J(merged);
+    if (changedHere){
+      const keep = {}; LOCAL_ONLY.forEach(k => keep[k] = state[k]);
+      state = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), merged, keep);
+      syncApplying = true; save(); syncApplying = false;
+      refreshAll();
+    }
+    store.set(SYNC_BASE, JSON.stringify(merged));
+    Object.assign(syncCfg, {last:Date.now(), status:"ok", dirty:false, error:""}); syncSaveCfg();
+    if (manual) toast(conflicts ? "Synced. Combined changes from both devices." : changedHere ? "Synced. Pulled in new changes." : "Synced. Everything's up to date.");
+  } catch(err){
+    syncCfg.status = "error"; syncCfg.dirty = true;
+    syncCfg.error = err.code === 401 ? "GitHub didn't accept the token. It may have expired. Paste a new one." : err.code === 404 ? "Couldn't find the sync gist. Tap Sync now to make a new one." : navigator.onLine ? "Couldn't reach GitHub. Will try again." : "Offline. Will sync when you're back online.";
+    if (err.code === 404){ syncCfg.gistId = ""; }
+    syncSaveCfg();
+    if (manual) toast(syncCfg.error);
+  } finally {
+    syncBusy = false; renderSyncStatus();
+    if (syncAgain){ syncAgain = false; setTimeout(() => syncNow(), 500); }
+  }
+}
+function scheduleSync(){
+  if (!syncCfg.token || syncApplying) return;
+  syncCfg.dirty = true;
+  clearTimeout(syncTimer); syncTimer = setTimeout(() => syncNow(), 4000);
+}
+function refreshAll(){
+  try {
+    renderLog(); renderClock();
+    if (!$("#progressView").hidden) renderProgress();
+    if (!$("#bodyView").hidden) renderBody();
+    if (!$("#mobilityView").hidden) renderMob();
+    if (!$("#cardioView").hidden) renderCardio();
+  } catch(e){}
+}
+function agoText(ms){ const s = Math.round((Date.now() - ms) / 1000); return s < 45 ? "just now" : s < 3600 ? Math.round(s / 60) + " min ago" : s < 86400 ? Math.round(s / 3600) + " hr ago" : Math.round(s / 86400) + " days ago"; }
+function renderSyncStatus(){
+  const el = $("#syncStatus"); if (!el) return;
+  const on = !!syncCfg.token;
+  $("#syncSetup").hidden = on; $("#syncOn").hidden = !on;
+  if (!on){ el.textContent = "Keep your iPhone and iPad in step, free, through your GitHub account."; return; }
+  el.textContent = syncCfg.status === "syncing" ? "Syncing…" : syncCfg.status === "error" || syncCfg.status === "offline" ? (syncCfg.error || "Offline. Will sync when you're back online.") : syncCfg.last ? "Synced " + agoText(syncCfg.last) : "Connected";
+}
+$("#syncConnect").onclick = async () => {
+  const tok = ($("#syncToken").value || "").trim();
+  if (!/^(ghp_|github_pat_|gho_)/.test(tok) && tok.length < 30){ toast("That doesn't look like a GitHub token."); return; }
+  syncCfg = {token:tok}; syncSaveCfg(); $("#syncToken").value = "";
+  renderSyncStatus(); await syncNow(true);
+  if (syncCfg.status === "error"){ if (syncCfg.error && /token/.test(syncCfg.error)){ syncCfg = {}; syncSaveCfg(); renderSyncStatus(); } }
+};
+$("#syncNowBtn").onclick = () => syncNow(true);
+$("#syncOff").onclick = () => {
+  if (!confirm("Stop syncing this device? Your data stays here and in your gist.")) return;
+  syncCfg = {}; syncSaveCfg(); store.set(SYNC_BASE, ""); renderSyncStatus(); toast("Sync off on this device.");
+};
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && syncCfg.token) syncNow(); });
+window.addEventListener("online", () => { if (syncCfg.token && syncCfg.dirty) syncNow(); });
+setInterval(() => { if (syncCfg.token && document.visibilityState === "visible"){ renderSyncStatus(); if (syncCfg.dirty && !syncBusy) syncNow(); } }, 30000);
+
+/* =========================================================
+   CARDIO LOAD: minutes × how hard. Apple's effort score first, then heart rate, then the sport.
+   ========================================================= */
+const CARDIO_INT = {soccer:1.35, football:1.3, basketball:1.3, tennis:1.15, squash:1.2, pickleball:1, "trail running":1.2, running:1.15, treadmill:1.1,
+  sprint:1.4, walking:.45, hiking:.8, "mountain biking":1.15, "stationary bike":.95, cycling:1, swimming:1.1, rowing:1.1, elliptical:.8, golf:.4};
+function cardioFactor(e){
+  if (num(e.effort)) return .3 + num(e.effort) * .13;                       /* effort 1–10 */
+  if (num(e.hr)) return Math.max(.35, Math.min(1.8, (num(e.hr) - 60) / 75));  /* avg heart rate */
+  const n = e.name.toLowerCase(), k = Object.keys(CARDIO_INT).find(x => n.includes(x));
+  return k ? CARDIO_INT[k] : 1;
+}
+const cardioMin = e => e.sets.filter(filled).reduce((a, x) => a + num(x.min), 0);
+const cardioLoad = e => cardioMin(e) * cardioFactor(e);
+const effortWord = f => f < .75 ? "easy" : f < 1.2 ? "moderate" : f < 1.5 ? "hard" : "all out";
+
+/* =========================================================
+   TRAINING DENSITY: how much work, how fast, how spread out
+   ========================================================= */
+function dayPoints(k){
+  return entries(k).filter(e => e.type === "s" || e.type === "t").reduce((a, e) => a + e.sets.filter(filled).reduce((b, x) =>
+    b + (e.type === "t" ? parseSec(x.sec) / 5 : num(x.r) * (num(x.w) && !isBW(e.name, e.type) ? 1 + num(x.w) / (state.unit === "kg" ? 80 : 175) : 1)), 0), 0);
+}
+function densityWeeks(n){
+  const b = weekBuckets(n);
+  b.forEach(w => { w.pts = 0; w.maxDay = 0; w.trainDays = 0; w.timedPts = 0; w.timedMin = 0; w.sessions = 0; });
+  workoutDays().forEach(k => b.forEach(w => {
+    if (k < w.start || k > w.end) return;
+    const p = dayPoints(k); if (!p) return;
+    w.pts += p; w.maxDay = Math.max(w.maxDay, p); w.trainDays++;
+    ((state.sessions || {})[k] || []).forEach(s => { if (!s.end) return; w.sessions++; const m = sessMs(s) / 60000; if (m >= 3){ w.timedPts += sessPoints(k, s); w.timedMin += m; } });
+  }));
+  b.forEach(w => { w.density = w.timedMin ? w.timedPts / w.timedMin : 0; w.conc = w.pts ? w.maxDay / w.pts : 0; });
+  return b;
+}
+const spreadWord = c => c >= .7 ? "mostly one big day" : c >= .45 ? "front-loaded on one day" : "spread across the week";
+function renderDensity(){
+  const box = $("#densityNote"); if (!box) return;
+  const W = densityWeeks(12), cur = W[W.length - 1], prev = W.slice(-5, -1).filter(w => w.pts);
+  const avg = f => prev.length ? prev.reduce((a, w) => a + f(w), 0) / prev.length : 0;
+  const parts = [];
+  if (cur.pts){
+    parts.push(`This week: ${fmtN(Math.round(cur.pts))} reps of work over ${cur.trainDays} ${cur.trainDays === 1 ? "day" : "days"}, ${spreadWord(cur.conc)} (biggest day ${Math.round(cur.conc * 100)}%).`);
+    if (cur.density) parts.push(`Pace ${cur.density.toFixed(1)} reps/min${avg(w => w.density) ? `, vs ${avg(w => w.density).toFixed(1)} your last 4 weeks` : ""}.`);
+  } else parts.push("No strength work yet this week.");
+  const loads = W.map(w => 0); cardioSessions().forEach(({k, e}) => W.forEach((w, i) => { if (k >= w.start && k <= w.end) loads[i] += cardioLoad(e); }));
+  if (loads[loads.length - 1] || loads.some(Boolean)){
+    const la = loads.slice(-5, -1).filter(Boolean), lavg = la.length ? la.reduce((a, b) => a + b, 0) / la.length : 0;
+    parts.push(`Cardio load ${Math.round(loads[loads.length - 1])}${lavg ? ` (4-week average ${Math.round(lavg)})` : ""}.`);
+  }
+  box.textContent = parts.join(" ");
+  if (!window.Chart) return;
+  const o = baseOpts();
+  o.scales.y1 = {position:"right", beginAtZero:true, grid:{display:false}, border:{display:false}};
+  o.plugins.legend = {display:true, position:"bottom", labels:{boxWidth:12, boxHeight:12}};
+  o.plugins.tooltip.displayColors = true;
+  o.plugins.tooltip.callbacks = {title: i => "Week of " + i[0].label, label: i => {
+    const w = W[i.dataIndex];
+    return i.dataset.yAxisID === "y1" ? `${i.raw.toFixed(1)} reps/min` : `${fmtN(Math.round(i.raw))} reps of work · ${w.trainDays} days · biggest day ${Math.round(w.conc * 100)}%`;
+  }};
+  mkChart("chDensity", {type:"bar", data:{labels:W.map(w => w.label), datasets:[
+    {type:"line", label:"Pace (reps/min)", data:W.map(w => w.density ? Math.round(w.density * 10) / 10 : null), yAxisID:"y1", borderColor:css("--ink"), backgroundColor:css("--ink"), pointRadius:3, borderWidth:2, tension:.3, spanGaps:true, order:0},
+    {label:"Work", data:W.map(w => Math.round(w.pts)), backgroundColor:css("--accent"), borderRadius:2, maxBarThickness:28, order:1}
+  ]}, options:o});
+}
+
+/* =========================================================
+   EXERCISE DETAIL
+   ========================================================= */
+function bestOf(e){
+  const sets = e.sets.filter(filled), bw = isBW(e.name, e.type);
+  if (e.type === "t") return Math.max(0, ...sets.map(s => parseSec(s.sec)));
+  if (bw) return Math.max(0, ...sets.map(s => num(s.r)));
+  return Math.max(0, ...sets.map(s => num(s.w) * (1 + num(s.r) / 30)));
+}
+function bestLabel(e){
+  const sets = e.sets.filter(filled), bw = isBW(e.name, e.type);
+  if (e.type === "t"){ const s = sets.reduce((a, x) => parseSec(x.sec) > parseSec(a.sec) ? x : a, sets[0]); return fmtSec(parseSec(s.sec)) + (num(s.w) && !bw ? ` with ${s.w} ${state.unit}` : ""); }
+  if (bw){ return Math.max(...sets.map(s => num(s.r))) + " reps"; }
+  const s = sets.reduce((a, x) => num(x.w) * (1 + num(x.r) / 30) > num(a.w) * (1 + num(a.r) / 30) ? x : a, sets[0]);
+  return `${s.w} ${state.unit} × ${s.r}`;
+}
+function openExDetail(name){
+  const hist = exerciseHistory(name);
+  if (!hist.length){ toast("No history yet for " + name + "."); return; }
+  const last = hist[hist.length - 1].entry, type = last.type, bw = isBW(name, type);
+  let total = 0, sets = 0, paceT = 0, paceR = 0, prs = 0, top = -1, bestH = hist[0];
+  hist.forEach(h => {
+    h.entry.sets.filter(filled).forEach(s => { sets++; total += type === "t" ? parseSec(s.sec) : num(s.r); if (type !== "t" && s.t && num(s.r)){ paceT += s.t; paceR += num(s.r); } });
+    const b = bestOf(h.entry); if (b > top){ if (top >= 0) prs++; top = b; bestH = h; }
+  });
+  const stats = [
+    [bestLabel(bestH.entry), "best · " + shortDate(bestH.date)],
+    [type === "t" ? fmtHMS(total) : fmtN(total), type === "t" ? "total time" : "total reps"],
+    [hist.length, hist.length === 1 ? "session" : "sessions"],
+    [prs, prs === 1 ? "PR" : "PRs"],
+    [paceR ? (paceT / paceR).toFixed(1) + "s" : "–", paceR ? "per rep (guided sets)" : "pace: time sets in a session"],
+    [shortDate(hist[hist.length - 1].date), "last done"]
+  ];
+  const rows = hist.slice().reverse().slice(0, 25).map((h, i, arr) => {
+    const older = hist.filter(x => x.date < h.date), wasPR = older.length && bestOf(h.entry) > Math.max(...older.map(x => bestOf(x.entry)));
+    return `<div class="exd-row"><span>${shortDate(h.date)}</span><span>${esc(describeSets(h.entry))}</span>${wasPR ? '<b class="pr">PR</b>' : "<i></i>"}</div>`;
+  }).join("");
+  $("#exdTitle").textContent = name;
+  $("#exdBody").innerHTML = `<p class="exd-tag">${esc(last.group || "")}${bw ? " · bodyweight" : ""}${type === "t" ? " · timed" : ""}</p>
+    <div class="exd-stats">${stats.map(([v, l]) => `<div><b>${esc(String(v))}</b><span>${esc(l)}</span></div>`).join("")}</div>
+    <h3 class="exd-h">Best set per session</h3>
+    <div class="chart">${window.Chart ? '<canvas id="chExd"></canvas>' : '<p class="hint">Charts need an internet connection the first time the app loads.</p>'}</div>
+    <h3 class="exd-h">History</h3><div class="exd-list">${rows}</div>`;
+  openSheet($("#exdSheet"));
+  if (window.Chart){
+    const o = baseOpts();
+    o.plugins.tooltip.callbacks = {title: i => shortDate(hist[i[0].dataIndex].date), label: i => bestLabel(hist[i.dataIndex].entry)};
+    mkChart("chExd", {type:"line", data:{labels:hist.map(h => shortDate(h.date)), datasets:[{data:hist.map(h => Math.round(bestOf(h.entry) * 10) / 10), borderColor:css("--accent"), backgroundColor:css("--accent"), tension:.3, borderWidth:2.5, pointRadius:4}]}, options:o});
+  }
+}
+
+/* =========================================================
+   CAMERA: squats and dips
+   ========================================================= */
+/* shared up-down counter: y grows as you go down; scale is your size; need is how far counts as a full rep */
+function dropCount(c, y, scale, need, t, angDown, angUp){
+  c.y = c.y == null ? y : c.y * .5 + y * .5;
+  if (c.phase !== "down") c.scale = c.scale == null ? scale : c.scale * .9 + scale * .1;
+  const S = c.scale || scale;
+  if (c.topY == null) c.topY = c.y;
+  else if (c.phase === "down") c.topY = Math.min(c.topY, c.y);
+  else c.topY = Math.min(c.y, c.topY + (c.y - c.topY < need * .5 * S ? .002 * S : 0));
+  const drop = (c.y - c.topY) / S;
+  c.depth = Math.max(0, Math.min(1, drop / need));
+  c.seen = (c.seen || 0) + 1;
+  if (c.phase === "setup" || !c.phase){ if (c.seen > 4){ c.phase = "up"; c.msg = "Go down"; } else c.msg = "Stand tall for a second"; return false; }
+  if (c.phase === "up"){ if (drop > need || angDown){ c.phase = "down"; c.msg = "Up"; } else c.msg = drop > need * .5 ? "Lower" : "Go down"; return false; }
+  if ((drop < need * .35 || (angUp && drop < need * .7)) && t - (c.lastRep || 0) > 450){ c.reps++; c.lastRep = t; c.phase = "up"; c.msg = "Good"; return true; }
+  c.msg = "Up";
+  return false;
+}
+function camPts(c, lm){ const ar = c.ar || .75; return k => ({x: lm[k].x * ar, y: lm[k].y, v: (lm[k] && (lm[k].visibility ?? 1)) || 0}); }
+function squatStep(c, lm, t){
+  if (!lm || lm.length < 29){ c.msg = "Can't see you. Put the phone 6 to 8 feet away so your whole body is in view."; return false; }
+  const P = camPts(c, lm), legs = [];
+  let kneeAng = null;
+  for (const [h, k, a, s] of [[23, 25, 27, 11], [24, 26, 28, 12]]){
+    const H = P(h), K = P(k), A = P(a), S = P(s);
+    if (H.v < .5 || K.v < .5) continue;
+    const thigh = Math.hypot(H.x - K.x, H.y - K.y), shin = A.v > .5 ? Math.hypot(K.x - A.x, K.y - A.y) : thigh;
+    legs.push({hy:H.y, len:thigh + shin, sy:S.v > .5 ? S.y : null});
+    if (A.v > .5){ const ang = angleAt(H, K, A); kneeAng = kneeAng == null ? ang : Math.min(kneeAng, ang); }
+  }
+  if (!legs.length){ c.msg = "Can't see your hips and knees. Move the phone back so your legs are in view."; return false; }
+  const hy = legs.reduce((a, l) => a + l.hy, 0) / legs.length, len = legs.reduce((a, l) => a + l.len, 0) / legs.length;
+  const sh = legs.map(l => l.sy).filter(v => v != null);
+  if (sh.length && sh[0] > hy - len * .2){ c.msg = "Stand up tall to start."; c.phase = "setup"; c.seen = 0; c.topY = null; return false; }
+  if (kneeAng != null){ c.ang = c.ang == null ? kneeAng : c.ang * .45 + kneeAng * .55; c.angTop = Math.max(c.ang, (c.angTop || 0) - .15); }
+  const angDown = c.ang != null && c.angTop > 150 && c.ang < 105, angUp = c.ang != null && c.ang > c.angTop - 15;
+  return dropCount(c, hy, len, .3, t, angDown, angUp);
+}
+function dipStep(c, lm, t){
+  if (!lm || lm.length < 25){ c.msg = "Can't see you. Put the phone 6 to 8 feet away, side on works best."; return false; }
+  const P = camPts(c, lm), arms = [];
+  let elAng = null, hipsBelow = true;
+  for (const [s, e, w, h] of [[11, 13, 15, 23], [12, 14, 16, 24]]){
+    const S = P(s), E = P(e), W = P(w), H = P(h);
+    if (S.v < .5 || E.v < .45) continue;
+    const U = Math.hypot(S.x - E.x, S.y - E.y);
+    c.ua = c.ua || {}; if (c.phase !== "down") c.ua[s] = Math.max(U, (c.ua[s] || 0) * .995);
+    arms.push({sy:S.y, U:c.ua[s] || U});
+    if (W.v > .5){ const a = angleAt(S, E, W); elAng = elAng == null ? a : Math.min(elAng, a); if (W.y < S.y) hipsBelow = false; }
+    if (H.v > .5 && H.y < S.y) hipsBelow = false;
+  }
+  if (!arms.length){ c.msg = "Can't see your shoulders and elbows. Move the phone back."; return false; }
+  if (!hipsBelow){ c.msg = "Get up on the bars with straight arms."; c.phase = "setup"; c.seen = 0; c.topY = null; return false; }
+  if (elAng != null){ c.ang = c.ang == null ? elAng : c.ang * .45 + elAng * .55; c.angTop = Math.max(c.ang, (c.angTop || 0) - .15); }
+  const sy = arms.reduce((a, x) => a + x.sy, 0) / arms.length, U = arms.reduce((a, x) => a + x.U, 0) / arms.length;
+  const angDown = c.ang != null && c.angTop > 150 && c.ang < c.angTop - 55, angUp = c.ang != null && c.ang > c.angTop - 18;
+  return dropCount(c, sy, U, .45, t, angDown, angUp);
+}
+
+/* =========================================================
+   STARTER TEMPLATES: golf, soccer, speed and quickness, hips
+   ========================================================= */
+const tR = (n, r) => Array.from({length:n}, () => ({w:"", r:String(r)}));
+const tT = (n, s) => Array.from({length:n}, () => ({sec:String(s)}));
+const tTW = (n, s) => Array.from({length:n}, () => ({w:"", sec:String(s)}));
+const STARTER_TEMPLATES = [
+  {name:"Golf: rotation and stability", items:[
+    {name:"Pallof Press", group:"Core", type:"s", sets:tR(3, 10)},
+    {name:"Band Woodchop", group:"Core", type:"s", sets:tR(3, 10)},
+    {name:"Single-Leg Romanian Deadlift", group:"Legs", type:"s", sets:tR(3, 8)},
+    {name:"Hip Thrust", group:"Legs", type:"s", sets:tR(3, 12)},
+    {name:"Side Plank", group:"Core", type:"t", sets:tT(3, 30)},
+    {name:"Suitcase Carry", group:"Core", type:"t", sets:tTW(3, 40)}]},
+  {name:"Soccer: legs and durability", items:[
+    {name:"Bulgarian Split Squat", group:"Legs", type:"s", sets:tR(3, 8)},
+    {name:"Nordic Hamstring Curl", group:"Legs", type:"s", sets:tR(3, 5)},
+    {name:"Copenhagen Plank", group:"Legs", type:"t", sets:tT(3, 20)},
+    {name:"Jump Squats", group:"Legs", type:"s", sets:tR(3, 8)},
+    {name:"Single-Leg Calf Raise", group:"Legs", type:"s", sets:tR(3, 15)},
+    {name:"Plank", group:"Core", type:"t", sets:tT(3, 45)}]},
+  {name:"Speed and quickness", items:[
+    {name:"A-Skips", group:"Legs", type:"t", sets:tT(3, 20)},
+    {name:"Pogo Hops", group:"Legs", type:"t", sets:tT(3, 20)},
+    {name:"Broad Jumps", group:"Legs", type:"s", sets:tR(4, 5)},
+    {name:"Skater Jumps", group:"Legs", type:"s", sets:tR(3, 8)},
+    {name:"Split Squat Jumps", group:"Legs", type:"s", sets:tR(3, 6)},
+    {name:"High Knees", group:"Legs", type:"t", sets:tT(3, 20)}]},
+  {name:"Hips: strength and stability", items:[
+    {name:"Glute Bridge", group:"Legs", type:"s", sets:tR(3, 12)},
+    {name:"Lateral Band Walk", group:"Legs", type:"s", sets:tR(3, 12)},
+    {name:"Cossack Squat", group:"Legs", type:"s", sets:tR(3, 6)},
+    {name:"Single-Leg Glute Bridge", group:"Legs", type:"s", sets:tR(3, 10)},
+    {name:"Clamshells", group:"Legs", type:"s", sets:tR(3, 15)},
+    {name:"Copenhagen Plank", group:"Legs", type:"t", sets:tT(3, 20)}]}
+];
+function addStarterTemplates(){
+  if ((state.starterTpl || 0) >= 1) return;
+  STARTER_TEMPLATES.forEach(t => { if (!state.templates.some(x => x.name === t.name)) state.templates.push(clone(t)); });
+  state.starterTpl = 1; save();
+}
+
 $("#openIntervals").onclick = openIntervals;
-window.__tally = {parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter};   /* test hook */
+$("#exDetailBtn").onclick = () => { const n = $("#exSelect").value; if (n) openExDetail(n); };
+window.__tally = {squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
 
 /* ---------- full-height fix for iPhone home-screen apps ---------- */
 function setAppHeight(){ document.documentElement.style.setProperty("--app-h", Math.max(window.innerHeight, screen.height && window.navigator.standalone ? screen.height : 0) + "px"); }
@@ -4472,6 +4997,8 @@ window.addEventListener("resize", setAppHeight);
 window.addEventListener("orientationchange", () => setTimeout(setAppHeight, 300));
 
 /* ---------- start ---------- */
+addStarterTemplates();
+if (syncCfg.token) setTimeout(() => syncNow(), 800);
 Object.keys(state.workouts).forEach(migrateSess);
 if (!state.celebrated) checkMilestones(true);
 applyAudioSession();
