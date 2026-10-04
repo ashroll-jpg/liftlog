@@ -674,7 +674,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
 
 .mob-goal{margin-top:10px}
 .mob-goal .g-tally b{color:var(--mob)}
-#mobGoalLine{display:flex;justify-content:center;margin-top:8px}
+#mobGoalLine{display:flex;justify-content:center;margin-top:8px;grid-column:1 / -1}
 .mg-row{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:var(--mute)}
 .mg-row .tally{height:18px}
 .mg-row b{color:var(--mob);font-size:14px;font-weight:600}
@@ -696,7 +696,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
 @media (min-width:900px){
   .wrap{max-width:1120px;padding-left:28px;padding-right:28px}
   .tabs .in{max-width:820px}
-  #logView,#cardioView,#mobilityView{max-width:760px;margin:0 auto}
+  #logView,#cardioView,#mobView{max-width:760px;margin:0 auto}
   /* Progress: two columns */
   #progressView:not([hidden]){display:grid;grid-template-columns:1fr 1fr;gap:0 18px;align-items:start}
   #progressView > .page-title,#progressView > .recap,#progressView > .stats,#progressView > .card:nth-of-type(4){grid-column:1 / -1}
@@ -778,6 +778,242 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
   .wo-media .wo-camlinks{margin:6px 0 0}
   .wo-media .wo-fig{width:min(calc(100dvh - 340px),520px)}
   .wo-main > .wo-fig,.wo-main > .wo-cam{max-width:none}
+}
+/* =====================================================================
+   REFINED THEME (4.0): fewer boxes, one accent, calmer type, soft motion.
+   A little grain stays on purpose.
+   ===================================================================== */
+:root{
+  --bg:#0C0C0D; --surface:#151517; --surface-2:#1D1D20; --field:#111113;
+  --line:rgba(242,239,232,.08); --line-2:rgba(242,239,232,.16);
+  --ink-2:rgba(242,239,232,.74); --mute:#8E8B85;
+  --r:12px; --r-sm:9px; --pill:999px;
+  --ease:cubic-bezier(.2,.8,.2,1); --spring:cubic-bezier(.3,1.3,.5,1);
+}
+body{font-size:16.5px;letter-spacing:-.003em;-webkit-font-smoothing:antialiased}
+.grain{opacity:.022}
+
+/* photo: darker fade, faint warm tint */
+.bg-photo{filter:grayscale(1) contrast(1.08) brightness(.92)}
+.bg-photo.show{opacity:calc(var(--bg-op,.16) * 1.35)}
+.bg-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(179,139,45,.10),rgba(12,12,13,.35) 55%,var(--bg) 100%);mix-blend-mode:normal}
+
+/* top and bottom bars: glass, hairlines */
+.top{background:color-mix(in srgb,var(--bg) 72%,transparent);border-bottom:1px solid var(--line)}
+.clock-main{border:0;background:var(--surface-2);border-radius:var(--pill);padding:7px 15px 7px 11px}
+.tabs{background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+.tabs button{font-family:var(--font);text-transform:none;letter-spacing:.01em;font-size:11px;font-weight:600}
+.tabs button[aria-selected="true"]{box-shadow:none;color:var(--ink)}
+.tabs button[aria-selected="true"] svg{color:var(--accent)}
+.tabs button svg,.icon-btn svg,.link svg,.clock-main svg{stroke-width:1.75}
+
+/* surfaces: no outlines, soft corners */
+.card,.goal,.stat,.ex,.mob,.nudge,.sess,.recap,.wo-done,#recovery,.fold-row,.cam-tips{border:0;border-radius:var(--r);background:var(--surface)}
+.card,.goal,.recap,#recovery{padding:18px}
+.ex{border-left:0;box-shadow:inset 3px 0 0 var(--c);padding:16px 12px 8px 18px}
+.mob{box-shadow:inset 3px 0 0 var(--mob);padding:16px 12px 10px 18px}
+.nudge{box-shadow:inset 3px 0 0 var(--accent);border-left:0;padding:14px 8px 12px 18px}
+.recap{box-shadow:none}
+.sess.open{box-shadow:none}
+.sess-head .ck,.wo-done .ck{border-radius:10px}
+.stats{gap:8px}
+.stat{padding:14px 16px}
+.crow,.rt,.exd-row,.trow,.rv-row{border-color:var(--line)}
+
+/* type: one display moment per screen, calm everywhere else */
+.ex h3,.mob h3,.rt b,.sh-txt b,.sb-head b,.fold-row .nm,.wo-done b,.rv-h,.rc-main b,.tpl-go b,.another .tpl-go b,.cam-name,.cam-tips b,.nudge b{
+  font-family:var(--font);font-stretch:100%;text-transform:none;letter-spacing:-.01em;font-weight:700}
+.ex h3,.mob h3{font-size:19px}
+.sh-txt b,.sb-head b,.wo-done b,.rv-h,.rc-main b{font-size:20px}
+.rt b,.fold-row .nm,.tpl-go b{font-size:16px}
+.sec-h,.sb-k,.rc-top,.rv-top,.exd-h,.fl>span,.exd-tag,.dens-key{font-family:var(--font);text-transform:none;letter-spacing:0;font-size:13px;font-weight:600;color:var(--mute)}
+.sb-k{color:var(--mute)}
+.sess-build.live .sb-k{color:var(--accent)}
+.rv-k{font-family:var(--font);text-transform:none;letter-spacing:0;font-size:13px;font-weight:700}
+.mob .tag,.rt .star,.exd-row .pr,.fold-row .pr{letter-spacing:.06em}
+.note,.hint{color:var(--mute)}
+
+/* links are quiet; gold is for the main action and achievements */
+.link{font-family:var(--font);text-transform:none;letter-spacing:0;font-size:15px;font-weight:600;color:var(--ink-2)}
+.link:hover{color:var(--ink)}
+.tools-row .link{color:var(--mute)}
+.sync-setup a{color:var(--accent)}
+
+/* buttons */
+.btn,.add-big,.finish-btn,.mob .go,.rt .go-btn{border-radius:var(--r-sm);transition:transform .15s var(--ease),filter .15s,background .15s;letter-spacing:.03em}
+.btn:active,.add-big:active,.finish-btn:active,.mob .go:active,.rt .go-btn:active,.tpl-go:active,.fold-row:active{transform:scale(.98)}
+.btn.ghost,.wo-end{background:var(--surface-2);border:0;color:var(--ink)}
+.btn.ghost:hover{background:#242428}
+.add-big{background:var(--surface-2);color:var(--ink);border:0}
+.add-big:hover{opacity:1;background:#242428}
+.finish-btn{box-shadow:0 8px 24px -12px rgba(179,139,45,.6)}
+.rt .add-btn{border:0;background:var(--surface-2);border-radius:var(--r-sm);text-transform:none;letter-spacing:0;font-family:var(--font);font-weight:600;font-size:13px}
+.another .tpl-go{border:0;background:var(--surface);border-radius:var(--r)}
+.another .tpl-go .go{color:var(--accent);font-family:var(--font);letter-spacing:0;font-weight:700}
+
+/* chips, toggles, steppers, fields */
+.mode,.lchip,.wo-chip{border-radius:var(--pill);border:1px solid var(--line-2);text-transform:none;letter-spacing:0;font-family:var(--font);font-weight:600}
+.mode{font-size:12px;padding:2px 10px}
+.mode.bw{border-color:var(--ink-2);color:var(--ink)}
+.lchip{font-size:13px;padding:3px 4px 3px 12px}
+.lchip.add{padding:7px 14px}
+.wo-chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg{border:0;background:var(--surface-2);border-radius:var(--r-sm);padding:3px;gap:2px}
+.seg button{background:transparent;border-radius:7px;transition:background .2s var(--ease),color .2s}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.stepper button{border:0;background:var(--surface-2);transition:transform .12s var(--ease)}
+.stepper button:active{transform:scale(.92)}
+.set input,.fl select,.fl input[type=date],.fl input[type=text],.fl input:not([type]),.note-edit,.sync-in input{border:1px solid var(--line);background:var(--field);border-radius:var(--r-sm);transition:border-color .15s,box-shadow .15s}
+.set input:focus,.fl input:focus,.fl select:focus,.note-edit:focus,.sync-in input:focus{outline:0;border-color:var(--line-2);box-shadow:0 0 0 3px rgba(242,239,232,.06)}
+.set.beat input{border-color:var(--accent)}
+
+/* sheets: rounded, springy */
+.sheet .panel{border-radius:22px 22px 0 0;background:#111113;box-shadow:0 -20px 60px rgba(0,0,0,.5)}
+.sheet.open .panel{animation:sheetIn .42s var(--spring) both}
+.sheet.open .scrim{animation:fadeIn .25s ease both}
+@keyframes sheetIn{from{translate:0 28px;opacity:0}to{translate:0 0;opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.toast{border-radius:var(--pill);padding:10px 18px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+
+/* tally marks draw themselves in */
+.tally rect,.tally line{transform-box:fill-box;transform-origin:50% 100%;animation:tallyIn .5s var(--spring) both}
+.tally :nth-child(2){animation-delay:.05s}.tally :nth-child(3){animation-delay:.1s}.tally :nth-child(4){animation-delay:.15s}
+.tally :nth-child(5){animation-delay:.22s}.tally :nth-child(6){animation-delay:.27s}.tally :nth-child(7){animation-delay:.32s}
+.tally :nth-child(8){animation-delay:.37s}.tally :nth-child(9){animation-delay:.42s}.tally :nth-child(n+10){animation-delay:.46s}
+@keyframes tallyIn{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
+.tally line{transform-origin:0 50%;animation-name:slashIn}
+@keyframes slashIn{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+
+/* PR badges get one shine */
+.fold-row .pr,.exd-row .pr,.set .n.pr,.ex .pr-badge{background:linear-gradient(110deg,var(--accent) 38%,#F1D891 50%,var(--accent) 62%);background-size:260% 100%;animation:shine 1.4s ease .25s 1 both;border-radius:5px}
+@keyframes shine{from{background-position:100% 0}to{background-position:0 0}}
+
+@media (prefers-reduced-motion:reduce){
+  .sheet.open .panel,.sheet.open .scrim,.tally rect,.tally line,.fold-row .pr,.exd-row .pr{animation:none}
+}
+
+.mg-row span{white-space:nowrap}
+.cam-view{border-radius:var(--r)}
+.wo-chip{padding:8px 14px}
+.goal h2{font-family:var(--font);font-stretch:100%;text-transform:none;letter-spacing:-.01em;font-weight:700;font-size:21px;line-height:1.15}
+.ex .tag,.set.head span,.wo-step > span,.wo-clock span,.pl-step,.cam-note,.trow .wk{font-family:var(--font);text-transform:none;letter-spacing:0;font-weight:600}
+.ex .tag{font-size:13px}
+.set.head span{font-size:12px;color:var(--mute)}
+.wo-step > span{font-size:13px}
+.trow .wk{font-size:13px}
+@media (min-width:760px){
+  .sheet .panel{border-radius:18px}
+  #woPlayer .panel{border-radius:0}
+}
+/* ---------- floating tab bar ---------- */
+.tabs{left:50%;right:auto;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);width:calc(100% - 24px);max-width:560px;
+  padding:6px;border:1px solid var(--line-2);border-radius:26px;background:color-mix(in srgb,#17171A 78%,transparent);
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);box-shadow:0 14px 38px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.04)}
+.tabs .in{gap:4px;max-width:none}
+.tabs button{border-radius:20px;padding:8px 0 7px;transition:background .25s var(--ease),color .25s var(--ease)}
+.tabs button[aria-selected="true"]{background:var(--tab-c,var(--accent));color:var(--tab-ink,#0E0E0E);box-shadow:0 6px 18px -8px var(--tab-c,var(--accent));animation:pop .34s var(--spring)}
+.tabs button[aria-selected="true"] svg{color:inherit}
+.tabs [data-tab="log"],.tabs [data-tab="progress"]{--tab-c:var(--str)}
+.tabs [data-tab="cardio"]{--tab-c:var(--car);--tab-ink:#F2EFE8}
+.tabs [data-tab="mobility"]{--tab-c:var(--mob)}
+.tabs [data-tab="body"]{--tab-c:var(--ink)}
+.wrap{padding-bottom:124px}
+body.timing .wrap{padding-bottom:196px}
+.timer{bottom:calc(env(safe-area-inset-bottom,0px) + 82px)}
+.toast{bottom:calc(env(safe-area-inset-bottom,0px) + 92px)}
+body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
+
+/* ---------- selected things light up ---------- */
+@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#0E0E0E;animation:pop .3s var(--spring)}
+#viewSeg [data-view="all"][aria-pressed="true"]{background:var(--ink);color:#0E0E0E}
+#viewSeg [data-view="s"][aria-pressed="true"]{background:var(--str)}
+#viewSeg [data-view="c"][aria-pressed="true"]{background:var(--car);color:#F2EFE8}
+#viewSeg [data-view="m"][aria-pressed="true"]{background:var(--mob)}
+.wo-chip.on{background:var(--accent);border-color:var(--accent);color:#0E0E0E;animation:pop .3s var(--spring)}
+.wo-chip.done{color:var(--accent)}
+.wo-chip.on.done{color:#0E0E0E}
+.mode.bw,#ivLadder[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 22%,transparent);border-color:var(--accent);color:#F1D891;animation:pop .3s var(--spring)}
+.stepper button:active,.seg button:active{background:color-mix(in srgb,var(--accent) 30%,var(--surface-2))}
+@media (prefers-reduced-motion:reduce){.tabs button[aria-selected="true"],.seg button[aria-pressed="true"],.wo-chip.on,.mode.bw{animation:none}}
+/* ---------- motion pack ---------- */
+@keyframes fadeUp{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+@keyframes slideR{from{translate:18px 0;opacity:.4}to{translate:0 0;opacity:1}}
+@keyframes slideL{from{translate:-18px 0;opacity:.4}to{translate:0 0;opacity:1}}
+.enter-r{animation:slideR .32s var(--ease)}
+.enter-l{animation:slideL .32s var(--ease)}
+.stagger > *,.stagger #exList > *,.stagger #mobList > *,.stagger #cardioList > *{animation:fadeUp .42s var(--ease) both}
+.stagger > :nth-child(2),.stagger #exList > :nth-child(2),.stagger #mobList > :nth-child(2),.stagger #cardioList > :nth-child(2){animation-delay:.04s}
+.stagger > :nth-child(3),.stagger #exList > :nth-child(3),.stagger #mobList > :nth-child(3),.stagger #cardioList > :nth-child(3){animation-delay:.08s}
+.stagger > :nth-child(4),.stagger #exList > :nth-child(4),.stagger #mobList > :nth-child(4),.stagger #cardioList > :nth-child(4){animation-delay:.12s}
+.stagger > :nth-child(5),.stagger #exList > :nth-child(5),.stagger #mobList > :nth-child(5),.stagger #cardioList > :nth-child(5){animation-delay:.16s}
+.stagger > :nth-child(6),.stagger #exList > :nth-child(6),.stagger #mobList > :nth-child(6),.stagger #cardioList > :nth-child(6){animation-delay:.2s}
+.stagger > :nth-child(n+7),.stagger #exList > :nth-child(n+7),.stagger #mobList > :nth-child(n+7),.stagger #cardioList > :nth-child(n+7){animation-delay:.24s}
+/* expand and collapse */
+@keyframes openIn{from{opacity:0;translate:0 -8px;clip-path:inset(0 0 100% 0)}to{opacity:1;translate:0 0;clip-path:inset(0 0 0 0)}}
+@keyframes closeOut{to{opacity:0;translate:0 -6px;clip-path:inset(0 0 100% 0)}}
+.opening{animation:openIn .32s var(--ease) both}
+.closing{animation:closeOut .17s ease-in both}
+/* rep flash */
+@keyframes repFlash{0%{box-shadow:inset 0 0 0 8px var(--accent),0 0 0 0 rgba(179,139,45,.6)}100%{box-shadow:inset 0 0 0 0 transparent,0 0 0 18px rgba(179,139,45,0)}}
+.cam-view.flash{animation:repFlash .55s ease-out}
+.cam-reps.pop{animation:camPop .45s var(--spring)}
+@keyframes camPop{0%{transform:scale(1.4);color:var(--accent)}100%{transform:scale(1);color:var(--ink)}}
+@keyframes bump{0%{transform:scale(1.35);color:var(--accent)}100%{transform:scale(1)}}
+.bump{display:inline-block;animation:bump .4s var(--spring)}
+/* rest ring */
+@media (max-width:759px){.wo-main.resting .wo-media{display:none}}
+.rest-ring{position:relative;width:min(58vw,230px);aspect-ratio:1;display:grid;place-items:center;margin:4px auto}
+.rest-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.rest-ring circle{fill:none;stroke-width:6;stroke-linecap:round}
+.rr-bg{stroke:var(--line-2)}
+.rr-fg{stroke:var(--ink);stroke-dasharray:100;stroke-dashoffset:0;transition:stroke-dashoffset .25s linear,stroke .3s}
+.rest-ring.end .rr-fg{stroke:var(--accent)}
+.rest-ring.end .pl-time{color:var(--accent)}
+.rest-ring .pl-time{font-size:min(15vw,64px)}
+@media (min-width:760px){.rest-ring{width:min(46vh,380px)}.rest-ring .pl-time{font-size:clamp(64px,9vw,120px)}}
+/* set stamp */
+.wo-tally{display:flex;justify-content:center;margin:2px 0}
+.wo-tally .tally{height:22px}
+.wo-tally .tally.still > *,.wo-tally .tally.stamping > :not(.new){animation:none}
+.wo-tally .tally .new{transform-box:fill-box;transform-origin:50% 50%;animation:stamp .5s var(--spring) both}
+@keyframes stamp{0%{transform:scale(2.2) translateY(-8px);opacity:0}55%{opacity:1}100%{transform:none;opacity:1}}
+@media (min-width:760px){.wo-tally .tally{height:34px}}
+/* reveal */
+.reveal-panel{max-width:460px}
+.rv-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:0 4px 6px}
+.rv-wrap > *{animation:fadeUp .45s var(--ease) both}
+.rv-wrap > :nth-child(2){animation-delay:.08s}.rv-wrap > :nth-child(3){animation-delay:.16s}.rv-wrap > :nth-child(4){animation-delay:.24s}
+.rv-wrap > :nth-child(5){animation-delay:.34s}.rv-wrap > :nth-child(6){animation-delay:.5s}.rv-wrap > :nth-child(n+7){animation-delay:.6s}
+.rv-ck{width:62px;height:62px;border-radius:16px;display:grid;place-items:center;background:var(--accent);color:#0E0E0E;animation:pop .5s var(--spring) both}
+.rv-ck svg{width:34px;height:34px}
+.rv-title{margin:0;font-family:var(--display);font-weight:900;font-stretch:125%;text-transform:uppercase;font-size:30px}
+.rv-time b{display:block;font-family:var(--mono);font-size:56px;line-height:1;color:var(--accent)}
+.rv-time span,.rv-grid span{font-size:13px;color:var(--mute);font-weight:600}
+.rv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+.rv-grid div{background:var(--surface);border-radius:var(--r);padding:12px 6px}
+.rv-grid b{display:block;font-family:var(--mono);font-size:28px}
+.rv-tally .tally{height:30px}
+.rv-tally .tally > *{animation-delay:calc(.45s + var(--i, 0) * .05s)}
+.rv-prs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.pr-chip{font-size:13px;font-weight:700;color:#0E0E0E;padding:5px 11px;border-radius:999px;background:linear-gradient(110deg,var(--accent) 38%,#F1D891 50%,var(--accent) 62%);background-size:260% 100%;animation:shine 1.4s ease 1s 1 both}
+.rv-int{margin:0;color:var(--mute);font-size:14px}
+.rv-goal{margin:0;color:var(--accent);font-weight:700}
+.rv-wrap .btn{width:100%;margin-top:4px}
+/* goal hit */
+@keyframes goalGlow{0%{box-shadow:0 0 0 0 rgba(179,139,45,0)}30%{box-shadow:0 0 0 3px rgba(179,139,45,.55),0 0 40px rgba(179,139,45,.35)}100%{box-shadow:0 0 0 0 rgba(179,139,45,0)}}
+.goal.hit{animation:goalGlow 1.8s ease .3s both}
+.goal.hit .tally line{filter:drop-shadow(0 0 6px var(--accent));animation-duration:.7s;animation-delay:.45s}
+.mob-goal.hit{animation-name:goalGlowG}
+@keyframes goalGlowG{0%{box-shadow:0 0 0 0 rgba(78,154,107,0)}30%{box-shadow:0 0 0 3px rgba(78,154,107,.55),0 0 40px rgba(78,154,107,.35)}100%{box-shadow:0 0 0 0 rgba(78,154,107,0)}}
+/* body map */
+@keyframes musIn{from{opacity:0}to{opacity:1}}
+.fill-in .mus{animation:musIn .45s ease both;animation-delay:calc(var(--d, 0) * 28ms)}
+@keyframes musGlow{0%{filter:drop-shadow(0 0 0 transparent)}40%{filter:drop-shadow(0 0 8px rgba(242,239,232,.7))}100%{filter:drop-shadow(0 0 0 transparent)}}
+.fig .mus.sel{animation:musGlow .7s ease}
+@media (prefers-reduced-motion:reduce){
+  .enter-r,.enter-l,.stagger > *,.stagger #exList > *,.opening,.closing,.cam-view.flash,.cam-reps.pop,.bump,.wo-tally .tally .new,.rv-wrap > *,.rv-ck,.pr-chip,.goal.hit,.fill-in .mus,.fig .mus.sel{animation:none}
+  .rr-fg{transition:none}
 }
 [hidden]{display:none!important}
 </style>
@@ -1065,6 +1301,13 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
   </div>
 </div>
 <!-- mobility: guided player -->
+<div class="sheet" id="revealSheet" role="dialog" aria-modal="true" aria-label="Session summary">
+  <div class="scrim"></div>
+  <div class="panel short reveal-panel">
+    <div class="sheet-head"><h2>&nbsp;</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="revealBody"></div>
+  </div>
+</div>
 <div class="sheet" id="exdSheet" role="dialog" aria-modal="true" aria-labelledby="exdTitle">
   <div class="scrim"></div>
   <div class="panel">
@@ -1185,7 +1428,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "3.5.1";
+const APP_VERSION = "4.2.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -1606,7 +1849,14 @@ $("#exList").addEventListener("click", ev => {
   if (act === "sess-end"){ if (sess && confirm("End this session?")) endSession(curDate, sess); return; }
   if (act === "sess-untimed"){ if (sess){ sess.untimed = true; endSession(curDate, sess); } return; }
   if (act === "sess-new"){ ensureOpen(curDate); save(); renderLog(); return; }
-  if (act === "sess-toggle"){ if (sessOpen.has(sid)) sessOpen.delete(sid); else sessOpen.add(sid); renderLog(); return; }
+  if (act === "sess-toggle"){
+    if (sessOpen.has(sid)){
+      const body = b.closest(".sess") && b.closest(".sess").querySelector(".sess-body");
+      if (body && !calm()){ body.classList.add("closing"); setTimeout(() => { sessOpen.delete(sid); renderLog(); }, 170); }
+      else { sessOpen.delete(sid); renderLog(); }
+    } else { sessOpen.add(sid); renderLog(); const nb = document.querySelector(`.sess-head[data-sid="${sid}"]`); replay(nb && nb.parentElement.querySelector(".sess-body"), "opening"); }
+    return;
+  }
   if (act === "sess-tpl"){ if (sess) saveSessionAsTemplate(curDate, sess); return; }
   if (act === "sess-del"){
     if (!sess || !confirm("Delete this session and everything logged in it?")) return;
@@ -1621,7 +1871,7 @@ $("#exList").addEventListener("click", ev => {
   if (act === "cam"){ openCam(i); return; }
   if (act === "detail"){ if (e) openExDetail(e.name); return; }
   if (act === "reopen"){ delete state.finished[curDate]; finOpen.clear(); save(); renderLog(); return; }
-  if (act === "unfold"){ finOpen.add(i); renderLog(); return; }
+  if (act === "unfold"){ finOpen.add(i); renderLog(); replay(document.querySelector(`article.ex[data-idx="${i}"]`), "opening"); return; }
   if (act === "fold"){ finOpen.delete(i); renderLog(); return; }
   if (act === "tpl"){ loadTemplate(+b.dataset.k); return; }
   if (act === "intervals"){ openIntervals(); return; }
@@ -2209,7 +2459,16 @@ function mkChart(id, cfg){
   if (charts[id]) charts[id].destroy();
   if (window.Chart) charts[id] = new Chart(document.getElementById(id), cfg);
 }
+function chartLook(){
+  if (!window.Chart || chartLook.done) return; chartLook.done = true;
+  Object.assign(Chart.defaults.elements.line, {borderWidth:2, tension:.35});
+  Object.assign(Chart.defaults.elements.point, {radius:2.5, hoverRadius:5, borderWidth:0});
+  Object.assign(Chart.defaults.elements.bar, {borderRadius:4});
+  Chart.defaults.animation = calm() ? false : {duration:750, easing:"easeOutQuart"};
+  Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+}
 function baseOpts(){
+  chartLook();
   const line = css("--line");
   Chart.defaults.font.family = css("--mono");
   Chart.defaults.font.size = 14;
@@ -2261,6 +2520,7 @@ function renderGoal(){
     <div><h2>${head}</h2><p>${sub}</p><button class="link" id="changeGoal">Change goal</button></div>`;
   $("#changeGoal").onclick = openSettings;
   renderMobGoal();
+  if (done >= goal && state.goalCeleb !== mon){ state.goalCeleb = mon; save(); replay($("#goal"), "hit"); }
 }
 /* separate stretching goal: stretch days per week */
 function mobGoalHTML(compact){
@@ -2274,7 +2534,8 @@ function mobGoalHTML(compact){
     <div><h2>${head}</h2><p>${esc(sub)}</p><button class="link" id="changeMobGoal">Change goal</button></div>`;
 }
 function renderMobGoal(){
-  const box = $("#mobGoalCard"); if (box){ box.innerHTML = mobGoalHTML(false); $("#changeMobGoal").onclick = openSettings; }
+  const box = $("#mobGoalCard"); if (box){ box.innerHTML = mobGoalHTML(false); $("#changeMobGoal").onclick = openSettings;
+    const mon = mondayOf(today()); if (mobDays().filter(d => d >= mon).length >= (state.mobGoal || 3) && state.mobGoalCeleb !== mon){ state.mobGoalCeleb = mon; save(); replay(box, "hit"); } }
 }
 
 function renderStats(){
@@ -2449,6 +2710,7 @@ $("#exSelect").onchange = renderExChart;
 
 function renderProgress(){
   renderGoal(); renderRecaps(); renderStats(); renderHeat(); renderWeekly(); renderDensity(); renderExSelect();   /* these work offline */
+  if (enterFlag === "progress") rollNumbers($("#progressView"));
   if (!window.Chart){ document.querySelectorAll(".chart").forEach(c => c.innerHTML = '<p class="hint">Charts need an internet connection the first time the app loads.</p>'); return; }
   renderDensity(); renderCardioChart(); renderMobChart(); renderExSelect(); renderExChart(); renderSplit(); renderDuration(); renderVolume();
 }
@@ -3561,9 +3823,9 @@ const FIG = {
 };
 let selMuscle = null;
 const NEUTRAL = "color-mix(in srgb, var(--mute) 28%, var(--field))";
-function figSVG(side, fillOf){
+function figSVG(side, fillOf, rank){
   const half = `<g class="base">${FIG_BASE}</g>` + FIG[side].map(([m, shape]) =>
-    `<g class="mus${m === selMuscle ? " sel" : ""}" data-m="${m}" style="fill:${fillOf(m)}"><title>${MUSCLE_NAMES[m]}</title>${shape}</g>`).join("");
+    `<g class="mus${m === selMuscle ? " sel" : ""}" data-m="${m}" style="fill:${fillOf(m)};--d:${rank ? rank[m] || 0 : 0}"><title>${MUSCLE_NAMES[m]}</title>${shape}</g>`).join("");
   return `<svg class="fig" viewBox="0 0 200 372" role="img" aria-label="${side === "front" ? "Front" : "Back"} of body, shaded by training">
     <g class="base">${FIG_HEAD}</g><g>${half}</g><g transform="matrix(-1 0 0 1 200 0)">${half}</g></svg>`;
 }
@@ -3578,8 +3840,10 @@ function renderBody(){
   if (!selMuscle || !(selMuscle in MUSCLE_NAMES)) selMuscle = order[0];
   document.querySelectorAll("#rangeSeg button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.r === range));
   document.querySelectorAll("#viewSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === view));
-  $("#figFront").innerHTML = figSVG("front", fillOf);
-  $("#figBack").innerHTML = figSVG("back", fillOf);
+  const rank = {}; order.slice().reverse().forEach((m, i) => rank[m] = i);
+  $("#figFront").innerHTML = figSVG("front", fillOf, rank);
+  $("#figBack").innerHTML = figSVG("back", fillOf, rank);
+  [$("#figFront"), $("#figBack")].forEach(f => f.classList.toggle("fill-in", enterFlag === "body" && !calm()));
   $("#bodyLegend").innerHTML = view === "all"
     ? `<span><i style="background:${NEUTRAL}"></i>None</span>` + ["s","c","m"].map(t => `<span><i style="background:${TYPE_COL[t]}"></i>${TYPE_NAME[t]}</span>`).join("") + "<span>Deeper = more</span>"
     : `<span><i style="background:${NEUTRAL}"></i>None</span><span>Less</span>` + [30,55,80,100].map(p => `<i style="background:color-mix(in srgb, ${TYPE_COL[view]} ${p}%, var(--field));margin:0"></i>`).join("") + "<span>More</span>";
@@ -3686,7 +3950,11 @@ $("#photoStr").addEventListener("click", e => {
 });
 
 /* ---------- tabs ---------- */
+const TAB_ORDER = ["log", "cardio", "mobility", "body", "progress"];
+let lastTab = "log";
 function showTab(tab){
+  const dir = TAB_ORDER.indexOf(tab) >= TAB_ORDER.indexOf(lastTab) ? "r" : "l", moved = tab !== lastTab;
+  lastTab = tab; enterFlag = moved ? tab : "";
   document.querySelectorAll("[data-tab]").forEach(x => x.setAttribute("aria-selected", x.dataset.tab === tab));
   $("#logView").hidden = tab !== "log";
   $("#progressView").hidden = tab !== "progress";
@@ -3696,6 +3964,13 @@ function showTab(tab){
   window.scrollTo(0,0);
   if (tab === "progress") renderProgress(); else if (tab === "body") renderBody(); else if (tab === "cardio") renderCardio(); else if (tab === "mobility") renderMobility(); else renderLog();
   applyBg(tab);
+  if (moved && !calm()){
+    const v = $({log:"#logView", progress:"#progressView", body:"#bodyView", cardio:"#cardioView", mobility:"#mobView"}[tab]);
+    v.classList.remove("enter-l", "enter-r", "stagger"); void v.offsetWidth;
+    v.classList.add(dir === "r" ? "enter-r" : "enter-l", "stagger");
+    clearTimeout(v._enterT); v._enterT = setTimeout(() => v.classList.remove("enter-l", "enter-r", "stagger"), 900);
+  }
+  enterFlag = "";
 }
 document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => showTab(b.dataset.tab));
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!$("#progressView").hidden) renderProgress(); });
@@ -4262,7 +4537,7 @@ async function camRun(els, onRep, kind){
       drawPose(pts);
       const dp = v.parentElement && v.parentElement.querySelector(".cam-depth i");
       if (dp){ dp.style.height = Math.round((cam.c.phase === "setup" ? 0 : cam.c.depth || 0) * 100) + "%"; dp.parentElement.classList.toggle("deep", cam.c.phase === "down"); }
-      if (rep){ tones(880, 1); buzz([60]); if (cam.onRep) cam.onRep(cam.c.reps); }
+      if (rep){ tones(880, 1); buzz([60]); replay(v.parentElement, "flash"); if (cam.onRep) cam.onRep(cam.c.reps); }
       camMsg(cam.c.msg);
     }
     cam.raf = requestAnimationFrame(loop);
@@ -4445,7 +4720,7 @@ function endSession(k, s, quiet){
   if (!kept){ state.sessions[k] = (state.sessions[k] || []).filter(x => x !== s); if (!state.sessions[k].length) delete state.sessions[k]; save(); renderLog(); if (!quiet) toast("Session ended. Nothing was logged."); return; }
   sessOpen.add(s.id); renderLog(); checkMilestones();
   const el = document.querySelector(`.sess-head[data-sid="${s.id}"]`); if (el) setTimeout(() => el.scrollIntoView({behavior:"smooth", block:"center"}), 60);
-  if (!quiet) toast(s.start ? `Session saved. ${fmtDur(s.dur)}.` : "Session saved.");
+  if (!quiet){ if (s.start) showReveal(k, s); else toast("Session saved."); }
 }
 function saveSessionAsTemplate(k, s){
   const items = sessEntries(k, s).map(([e]) => ({name:e.name, group:e.group, type:e.type, ss:!!e.ss, sets:clone(e.sets.filter(filled).map(x => { const y = Object.assign({}, x); delete y.done; delete y.t; return y; }))}));
@@ -4528,7 +4803,7 @@ function wpDone(){
     s.r = String(wp.reps);
   }
   if (!isBW(e.name, e.type)) s.w = wp.w ? String(wp.w) : (s.w || "");
-  s.done = true; s.t = Math.max(1, Math.round((now - (wp.holdStart || wp.setStart)) / 1000));
+  s.done = true; s.t = Math.max(1, Math.round((now - (wp.holdStart || wp.setStart)) / 1000)); wp.stamp = true;
   save();
   if (wp.camOn){ stopCam(); wp.camOn = false; }
   tones(988, 1); buzz([80]);
@@ -4559,7 +4834,8 @@ function wpTick(){
   if (wp.phase === "rest"){
     const left = Math.max(0, Math.ceil((wp.restEnd - now) / 1000));
     if (T("woRest")) T("woRest").textContent = fmtHMS(left);
-    if (T("woRestBar")) T("woRestBar").style.width = (100 - 100 * left / wp.restLen) + "%";
+    const ring = T("woRing");
+    if (ring){ ring.style.strokeDashoffset = Math.min(100, Math.max(0, 100 * (1 - (wp.restEnd - now) / 1000 / wp.restLen))); ring.parentElement.parentElement.classList.toggle("end", left <= 3); }
     if (left <= 3 && left > 0 && left !== wp.lastBeep){ wp.lastBeep = left; tones(600, 1); }
     if (left <= 0){ tones(880, 1); buzz([120]); wpEnter(wp.after); }
   }
@@ -4578,7 +4854,9 @@ function wpRender(){
     const j = undoneJ(e), n = e.sets.length, doneN = e.sets.filter(x => x.done).length, bw = isBW(e.name, e.type);
     const pv = lastTime(e.name, wp.k), pset = pv ? pv.entry.sets.filter(filled)[j < 0 ? 0 : j] : null;
     const target = pset ? (e.type === "t" ? `Last time ${fmtSec(parseSec(pset.sec))}` : `Last time ${bw ? "" : (pset.w ? pset.w + "×" : "")}${pset.r || "–"}`) + " · beat it" : "";
-    const head = `<h3 class="pl-name">${esc(e.name)}</h3><div class="pl-side">${j >= 0 ? `Set ${j + 1} of ${n}` : `${doneN} ${doneN === 1 ? "set" : "sets"} done`}${target && wp.phase === "set" ? ` · ${target}` : ""}</div>`;
+    const doneMarks = e.sets.filter(x => x.done).length;
+    const stampHTML = doneMarks ? `<div class="wo-tally">${tallySVG(Array.from({length:doneMarks}, () => "var(--accent)"))}</div>` : "";
+    const head = `<h3 class="pl-name">${esc(e.name)}</h3>${stampHTML}<div class="pl-side">${j >= 0 ? `Set ${j + 1} of ${n}` : `${doneN} ${doneN === 1 ? "set" : "sets"} done`}${target && wp.phase === "set" ? ` · ${target}` : ""}</div>`;
     const cam = usesCam(e) && wp.phase === "set";
     const media = cam
       ? `<div class="cam-view wo-cam"><video id="woVideo" playsinline muted autoplay></video><canvas id="woCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="woCount">${wp.reps}</div></div><p class="cam-msg" id="woCamMsg">Starting the camera…</p>
@@ -4593,7 +4871,9 @@ function wpRender(){
     } else if (wp.phase === "rest"){
       const nxE = list[wp.after], nxJ = nxE ? undoneJ(nxE) : -1;
       const nxt = nxE ? (wp.after === wp.idx ? `Next: set ${nxJ + 1}` : `Next: ${esc(nxE.name)}`) : "";
-      mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl"><div class="wo-rest"><span class="iv-label rest">Rest</span><div class="pl-time" id="woRest">${fmtHMS(Math.max(0, Math.ceil((wp.restEnd - Date.now()) / 1000)))}</div><div class="pl-bar"><i id="woRestBar"></i></div><div class="pl-next">${nxt}</div></div>
+      mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl"><div class="wo-rest"><span class="iv-label rest">Rest</span>
+        <div class="rest-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="rr-bg" cx="60" cy="60" r="54"/><circle class="rr-fg" id="woRing" cx="60" cy="60" r="54" pathLength="100"/></svg><div class="pl-time" id="woRest">${fmtHMS(Math.max(0, Math.ceil((wp.restEnd - Date.now()) / 1000)))}</div></div>
+        <div class="pl-next">${nxt}</div></div>
         <div class="wo-row3"><button class="btn ghost" data-wo="rest-">−15s</button><button class="btn ghost" data-wo="rest+">+15s</button><button class="btn" data-wo="skiprest">Skip rest</button></div>
         <button class="link wo-addset" data-wo="addset">+ Add another set of ${esc(e.name)}</button></div>`;
     } else if (wp.phase === "exdone"){
@@ -4601,8 +4881,11 @@ function wpRender(){
     }
   }
   const nav = `<div class="wo-nav"><button class="btn ghost" data-wo="prev"${pos <= 0 ? " disabled" : ""}>‹ Prev</button><button class="btn ghost" data-wo="next"${pos < 0 || pos >= order.length - 1 ? " disabled" : ""}>Next exercise ›</button></div>`;
-  $("#woBody").innerHTML = `<div class="wo">${top}<div class="wo-main">${mid}</div>${nav}</div>`;
+  $("#woBody").innerHTML = `<div class="wo">${top}<div class="wo-main${wp.phase === "rest" ? " resting" : ""}">${mid}</div>${nav}</div>`;
   const chip = document.querySelector(".wo-chip.on"); if (chip) chip.scrollIntoView({block:"nearest", inline:"center"});
+  const tal = document.querySelector("#woBody .wo-tally .tally");
+  if (tal){ if (wp.stamp && !calm()){ tal.classList.add("stamping"); const marks = tal.children; marks[marks.length - 1].classList.add("new"); } else tal.classList.add("still"); }
+  wp.stamp = false;
   if (e && document.querySelector("#woBody .pl-fig")) animSet(e.name, "", $("#woBody"), strKey(e.name));
   if (e && usesCam(e) && wp.phase === "set") wpCam();
 }
@@ -4611,7 +4894,7 @@ function wpCam(){
   const e = wpList()[wp.idx];
   camRun({video:$("#woVideo"), canvas:$("#woCanvas"), msg:$("#woCamMsg")}, n => {
     wp.reps = n; const c = $("#woCount"); if (c){ c.textContent = n; c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
-    const b = document.querySelector('#woBody .wo-step b'); if (b) b.textContent = n;
+    const b = document.querySelector('#woBody .wo-step b'); if (b){ b.textContent = n; replay(b, "bump"); }
   }, e ? camKind(e.name) : "pushup");
 }
 $("#woBody").addEventListener("click", ev => {
@@ -4788,7 +5071,7 @@ function refreshAll(){
     renderLog(); renderClock();
     if (!$("#progressView").hidden) renderProgress();
     if (!$("#bodyView").hidden) renderBody();
-    if (!$("#mobilityView").hidden) renderMob();
+    if (!$("#mobView").hidden) renderMobility();
     if (!$("#cardioView").hidden) renderCardio();
   } catch(e){}
 }
@@ -5033,6 +5316,61 @@ function addStarterTemplates(){
   if ((state.starterTpl || 0) >= 1) return;
   STARTER_TEMPLATES.forEach(t => { if (!state.templates.some(x => x.name === t.name)) state.templates.push(clone(t)); });
   state.starterTpl = 1; save();
+}
+
+/* =========================================================
+   MOTION helpers
+   ========================================================= */
+const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+let enterFlag = "";            /* set when a tab is opened, so its page animates in once */
+/* numbers count up to their value */
+function rollNumbers(root, sel){
+  if (calm() || !root) return;
+  root.querySelectorAll(sel || ".stat b, .rc-stats b, .exd-stats b, .rv-num").forEach(el => {
+    const txt = el.textContent.trim();
+    if (/:/.test(txt)){                                        /* times like 1:05:20 count up in seconds */
+      const parts = txt.split(":").map(Number); if (parts.some(isNaN)) return;
+      const secs = parts.reduce((a, b) => a * 60 + b, 0); if (!secs) return;
+      return tween(650, e => el.textContent = fmtHMS(Math.round(secs * e)), () => el.textContent = txt);
+    }
+    const m = /^([\d,]+(?:\.\d+)?)(.*)$/.exec(txt); if (!m) return;
+    const target = parseFloat(m[1].replace(/,/g, "")); if (!target || target > 1e7) return;
+    const dec = (m[1].split(".")[1] || "").length, suf = m[2];
+    tween(650, e => el.textContent = (dec ? (target * e).toFixed(dec) : fmtN(Math.round(target * e))) + suf, () => el.textContent = txt);
+  });
+}
+function tween(ms, fn, done){
+  const t0 = performance.now();
+  const step = now => { const p = Math.min(1, (now - t0) / ms); fn(1 - Math.pow(1 - p, 3)); if (p < 1) requestAnimationFrame(step); else if (done) done(); };
+  requestAnimationFrame(step);
+}
+function replay(el, cls){ if (!el || calm()) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+/* ---------- session-end reveal ---------- */
+function showReveal(k, s){
+  const items = sessEntries(k, s);
+  let sets = 0, reps = 0, held = 0;
+  items.forEach(([e]) => e.sets.filter(filled).forEach(x => { sets++; if (e.type === "t") held += parseSec(x.sec); else reps += num(x.r); }));
+  const prs = items.filter(([e]) => prInfo(e, k).j >= 0).map(([e]) => e.name);
+  const mon = mondayOf(today()), wk = goalDays().filter(d => d >= mon).length;
+  const goalLine = k === today() && wk === state.goal ? `<p class="rv-goal">Weekly goal hit. ${wk} of ${state.goal}.</p>` : "";
+  const it = intensityText(k, s);
+  const secs = Math.round(sessMs(s) / 1000);
+  $("#revealBody").innerHTML = `<div class="rv-wrap">
+    <div class="rv-ck">${CHECK_SVG}</div>
+    <h2 class="rv-title">Session done.</h2>
+    <div class="rv-time"><b class="rv-num">${fmtHMS(secs)}</b><span>${s.name ? esc(s.name) : "time"}</span></div>
+    <div class="rv-grid"><div><b class="rv-num">${reps}</b><span>reps</span></div><div><b class="rv-num">${sets}</b><span>${sets === 1 ? "set" : "sets"}</span></div><div><b class="rv-num">${items.length}</b><span>${items.length === 1 ? "exercise" : "exercises"}</span></div></div>
+    ${sets ? `<div class="rv-tally">${tallySVG(Array.from({length:sets}, () => "var(--accent)"))}</div>` : ""}
+    ${held ? `<p class="rv-int">${fmtHMS(held)} held</p>` : ""}
+    ${prs.length ? `<div class="rv-prs">${prs.map(n => `<span class="pr-chip">PR · ${esc(n)}</span>`).join("")}</div>` : ""}
+    ${it ? `<p class="rv-int">${esc(it)}</p>` : ""}
+    ${goalLine}
+    <button class="btn wide" data-reveal-close>Done</button></div>`;
+  $("#revealBody [data-reveal-close]").onclick = () => closeSheet($("#revealSheet"));
+  openSheet($("#revealSheet"));
+  rollNumbers($("#revealBody"), ".rv-num");
+  if (prs.length || goalLine) setTimeout(() => { tones(1046, 2, .14); buzz([60, 60, 120]); }, 700);
 }
 
 $("#openIntervals").onclick = openIntervals;
