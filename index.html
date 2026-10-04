@@ -706,7 +706,10 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
   /* Body map: map on the left, details on the right */
   #bodyView:not([hidden]){display:grid;grid-template-columns:1.1fr 1fr;gap:0 18px;align-items:start}
   #bodyView > .page-title,#bodyView > #recovery{grid-column:1 / -1}
-  .body-l{position:sticky;top:76px}
+  #bodyView:not([hidden]){grid-template-rows:auto auto auto 1fr}
+  .body-l{grid-column:1;grid-row:3}
+  .body-r{grid-column:2;grid-row:3 / span 2}
+  #doneCard{grid-column:1;grid-row:4;margin-top:14px}
   /* players: picture on the left, controls on the right, when there's room */
   #woPlayer .panel,#mobPlayer .panel,#ivPlayer .panel,#camSheet .panel{max-width:1040px}
 }
@@ -1033,6 +1036,28 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
 .bal-tools .btn{width:100%}
 .bal-tools .note{margin:6px 0 0;font-size:12px}
 .low-tag{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.04em;color:#0E0E0E;background:color-mix(in srgb,var(--accent) 85%,#fff);border-radius:999px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+/* gym */
+.gym-intro{margin:0 0 12px}
+.gym-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.gym-item{display:flex;align-items:center;gap:10px;text-align:left;background:var(--surface-2);border:1px solid transparent;color:var(--ink);border-radius:var(--r-sm);padding:12px;font:inherit;font-weight:600;font-size:15px;cursor:pointer;transition:background .2s,border-color .2s}
+.gym-ck{width:22px;height:22px;flex-shrink:0;border-radius:6px;border:1.5px solid var(--line-2);display:grid;place-items:center;color:transparent;transition:background .2s,border-color .2s}
+.gym-ck svg{width:15px;height:15px}
+.gym-item[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 16%,var(--surface-2));border-color:color-mix(in srgb,var(--accent) 60%,transparent)}
+.gym-item[aria-pressed="true"] .gym-ck{background:var(--accent);border-color:var(--accent);color:#0E0E0E;animation:pop .3s var(--spring)}
+.gym-sum{margin:14px 0 4px}
+.md-sub{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.md-gym{font-size:12px}
+/* done list */
+#doneCard{margin-top:14px}
+.done-list{display:flex;flex-direction:column;margin-top:6px}
+.done-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr) 34px;align-items:center;gap:10px;padding:10px 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.dn-name{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;min-width:0}
+.dn-name i{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dn-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dn-tally{display:flex;align-items:center;gap:6px;overflow:hidden}
+.dn-tally .tally{height:18px;flex-shrink:1;max-width:100%}
+.dn-tally em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--mute)}
+.dn-n{font-family:var(--mono);text-align:right;color:var(--mute)}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1047,6 +1072,9 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
       <button class="icon-btn reset" id="clockReset" aria-label="Reset workout timer" title="Reset" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
     </div>
     <div class="top-actions">
+      <button class="icon-btn" id="openGym" aria-label="What's in my gym" title="What's in my gym">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.6 8.4a3.4 3.4 0 0 1 6.8 0"/><path d="M7.2 9.6h9.6l1.1 2.3a6.6 6.6 0 1 1-11.8 0z"/></svg>
+      </button>
       <button class="icon-btn" id="openPlates" aria-label="Plate calculator" title="Plate calculator">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/></svg>
       </button>
@@ -1124,6 +1152,7 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
       <div id="balance"></div>
     </section>
     </div>
+    <section class="card" id="doneCard"></section>
   </main>
 
   <main id="progressView" hidden>
@@ -1320,6 +1349,13 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
   </div>
 </div>
 <!-- mobility: guided player -->
+<div class="sheet" id="gymSheet" role="dialog" aria-modal="true" aria-labelledby="gymTitle">
+  <div class="scrim"></div>
+  <div class="panel short">
+    <div class="sheet-head"><h2 id="gymTitle">What's in my gym</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="gymBody"></div>
+  </div>
+</div>
 <div class="sheet" id="revealSheet" role="dialog" aria-modal="true" aria-label="Session summary">
   <div class="scrim"></div>
   <div class="panel short reveal-panel">
@@ -1447,7 +1483,7 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "4.3.0";
+const APP_VERSION = "4.4.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -3870,6 +3906,7 @@ function renderBody(){
   $("#figFront").innerHTML = figSVG("front", fillOf, rank);
   $("#figBack").innerHTML = figSVG("back", fillOf, rank);
   [$("#figFront"), $("#figBack")].forEach(f => f.classList.toggle("fill-in", enterFlag === "body" && !calm()));
+  renderDoneList(range, view);
   $("#bodyLegend").innerHTML = view === "all"
     ? `<span><i style="background:${NEUTRAL}"></i>None</span>` + ["s","c","m"].map(t => `<span><i style="background:${TYPE_COL[t]}"></i>${TYPE_NAME[t]}</span>`).join("") + "<span>Deeper = more</span>"
     : `<span><i style="background:${NEUTRAL}"></i>None</span><span>Less</span>` + [30,55,80,100].map(p => `<i style="background:color-mix(in srgb, ${TYPE_COL[view]} ${p}%, var(--field));margin:0"></i>`).join("") + "<span>More</span>";
@@ -3889,7 +3926,7 @@ function renderBody(){
       const sug = suggestFor(m, 5), str = stretchesFor(m, 2);
       const day = today(), o = ((state.sessions || {})[day] || []).find(x => !x.end), have = new Set(o ? sessEntries(day, o).map(([e]) => e.name) : []);
       const hint = x => [x.bw ? "bodyweight" : x.light ? "light equipment" : "", x.done ? "you've done it" : ""].filter(Boolean).join(" · ");
-      return (sug.length ? `<h3 class="md-sub">Try these for ${MUSCLE_NAMES[m].toLowerCase()}</h3><div class="sug">${sug.map(x => `<div class="sug-row"><div><b>${esc(x.name)}</b>${hint(x) ? `<span>${hint(x)}</span>` : ""}</div><button class="btn ghost sug-btn" data-sug="${esc(x.name)}" data-g="${esc(x.group)}" data-t="${x.type}"${have.has(x.name) ? " disabled" : ""}>${have.has(x.name) ? "Added" : "+ Add"}</button></div>`).join("")}</div>` : "")
+      return (!sug.length ? `<p class="hint">No exercises for this muscle match your gym. <button class="link" data-open-gym>Edit what's in my gym</button></p>` : "") + (sug.length ? `<h3 class="md-sub">Try these for ${MUSCLE_NAMES[m].toLowerCase()} <button class="link md-gym" data-open-gym>Your gym</button></h3><div class="sug">${sug.map(x => `<div class="sug-row"><div><b>${esc(x.name)}</b>${hint(x) ? `<span>${hint(x)}</span>` : ""}</div><button class="btn ghost sug-btn" data-sug="${esc(x.name)}" data-g="${esc(x.group)}" data-t="${x.type}"${have.has(x.name) ? " disabled" : ""}>${have.has(x.name) ? "Added" : "+ Add"}</button></div>`).join("")}</div>` : "")
         + (str.length ? `<h3 class="md-sub">Stretch it</h3><div class="sug">${str.map(n => `<div class="sug-row"><div><b>${esc(n)}</b><span>mobility</span></div><button class="btn ghost sug-btn" data-sugm="${esc(n)}">+ Add</button></div>`).join("")}</div>` : "");
     })()}`;
 
@@ -3914,6 +3951,7 @@ function suggestFor(m, n){
     .concat(catalog.filter(x => (x.type === "s" || x.type === "t") && x.group !== "Mobility" && x.group !== "Cardio"));
   pool.forEach(x => {
     const key = x.name.toLowerCase(); if (seen.has(key)) return; seen.add(key);
+    if (!canDo(x.name, x.equip)) return;
     const w = (musclesFor({name:x.name, group:x.group, type:x.type}) || {})[m] || 0;
     if (w < .7) return;
     const bw = isBW(x.name, x.type) || (x.extra && !/band|carry|pallof/i.test(x.name)), light = /band|dumbbell|kettlebell|carry/i.test(x.name) || /body only|bands|dumbbell|kettlebell/i.test(x.equip || "");
@@ -3953,6 +3991,9 @@ $("#bodyView").addEventListener("click", e => {
   const sm = e.target.closest("[data-sugm]");
   if (sm){ const L = state.workouts[today()] = state.workouts[today()] || []; L.push(newMobEntry(sm.dataset.sugm)); save(); sm.textContent = "Added"; sm.disabled = true;
     toast(`Added ${sm.dataset.sugm} to today's stretches.`, false, {label:"Open", fn: () => { mobDate = today(); showTab("mobility"); }}); return; }
+  if (e.target.closest("[data-open-gym]")){ $("#openGym").click(); return; }
+  const dn = e.target.closest("[data-dn]");
+  if (dn){ if (dn.dataset.dt === "s") openExDetail(dn.dataset.dn); return; }
   if (e.target.closest("#balanceBuild")){ buildBalanceSession(JSON.parse(e.target.closest("#balanceBuild").dataset.lows)); return; }
   const r = e.target.closest("[data-r]");
   if (r){ state.bodyRange = +r.dataset.r; save(); selMuscle = null; renderBody(); return; }
@@ -4427,7 +4468,7 @@ function anotherHTML(){
 const MP_VER = "0.10.14";
 const MP_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}`;
 const MP_MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
-const CAM_KINDS = [[/push.?ups?\b|press.?ups?\b/i, "pushup"], [/pull.?ups?\b|chin.?ups?\b|muscle.?ups?\b/i, "pullup"], [/\bdips?\b/i, "dip"], [/squat/i, "squat"]];
+const CAM_KINDS = [[/push.?ups?\b|press.?ups?\b/i, "pushup"], [/pull.?ups?\b|chin.?ups?\b|muscle.?ups?\b/i, "pullup"], [/\bdips?\b/i, "dip"], [/cossack/i, "cossack"], [/squat/i, "squat"]];
 const camKind = name => { const m = CAM_KINDS.find(([re]) => re.test(name)); return m ? m[1] : null; };
 let poseLM = null, poseLoading = null;
 const cam = {active:false, stream:null, raf:0, i:-1, day:"", kind:"", facing:"user", lastT:-1, c:null, els:null, onRep:null};
@@ -4578,10 +4619,11 @@ function pullupStep(c, lm, t){
   }
   return false;
 }
-const CAM_STEP = {pushup: pushupStep, pullup: pullupStep, squat: (c, l, t) => squatStep(c, l, t), dip: (c, l, t) => dipStep(c, l, t)};
+const CAM_STEP = {pushup: pushupStep, pullup: pullupStep, squat: (c, l, t) => squatStep(c, l, t), dip: (c, l, t) => dipStep(c, l, t), cossack: (c, l, t) => cossackStep(c, l, t)};
 /* where to put the phone, per exercise */
 const CAM_TIPS = {
   pushup: ["Phone upright, 4 to 6 feet in front of you, low and tilted up a little.", "Side on works too. Head and shoulders must stay in view.", "Hold the top for a second before your first rep."],
+  cossack: ["Phone upright, 6 to 8 feet away, facing you, about waist high.", "Step wide so both feet stay in the picture as you shift side to side.", "Stand tall for a second. Each side counts as one rep."],
   squat: ["Phone upright, 6 to 8 feet away, about waist high.", "In front of you or side on. Your whole body, feet included, should be in view.", "Stand tall for a second before your first rep."],
   dip: ["Phone upright, 6 to 8 feet away. Side on is best.", "Shoulders, elbows and hips should stay in view at the top and the bottom.", "Start at the top with straight arms for a second."],
   pullup: ["Phone upright, 6 to 8 feet away. In front of you or behind you both work.", "Prop it about waist high and tilt it up so your elbows and shoulders stay in view at the bottom and the top. Hands on the bar can be out of frame.", "Doorway bar? Put the phone in the next room looking through the doorway. Tight on space? Side on works.", "Start from a dead hang for a second."]
@@ -4611,7 +4653,7 @@ async function camRun(els, onRep, kind){
   if (cam.els !== els || !cam.stream) return;
   cam.active = true; window.__camOn = true; syncWake();
   cam.c.ar = (v.videoWidth && v.videoHeight) ? v.videoWidth / v.videoHeight : .75;
-  camMsg({pullup:"Keep the phone upright, 6 to 8 feet away, tilted up toward the bar.", squat:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", dip:"Keep the phone upright, 6 to 8 feet away. Side on works best."}[cam.kind] || "Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
+  camMsg({cossack:"Keep the phone upright, 6 to 8 feet away, facing you, with both feet in view.", pullup:"Keep the phone upright, 6 to 8 feet away, tilted up toward the bar.", squat:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", dip:"Keep the phone upright, 6 to 8 feet away. Side on works best."}[cam.kind] || "Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
   const loop = () => {
     if (!cam.active || cam.els !== els) return;
     if (v.readyState >= 2 && v.currentTime !== cam.lastT){
@@ -5342,6 +5384,29 @@ function squatStep(c, lm, t){
   const angDown = c.ang != null && c.angTop > 150 && c.ang < 105, angUp = c.ang != null && c.ang > c.angTop - 15;
   return dropCount(c, hy, len, .3, t, angDown, angUp);
 }
+/* Cossack squats: a wide stance, sinking onto one leg at a time. Each side counts.
+   Signal: your hips drop toward the bent knee; the side comes from where your hips shift. */
+function cossackStep(c, lm, t){
+  if (!lm || lm.length < 29){ c.msg = "Can't see you. Put the phone 6 to 8 feet away, facing you, with both feet in view."; return false; }
+  const P = camPts(c, lm), lH = P(23), rH = P(24), lK = P(25), rK = P(26), lA = P(27), rA = P(28), lS = P(11), rS = P(12);
+  if (lH.v < .5 || rH.v < .5 || lK.v < .5 || rK.v < .5){ c.msg = "Can't see your hips and knees. Step back so both legs are in view."; return false; }
+  const hy = (lH.y + rH.y) / 2, hx = (lH.x + rH.x) / 2;
+  const thigh = (Math.hypot(lH.x - lK.x, lH.y - lK.y) + Math.hypot(rH.x - rK.x, rH.y - rK.y)) / 2;
+  const leg = thigh * 2;
+  if (lS.v > .5 && rS.v > .5 && (lS.y + rS.y) / 2 > hy - leg * .2){ c.msg = "Stand tall in a wide stance to start."; c.phase = "setup"; c.seen = 0; c.topY = null; return false; }
+  let kAng = null, side = null;
+  if (lA.v > .5 && rA.v > .5){
+    const la = angleAt(lH, lK, lA), ra = angleAt(rH, rK, rA);
+    kAng = Math.min(la, ra); side = la < ra ? "L" : "R";              /* the bent knee is the working side */
+  }
+  if (kAng != null){ c.ang = c.ang == null ? kAng : c.ang * .45 + kAng * .55; c.angTop = Math.max(c.ang, (c.angTop || 0) - .15); }
+  const angDown = c.ang != null && c.angTop > 140 && c.ang < 100, angUp = c.ang != null && c.ang > c.angTop - 20;
+  const was = c.phase;
+  const rep = dropCount(c, hy, leg, .22, t, angDown, angUp);
+  if (c.phase === "down" && was !== "down") c.downSide = side;
+  if (rep && c.downSide) c.msg = `Good. ${c.downSide === "L" ? "Left" : "Right"} side`;
+  return rep;
+}
 function dipStep(c, lm, t){
   if (!lm || lm.length < 25){ c.msg = "Can't see you. Put the phone 6 to 8 feet away, side on works best."; return false; }
   const P = camPts(c, lm), arms = [];
@@ -5460,9 +5525,86 @@ function showReveal(k, s){
   if (prs.length || goalLine) setTimeout(() => { tones(1046, 2, .14); buzz([60, 60, 120]); }, 700);
 }
 
+/* =========================================================
+   WHAT'S IN MY GYM: suggestions only use equipment you have
+   ========================================================= */
+const GYM_ITEMS = [
+  ["pullup", "Pull-up bar"], ["dip", "Dip bars"], ["bands", "Resistance bands"], ["db", "Dumbbells"], ["kb", "Kettlebells"],
+  ["bench", "Bench"], ["barbell", "Barbell and rack"], ["cable", "Cable machine"], ["machine", "Weight machines"],
+  ["rings", "Rings or TRX"], ["box", "Plyo box or step"], ["medball", "Medicine ball"], ["roller", "Foam roller"]
+];
+const GYM_DEFAULT = {pullup:true, bands:true, db:true};
+const gymHas = () => Object.assign({}, state.gym || GYM_DEFAULT);
+/* what an exercise needs: a list of options, any one is enough. [] means bodyweight */
+function equipNeeds(name, equip){
+  const n = String(name).toLowerCase(), q = String(equip || "").toLowerCase();
+  if (/barbell|bench press|deadlift|rack pull|clean|snatch|jerk|back squat|front squat|good morning|overhead press|push press|thruster|hip thrust/.test(n) && !/dumbbell|kettlebell|band|single.?leg glute|glute bridge/.test(n)) return [["barbell"]];
+  if (/cable|pulldown|face pull|pushdown|crossover/.test(n) || /cable/.test(q)) return [["cable"]];
+  if (/machine|leg press|pec deck|leg curl|leg extension|smith|hack squat|lever|seated calf/.test(n) || /machine/.test(q)) return [["machine"]];
+  if (/dumbbell|\bdb\b|arnold|goblet/.test(n) || /dumbbell/.test(q)) return [["db"], ["kb"]];
+  if (/kettlebell|swing|turkish/.test(n) || /kettlebell/.test(q)) return [["kb"], ["db"]];
+  if (/band|pallof|pull.?apart|woodchop|clamshell w/.test(n) || /bands/.test(q)) return [["bands"], ["cable"]];
+  if (/carry|farmer|suitcase|waiter/.test(n)) return [["db"], ["kb"], ["barbell"]];
+  if (/curl|lateral raise|front raise|rear delt fly|reverse fly|shrug/.test(n) && !/nordic|leg curl/.test(n)) return [["db"], ["kb"], ["bands"], ["cable"]];
+  if (/pull.?up|chin.?up|hanging|dead hang|muscle.?up|toes to bar/.test(n)) return [["pullup"], ["rings"]];
+  if (/bench dip/.test(n)) return [["bench"], []];
+  if (/\bdips?\b/.test(n)) return [["dip"], ["rings"]];
+  if (/inverted row|ring row|trx/.test(n)) return [["rings"], ["pullup"], ["barbell"]];
+  if (/box jump|step.?up|box squat/.test(n)) return [["box"], ["bench"]];
+  if (/medicine ball|med ball|wall ball|slam/.test(n) || /medicine ball/.test(q)) return [["medball"]];
+  if (/foam roll/.test(n) || /foam roll/.test(q)) return [["roller"]];
+  if (/nordic/.test(n)) return [[]];
+  if (/e-z|ez.?bar/.test(n + q) || /barbell/.test(q)) return [["barbell"]];
+  return [[]];
+}
+function canDo(name, equip){ const g = gymHas(); return equipNeeds(name, equip).some(opt => opt.every(k => g[k])); }
+function renderGym(){
+  const g = gymHas();
+  $("#gymBody").innerHTML = `<p class="note gym-intro">Tap what you can use. Exercise suggestions on the Body map only use this equipment. Bodyweight moves are always in.</p>
+    <div class="gym-grid">${GYM_ITEMS.map(([k, label]) => `<button class="gym-item" data-gym="${k}" aria-pressed="${!!g[k]}"><span class="gym-ck">${CHECK_SVG}</span>${label}</button>`).join("")}</div>
+    <p class="note gym-sum">${GYM_ITEMS.filter(([k]) => g[k]).length ? "You have: bodyweight, " + GYM_ITEMS.filter(([k]) => g[k]).map(([, l]) => l.toLowerCase()).join(", ") + "." : "Bodyweight only."}</p>`;
+}
+$("#gymBody").addEventListener("click", e => {
+  const b = e.target.closest("[data-gym]"); if (!b) return;
+  const g = gymHas(); g[b.dataset.gym] = !g[b.dataset.gym]; state.gym = g; save(); renderGym();
+  if (!$("#bodyView").hidden) renderBody();
+});
+$("#openGym").onclick = () => { renderGym(); openSheet($("#gymSheet")); };
+
+/* =========================================================
+   BODY MAP: everything you did in the range, a tally mark per set
+   ========================================================= */
+function renderDoneList(range, view){
+  const box = $("#doneCard"); if (!box) return;
+  const since = addDays(today(), -(range - 1)), agg = {};
+  Object.keys(state.workouts).forEach(k => {
+    if (k < since || k > today()) return;
+    const pend = pendingSids(k);
+    entries(k).forEach(e => {
+      const t = e.type === "t" ? "s" : e.type;
+      if (view !== "all" && t !== view) return;
+      const pe = pend && e.sid && pend.has(e.sid);
+      const n = t === "c" ? (e.sets.some(filled) ? 1 : 0) : e.sets.filter(x => filled(x) && (!pe || x.done)).length;
+      if (!n) return;
+      const a = agg[e.name] = agg[e.name] || {t, n:0, days:new Set(), last:k};
+      a.n += n; a.days.add(k); if (k > a.last) a.last = k;
+    });
+  });
+  const rows = Object.entries(agg).sort((a, b) => b[1].n - a[1].n || a[0].localeCompare(b[0]));
+  const total = rows.reduce((s, [, a]) => s + a.n, 0);
+  box.innerHTML = `<h2>Done in the last ${range} days</h2>
+    <p class="note">${rows.length ? `${rows.length} ${rows.length === 1 ? "exercise" : "exercises"}, ${total} ${total === 1 ? "mark" : "marks"}. One mark per set (per session for cardio).` : "Nothing logged in this range yet."}</p>
+    <div class="done-list">${rows.map(([name, a]) => {
+      const marks = Math.min(a.n, 40);
+      return `<button class="done-row" data-dn="${esc(name)}" data-dt="${a.t}"><span class="dn-name"><i style="background:${TYPE_VAR[a.t]}"></i>${esc(name)}</span>
+        <span class="dn-tally">${tallySVG(Array.from({length:marks}, () => TYPE_VAR[a.t]))}${a.n > marks ? `<em>+${a.n - marks}</em>` : ""}</span>
+        <span class="dn-n">${a.n}</span></button>`;
+    }).join("")}</div>`;
+}
+
 $("#openIntervals").onclick = openIntervals;
 $("#exDetailBtn").onclick = () => { const n = $("#exSelect").value; if (n) openExDetail(n); };
-window.__tally = {squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
+window.__tally = {cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
 
 /* ---------- full-height fix for iPhone home-screen apps ---------- */
 function setAppHeight(){ document.documentElement.style.setProperty("--app-h", Math.max(window.innerHeight, screen.height && window.navigator.standalone ? screen.height : 0) + "px"); }
