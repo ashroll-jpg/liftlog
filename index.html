@@ -1015,6 +1015,24 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
   .enter-r,.enter-l,.stagger > *,.stagger #exList > *,.opening,.closing,.cam-view.flash,.cam-reps.pop,.bump,.wo-tally .tally .new,.rv-wrap > *,.rv-ck,.pr-chip,.goal.hit,.fill-in .mus,.fig .mus.sel{animation:none}
   .rr-fg{transition:none}
 }
+/* header: one solid full-width bar (a real layer, not shadow tricks, so no seams on wide screens) */
+.top{background:transparent;box-shadow:none;clip-path:none;border-bottom:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+.top::before{content:"";position:absolute;z-index:-1;left:50%;width:100vw;transform:translateX(-50%);
+  top:calc(-1 * env(safe-area-inset-top,0px) - 2px);bottom:0;
+  background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+/* balancing suggestions */
+#muscleDetail,#balance{scroll-margin-top:84px}
+.md-sub{font-size:13px;font-weight:700;color:var(--mute);margin:18px 0 6px}
+.sug{display:flex;flex-direction:column}
+.sug-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.sug-row b{display:block;font-weight:600;font-size:15px}
+.sug-row span{display:block;font-size:12px;color:var(--mute);margin-top:2px}
+.sug-btn{flex-shrink:0;padding:8px 14px;font-size:13px}
+.sug-btn:disabled{opacity:.55;color:var(--accent)}
+.bal-tools{margin:4px 0 10px}
+.bal-tools .btn{width:100%}
+.bal-tools .note{margin:6px 0 0;font-size:12px}
+.low-tag{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.04em;color:#0E0E0E;background:color-mix(in srgb,var(--accent) 85%,#fff);border-radius:999px;padding:1px 6px;margin-left:6px;vertical-align:2px}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1101,7 +1119,8 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
     <section class="card" id="muscleDetail"></section>
     <section class="card">
       <h2>Muscle balance</h2>
-      <p class="note">Points per muscle. One point is a strength set, 10 minutes of cardio, or 1 minute of stretching. Helper muscles get partial credit.</p>
+      <p class="note">Points per muscle. One point is a strength set, 10 minutes of cardio, or 1 minute of stretching. Helper muscles get partial credit. Tap a muscle for exercises that target it.</p>
+      <div id="balanceTools" class="bal-tools"></div>
       <div id="balance"></div>
     </section>
     </div>
@@ -1428,7 +1447,7 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "4.2.0";
+const APP_VERSION = "4.3.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -1494,6 +1513,7 @@ function addToCatalog(name, group, type, equip, prim, sec){
 function buildCatalog(remote){
   catalog = []; byName = {};
   BUILTIN.forEach(([g, list]) => list.forEach(s => { const p = s.split("|"); addToCatalog(p[0], g, p[1]); }));
+  catalog.forEach(ex => ex.builtin = true);
   (state.custom || []).forEach(e => addToCatalog(e.name, e.group, e.type));
   (remote || []).forEach(e => addToCatalog(e[0], e[1], e[2], e[3], e[4], e[5]));
   catalog.forEach(ex => { if (ex.type === "s" && isTimedName(ex.name)) ex.type = "t"; });
@@ -3682,6 +3702,12 @@ const MUSCLE_NAMES = {chest:"Chest", frontDelts:"Front shoulders", sideDelts:"Si
 const REMOTE_M = {chest:{chest:1}, lats:{lats:1}, "middle back":{midBack:1}, "lower back":{lowerBack:1}, traps:{traps:1}, neck:{traps:.5}, shoulders:{frontDelts:.8,sideDelts:.8}, biceps:{biceps:1}, triceps:{triceps:1}, forearms:{forearms:1}, quadriceps:{quads:1}, hamstrings:{hamstrings:1}, glutes:{glutes:1}, calves:{calves:1}, adductors:{adductors:1}, abductors:{glutes:.6}, abdominals:{abs:1,obliques:.5}};
 /* first match wins, so specific patterns come first */
 const RULES = [
+  [/copenhagen|adductor|cossack|sumo squat|side.?lying adduction/, {adductors:1, obliques:.3, glutes:.3}],
+  [/pull.?apart|face pull|y.?t.?w|reverse fly|rear delt/, {rearDelts:1, midBack:.6, traps:.3}],
+  [/pike push|handstand/, {frontDelts:1, sideDelts:.75, triceps:.6, traps:.3}],
+  [/superman|back extension|reverse hyper/, {lowerBack:1, glutes:.5, hamstrings:.3}],
+  [/bird.?dog/, {lowerBack:.8, glutes:.6, abs:.5}],
+  [/dead.?bug/, {abs:1, obliques:.4}],
   [/clamshell|band walk|monster walk|hip airplane|fire hydrant|side.?lying leg/, {glutes:1, adductors:.3, quads:.2}],
   [/pogo|a.?skips?|high knees|tuck jump|bounds?\b|hops?\b/, {calves:1, quads:.7, glutes:.5, hamstrings:.3}],
   [/leg curl|hamstring curl|nordic/, {hamstrings:1}],
@@ -3837,7 +3863,7 @@ function renderBody(){
   const max = Math.max(1, ...Object.keys(sc).map(val));
   const fillOf = k => { const v = val(k); if (!v) return NEUTRAL; return `color-mix(in srgb, ${TYPE_COL[view === "all" ? dom(k) : view]} ${Math.round(25 + 75*v/max)}%, var(--field))`; };
   const order = Object.keys(MUSCLE_NAMES).sort((a,b) => val(b) - val(a));
-  if (!selMuscle || !(selMuscle in MUSCLE_NAMES)) selMuscle = order[0];
+  if (!selMuscle || !(selMuscle in MUSCLE_NAMES)) selMuscle = order[order.length - 1];   /* start where you need it most */
   document.querySelectorAll("#rangeSeg button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.r === range));
   document.querySelectorAll("#viewSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === view));
   const rank = {}; order.slice().reverse().forEach((m, i) => rank[m] = i);
@@ -3858,21 +3884,82 @@ function renderBody(){
     <div class="md-num">${Math.round(val(m)*10)/10}<small>points, ${range} days</small></div></div>
     <div class="md-types">${["s","c","m"].filter(t => view === "all" || t === view).map(t => `<div><span>${TYPE_NAME[t]}</span><span class="tr"><i style="width:${Math.round(100*sc[m][t]/tmax)}%;background:${TYPE_COL[t]}"></i></span><span>${sc[m][t] ? typeLabel(t) : "–"}</span></div>`).join("")}</div>
     ${exs.length ? `<ul class="md-ex">${exs.map(([n,x]) => `<li style="--dc:${TYPE_COL[x.t]}"><span>${esc(n)}</span><span>${x.t === "s" ? x.sets + " " + (x.sets === 1 ? "set" : "sets") + (x.reps ? ", " + fmtN(x.reps) + " reps" : "") : fmtHMS(x.secs) + (x.t === "c" ? " cardio" : " held")}</span></li>`).join("")}</ul>`
-      : `<p class="hint" style="padding-bottom:0">Nothing hit this muscle in the last ${range} days.</p>`}`;
+      : `<p class="hint" style="padding-bottom:0">Nothing hit this muscle in the last ${range} days.</p>`}
+    ${(() => {
+      const sug = suggestFor(m, 5), str = stretchesFor(m, 2);
+      const day = today(), o = ((state.sessions || {})[day] || []).find(x => !x.end), have = new Set(o ? sessEntries(day, o).map(([e]) => e.name) : []);
+      const hint = x => [x.bw ? "bodyweight" : x.light ? "light equipment" : "", x.done ? "you've done it" : ""].filter(Boolean).join(" · ");
+      return (sug.length ? `<h3 class="md-sub">Try these for ${MUSCLE_NAMES[m].toLowerCase()}</h3><div class="sug">${sug.map(x => `<div class="sug-row"><div><b>${esc(x.name)}</b>${hint(x) ? `<span>${hint(x)}</span>` : ""}</div><button class="btn ghost sug-btn" data-sug="${esc(x.name)}" data-g="${esc(x.group)}" data-t="${x.type}"${have.has(x.name) ? " disabled" : ""}>${have.has(x.name) ? "Added" : "+ Add"}</button></div>`).join("")}</div>` : "")
+        + (str.length ? `<h3 class="md-sub">Stretch it</h3><div class="sug">${str.map(n => `<div class="sug-row"><div><b>${esc(n)}</b><span>mobility</span></div><button class="btn ghost sug-btn" data-sugm="${esc(n)}">+ Add</button></div>`).join("")}</div>` : "");
+    })()}`;
 
+  const lows = order.slice().reverse().filter(k => suggestFor(k, 1).length).slice(0, 3);
+  $("#balanceTools").innerHTML = view === "m" ? "" : `<button class="btn" id="balanceBuild" data-lows='${JSON.stringify(lows)}'>Build a balance session</button><p class="note">Adds two exercises each for ${listWords(lows.map(k => MUSCLE_NAMES[k].toLowerCase()))} to today's session.</p>`;
   $("#balance").innerHTML = order.map(k => {
-    const v = val(k);
+    const v = val(k), low = lows.includes(k);
     const segs = (view === "all" ? ["s","c","m"] : [view]).map(t => `<span class="seg-${t}" style="width:${(100*sc[k][t]/max).toFixed(1)}%"></span>`).join("");
-    return `<button class="bal${v ? "" : " zero"}${k === selMuscle ? " sel" : ""}" data-m="${k}"><span>${MUSCLE_NAMES[k]}</span><span class="track">${segs}</span><span class="v">${v ? Math.round(v*10)/10 : "–"}</span></button>`;
+    return `<button class="bal${v ? "" : " zero"}${k === selMuscle ? " sel" : ""}${low ? " low" : ""}" data-m="${k}"><span>${MUSCLE_NAMES[k]}${low ? '<em class="low-tag">Low</em>' : ""}</span><span class="track">${segs}</span><span class="v">${v ? Math.round(v*10)/10 : "–"}</span></button>`;
   }).join("");
 }
+/* ----- balancing suggestions ----- */
+const EXTRA_SUGGEST = [["Band Pull-Apart","Shoulders"],["Pike Push-Up","Shoulders"],["Y-T-W Raises","Shoulders"],["Copenhagen Plank","Legs","t"],
+  ["Cossack Squat","Legs"],["Nordic Hamstring Curl","Legs"],["Single-Leg Calf Raise","Legs"],["Inverted Row","Back"],["Superman Hold","Back","t"],
+  ["Bird Dog","Core"],["Dead Bug","Core"],["Diamond Push-Up","Arms"],["Bench Dips","Arms"],["Glute Bridge","Legs"],["Single-Leg Glute Bridge","Legs"],
+  ["Lateral Band Walk","Legs"],["Clamshells","Legs"],["Pallof Press","Core"],["Side Plank","Core","t"],["Suitcase Carry","Core","t"],["Chin-Up","Back"],["Pushups","Chest"]];
+const HEAVY_EQUIP = /barbell|machine|cable|smith|leg press|hack squat|pec deck|pulldown|t-bar|ez-bar|preacher|sled|lever|deadlift|rack pull|clean|snatch|jerk|back squat|front squat|bench press|overhead press|good morning/i;
+function suggestFor(m, n){
+  const done = new Set(), out = [], seen = new Set();
+  workoutDays().forEach(k => entries(k).forEach(e => done.add(e.name)));
+  const pool = EXTRA_SUGGEST.map(([name, group, type]) => ({name, group, type:type || "s", extra:true}))
+    .concat(catalog.filter(x => (x.type === "s" || x.type === "t") && x.group !== "Mobility" && x.group !== "Cardio"));
+  pool.forEach(x => {
+    const key = x.name.toLowerCase(); if (seen.has(key)) return; seen.add(key);
+    const w = (musclesFor({name:x.name, group:x.group, type:x.type}) || {})[m] || 0;
+    if (w < .7) return;
+    const bw = isBW(x.name, x.type) || (x.extra && !/band|carry|pallof/i.test(x.name)), light = /band|dumbbell|kettlebell|carry/i.test(x.name) || /body only|bands|dumbbell|kettlebell/i.test(x.equip || "");
+    let sc = w * 3 + (bw ? 2.2 : light ? 1.2 : 0) + (done.has(x.name) ? 1.5 : 0) + (x.builtin || x.extra ? 1 : 0);
+    if (HEAVY_EQUIP.test(x.name) || /machine|cable|barbell|e-z/i.test(x.equip || "")) sc -= 2.5;
+    out.push({name:x.name, group:x.group, type:x.type, sc, bw, light, done:done.has(x.name)});
+  });
+  return out.sort((a, b) => b.sc - a.sc).slice(0, n || 5);
+}
+function stretchesFor(m, n){
+  return MOB_CATALOG.filter(r => (r[4] || {})[m] >= .7).sort((a, b) => b[4][m] - a[4][m]).slice(0, n || 2).map(r => r[0]);
+}
+function addSuggested(x, quiet){
+  const day = today(), o = ensureOpen(day), L = state.workouts[day] = state.workouts[day] || [];
+  if (L.some(e => e.sid === o.id && e.name === x.name)){ if (!quiet) toast(x.name + " is already in today's session."); return false; }
+  L.push({name:x.name, group:x.group, type:x.type, sid:o.id, sets:setsFor(x.name, x.type)});
+  save();
+  if (!quiet) toast(`Added ${x.name} to today's session.`, false, {label:"Open", fn: () => { curDate = today(); showTab("log"); }});
+  return true;
+}
+function buildBalanceSession(lows){
+  const day = today(), o = ensureOpen(day), fresh = !sessEntries(day, o).length && !o.start;
+  let added = 0; const names = [];
+  lows.forEach(m => {
+    let n = 0;
+    suggestFor(m, 6).forEach(x => { if (n < 2 && addSuggested(x, true)){ n++; added++; } });
+    if (n) names.push(MUSCLE_NAMES[m].toLowerCase());
+  });
+  if (!added){ toast("Today's session already covers those."); return; }
+  if (fresh) o.name = "Balance: " + names.join(", ");
+  save(); curDate = today(); showTab("log");
+  toast(`Added ${added} exercises for ${listWords(names)}.`);
+}
 $("#bodyView").addEventListener("click", e => {
+  const sg = e.target.closest("[data-sug]");
+  if (sg){ addSuggested({name:sg.dataset.sug, group:sg.dataset.g, type:sg.dataset.t}); replay(sg, "bump"); sg.textContent = "Added"; sg.disabled = true; return; }
+  const sm = e.target.closest("[data-sugm]");
+  if (sm){ const L = state.workouts[today()] = state.workouts[today()] || []; L.push(newMobEntry(sm.dataset.sugm)); save(); sm.textContent = "Added"; sm.disabled = true;
+    toast(`Added ${sm.dataset.sugm} to today's stretches.`, false, {label:"Open", fn: () => { mobDate = today(); showTab("mobility"); }}); return; }
+  if (e.target.closest("#balanceBuild")){ buildBalanceSession(JSON.parse(e.target.closest("#balanceBuild").dataset.lows)); return; }
   const r = e.target.closest("[data-r]");
   if (r){ state.bodyRange = +r.dataset.r; save(); selMuscle = null; renderBody(); return; }
   const v = e.target.closest("[data-view]");
   if (v){ state.bodyView = v.dataset.view; save(); selMuscle = null; renderBody(); return; }
   const m = e.target.closest("[data-m]");
-  if (m){ selMuscle = m.dataset.m; renderBody(); if (m.closest(".fig")) $("#muscleDetail").scrollIntoView({behavior:"smooth", block:"nearest"}); }
+  if (m){ selMuscle = m.dataset.m; renderBody(); $("#muscleDetail").scrollIntoView({behavior:"smooth", block:"nearest"}); }
 });
 
 /* ---------- BACKGROUND PHOTOS (stored on this device only) ---------- */
