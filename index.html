@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0E0E0E">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1058,6 +1058,10 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
 .dn-tally .tally{height:18px;flex-shrink:1;max-width:100%}
 .dn-tally em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--mute)}
 .dn-n{font-family:var(--mono);text-align:right;color:var(--mute)}
+/* no zoom: double-tap zoom off everywhere; text boxes at 16px so iPhone doesn't zoom in when you tap one */
+html,body{touch-action:manipulation}
+input,select,textarea{font-size:16px}
+.set input{font-size:max(16px,1em)}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1483,7 +1487,7 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "4.4.0";
+const APP_VERSION = "4.4.1";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -5063,7 +5067,7 @@ const SYNC_KEY = "tally.sync", SYNC_BASE = "tally.sync.base", SYNC_FILE = "tally
 const LOCAL_ONLY = ["clock"];                       /* never synced */
 let syncCfg = {}; try { syncCfg = JSON.parse(store.get(SYNC_KEY)) || {}; } catch(e){ syncCfg = {}; }
 const syncSaveCfg = () => store.set(SYNC_KEY, JSON.stringify(syncCfg));
-let syncBusy = false, syncTimer = 0, syncAgain = false, syncApplying = false;
+let syncBusy = false, syncTimer = 0, syncAgain = false, syncApplying = false, syncSoon = false;
 const ghHeaders = () => ({"Authorization": "Bearer " + syncCfg.token, "Accept": "application/vnd.github+json"});
 const J = x => JSON.stringify(x === undefined ? null : x);
 
@@ -5153,7 +5157,7 @@ async function pullRemote(){
   const txt = f.truncated ? await (await fetch(f.raw_url, {cache:"no-store"})).text() : f.content;
   try { return JSON.parse(txt); } catch(e){ return null; }
 }
-const playersBusy = () => (typeof wp !== "undefined" && wp.open) || (typeof player !== "undefined" && player.iv) || !!runningSess();
+const playersBusy = () => (typeof wp !== "undefined" && wp.open) || (typeof player !== "undefined" && player.iv);
 async function syncNow(manual){
   if (!syncCfg.token) return;
   if (syncBusy){ syncAgain = true; return; }
@@ -5193,10 +5197,12 @@ async function syncNow(manual){
 function scheduleSync(){
   if (!syncCfg.token || syncApplying) return;
   syncCfg.dirty = true;
-  clearTimeout(syncTimer); syncTimer = setTimeout(() => syncNow(), 4000);
+  clearTimeout(syncTimer); syncTimer = setTimeout(() => syncNow(), syncSoon ? 800 : 4000); syncSoon = false;
 }
 function refreshAll(){
   try {
+    if ($("#gymSheet").classList.contains("open")) renderGym();
+    if ($("#settings").classList.contains("open")) renderSettings();
     renderLog(); renderClock();
     if (!$("#progressView").hidden) renderProgress();
     if (!$("#bodyView").hidden) renderBody();
@@ -5220,11 +5226,18 @@ $("#syncConnect").onclick = async () => {
   if (syncCfg.status === "error"){ if (syncCfg.error && /token/.test(syncCfg.error)){ syncCfg = {}; syncSaveCfg(); renderSyncStatus(); } }
 };
 $("#syncNowBtn").onclick = () => syncNow(true);
+/* any change made in Settings goes to your other device within a second */
+["click", "change", "input"].forEach(ev => $("#settings").addEventListener(ev, () => { syncSoon = true; }, true));
 $("#syncOff").onclick = () => {
   if (!confirm("Stop syncing this device? Your data stays here and in your gist.")) return;
   syncCfg = {}; syncSaveCfg(); store.set(SYNC_BASE, ""); renderSyncStatus(); toast("Sync off on this device.");
 };
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && syncCfg.token) syncNow(); });
+document.addEventListener("visibilitychange", () => {
+  if (!syncCfg.token) return;
+  if (document.visibilityState === "visible") syncNow();
+  else if (syncCfg.dirty){ clearTimeout(syncTimer); syncNow(); }     /* leaving the app: send changes now */
+});
+window.addEventListener("pagehide", () => { if (syncCfg.token && syncCfg.dirty){ clearTimeout(syncTimer); syncNow(); } });
 window.addEventListener("online", () => { if (syncCfg.token && syncCfg.dirty) syncNow(); });
 setInterval(() => { if (syncCfg.token && document.visibilityState === "visible"){ renderSyncStatus(); if (syncCfg.dirty && !syncBusy) syncNow(); } }, 30000);
 
@@ -5566,7 +5579,7 @@ function renderGym(){
 }
 $("#gymBody").addEventListener("click", e => {
   const b = e.target.closest("[data-gym]"); if (!b) return;
-  const g = gymHas(); g[b.dataset.gym] = !g[b.dataset.gym]; state.gym = g; save(); renderGym();
+  const g = gymHas(); g[b.dataset.gym] = !g[b.dataset.gym]; state.gym = g; syncSoon = true; save(); renderGym();
   if (!$("#bodyView").hidden) renderBody();
 });
 $("#openGym").onclick = () => { renderGym(); openSheet($("#gymSheet")); };
@@ -5611,6 +5624,12 @@ function setAppHeight(){ document.documentElement.style.setProperty("--app-h", M
 setAppHeight();
 window.addEventListener("resize", setAppHeight);
 window.addEventListener("orientationchange", () => setTimeout(setAppHeight, 300));
+
+/* ---------- no accidental zoom: pinch, double-tap, or focusing a small text box ---------- */
+["gesturestart", "gesturechange", "gestureend"].forEach(ev => document.addEventListener(ev, e => e.preventDefault(), {passive:false}));
+document.addEventListener("touchmove", e => { if (e.touches && e.touches.length > 1) e.preventDefault(); }, {passive:false});
+let lastTouchEnd = 0;
+document.addEventListener("touchend", e => { const now = Date.now(); if (now - lastTouchEnd < 300 && !e.target.closest("input,textarea,select")) e.preventDefault(); lastTouchEnd = now; }, {passive:false});
 
 /* ---------- start ---------- */
 addStarterTemplates();
