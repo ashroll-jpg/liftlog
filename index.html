@@ -1109,6 +1109,25 @@ input,select,textarea{font-size:16px}
 #ptSumBody .quick{display:flex;gap:8px}
 #ptSumBody .quick .btn{flex:1}
 @media (min-width:900px){ #ptView{max-width:760px;margin:0 auto} }
+.pt-acts{display:flex;gap:16px}
+.pt-item{min-width:0;grid-template-columns:minmax(0,1fr)}
+.pt-item-h .icon-btn{width:36px;height:36px;flex-shrink:0}
+.seg.pt-kind{display:flex;width:100%}
+.pt-kind button{min-width:0;padding:9px 4px;font-size:14px}
+.pt-kind button[aria-pressed="true"]{background:var(--pt);color:#F2EFE8}
+.pt-grid > *{min-width:0}
+.pt-grid input,.pt-item .fl input{width:100%;min-width:0}
+.pt-how{margin:0 0 14px;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--ink-2)}
+.pt-paste{display:block;width:100%;margin-top:12px;background:var(--field);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;font-family:var(--mono);font-size:16px;color:var(--ink);resize:vertical}
+.pt-list li.chk b,.pt-item.chk{box-shadow:inset 3px 0 0 var(--accent)}
+.pt-list li.chk em{color:var(--accent)}
+.pt-chk{margin:0;font-size:13px;font-weight:600;color:var(--accent)}
+.pt-past details{border-top:1px solid var(--line);padding:10px 0}
+.pt-past summary{cursor:pointer;list-style:none;display:flex;flex-direction:column}
+.pt-past summary::-webkit-details-marker{display:none}
+.pt-past summary span{font-size:13px;color:var(--mute)}
+.pt-past .link{margin-top:6px}
+#ptPasteNext{margin-top:10px}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1460,6 +1479,23 @@ input,select,textarea{font-size:16px}
     <button class="btn wide pt-btn" id="ptEditSave">Save plan</button>
   </div>
 </div>
+<div class="sheet" id="ptPasteSheet" role="dialog" aria-modal="true" aria-labelledby="ptPasteTitle">
+  <div class="scrim"></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="ptPasteTitle">New PT script</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="exd-scroll">
+      <ol class="pt-how">
+        <li>Take a photo of your script.</li>
+        <li>In Photos, press and hold on the writing, tap <b>Select All</b>, then <b>Copy</b>.</li>
+        <li>Come back here and tap <b>Paste</b>.</li>
+      </ol>
+      <button class="btn pt-btn wide" id="ptPasteBtn">Paste</button>
+      <textarea id="ptPasteText" class="pt-paste" rows="7" placeholder="Or type or paste it here. One exercise per line, e.g.&#10;KB squats - 40# 3x10-12&#10;Single leg balance - 1 min each"></textarea>
+      <div id="ptPastePreview"></div>
+    </div>
+    <button class="btn wide pt-btn" id="ptPasteNext" disabled>Review and save</button>
+  </div>
+</div>
 <div class="sheet" id="ptPlayer" role="dialog" aria-modal="true" aria-labelledby="ptPTitle">
   <div class="scrim"></div>
   <div class="panel">
@@ -1576,7 +1612,7 @@ input,select,textarea{font-size:16px}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "4.5.0";
+const APP_VERSION = "4.7.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -1591,7 +1627,24 @@ function load(){
 let state = load();
 /* one-time safety copy before workouts become sessions */
 try { if (store.get(KEY) && !store.get(KEY + ".pre3")) store.set(KEY + ".pre3", store.get(KEY)); } catch(e){}
-function save(){ store.set(KEY, JSON.stringify(state)); try { scheduleSync(); } catch(e){} }
+/* PT setup carries a "changed at" time so sync can tell a real change from an untouched default */
+const ptIsDefault = p => !p || (!p.on && !p.plan && !(p.scripts || []).length && (p.goal || 5) === 5 && !p.cleared);
+/* the newest PT setup wins, but a device that never got a plan can't erase one that exists elsewhere */
+function ptPick(l, r){
+  if (ptIsDefault(l) && !ptIsDefault(r)) return clone(r);
+  if (ptIsDefault(r) && !ptIsDefault(l)) return clone(l);
+  if (!l || !r) return clone(l || r);
+  const newer = (r.at || 0) > (l.at || 0) ? r : l, older = newer === r ? l : r, out = clone(newer);
+  if (!out.plan && older.plan && !(out.cleared && out.cleared >= (older.at || 0))){ out.plan = clone(older.plan); out.scripts = clone(older.scripts || []); }
+  return out;
+}
+const ptSig = p => p ? JSON.stringify(Object.assign({}, p, {at:0})) : "";
+let lastPtSig = ptSig(state.pt);
+if (state.pt && !ptIsDefault(state.pt) && !state.pt.at){ state.pt.at = Date.now(); store.set(KEY, JSON.stringify(state)); }
+function save(){
+  try { const sig = ptSig(state.pt); if (sig !== lastPtSig){ lastPtSig = sig; if (state.pt) state.pt.at = ptIsDefault(state.pt) ? 0 : Date.now(); } } catch(e){}
+  store.set(KEY, JSON.stringify(state)); try { scheduleSync(); } catch(e){}
+}
 
 /* ---------- groups ---------- */
 const GROUPS = ["Chest","Back","Shoulders","Arms","Legs","Core","Full body","Cardio","Mobility"];
@@ -1602,11 +1655,11 @@ const gcolor = g => css(GVAR[g] || "--mobility");
 /* ---------- built-in catalog (s=sets, c=cardio, t=timed) ---------- */
 const BUILTIN = [
  ["Chest",["Barbell Bench Press","Incline Barbell Bench Press","Decline Barbell Bench Press","Dumbbell Bench Press","Incline Dumbbell Press","Dumbbell Fly","Incline Dumbbell Fly","Cable Crossover","Chest Press Machine","Pec Deck","Push-Up","Incline Push-Up","Chest Dip","Landmine Press","Smith Machine Bench Press"]],
- ["Back",["Deadlift","Pull-Up","Chin-Up","Assisted Pull-Up","Lat Pulldown","Close-Grip Lat Pulldown","Barbell Row","Pendlay Row","Dumbbell Row","Seated Cable Row","T-Bar Row","Chest-Supported Row","Inverted Row","Straight-Arm Pulldown","Face Pull","Rack Pull","Back Extension","Good Morning","Barbell Shrug","Dumbbell Shrug","Dead Hang|t","Flexed-Arm Hang|t","Superman Hold|t"]],
- ["Shoulders",["Overhead Press","Seated Dumbbell Shoulder Press","Arnold Press","Push Press","Lateral Raise","Cable Lateral Raise","Front Raise","Rear Delt Fly","Reverse Pec Deck","Upright Row","Shoulder Press Machine","Wall Handstand Hold|t"]],
- ["Arms",["Barbell Curl","Dumbbell Curl","Hammer Curl","Preacher Curl","Incline Dumbbell Curl","Cable Curl","Concentration Curl","EZ-Bar Curl","Tricep Pushdown","Rope Pushdown","Overhead Tricep Extension","Skull Crusher","Close-Grip Bench Press","Tricep Dip","Tricep Kickback","Wrist Curl","Reverse Curl"]],
- ["Legs",["Back Squat","Front Squat","Goblet Squat","Bodyweight Squat","Leg Press","Hack Squat","Romanian Deadlift","Stiff-Leg Deadlift","Sumo Deadlift","Trap Bar Deadlift","Bulgarian Split Squat","Walking Lunge","Reverse Lunge","Step-Up","Leg Extension","Lying Leg Curl","Seated Leg Curl","Nordic Curl","Hip Thrust","Glute Bridge","Standing Calf Raise","Seated Calf Raise","Hip Abduction Machine","Hip Adduction Machine","Box Jump","Wall Sit|t","Glute Bridge Hold|t","Split Squat Hold|t"]],
- ["Core",["Plank|t","Side Plank|t","Hollow Hold|t","Crunch","Sit-Up","Hanging Leg Raise","Lying Leg Raise","Russian Twist","Cable Crunch","Ab Wheel Rollout","Bicycle Crunch","Mountain Climber|t","Dead Bug","Pallof Press","Cable Woodchopper","Suitcase Carry|t","Copenhagen Plank|t","Reverse Plank|t","Bear Plank Hold|t","Boat Hold|t","L-Sit|t","Plank Shoulder Taps"]],
+ ["Back",["Deadlift","Pull-Up","Chin-Up","Assisted Pull-Up","Lat Pulldown","Close-Grip Lat Pulldown","Barbell Row","Pendlay Row","Dumbbell Row","Seated Cable Row","T-Bar Row","Chest-Supported Row","Inverted Row","Straight-Arm Pulldown","Face Pull","Rack Pull","Back Extension","Good Morning","Barbell Shrug","Dumbbell Shrug","Dead Hang|t","Flexed-Arm Hang|t","Superman Hold|t","Weighted Bar Bent-Over Row"]],
+ ["Shoulders",["Overhead Press","Seated Dumbbell Shoulder Press","Arnold Press","Push Press","Lateral Raise","Cable Lateral Raise","Front Raise","Rear Delt Fly","Reverse Pec Deck","Upright Row","Shoulder Press Machine","Wall Handstand Hold|t","Weighted Bar Overhead Press","Weighted Bar Upright Row"]],
+ ["Arms",["Barbell Curl","Dumbbell Curl","Hammer Curl","Preacher Curl","Incline Dumbbell Curl","Cable Curl","Concentration Curl","EZ-Bar Curl","Tricep Pushdown","Rope Pushdown","Overhead Tricep Extension","Skull Crusher","Close-Grip Bench Press","Tricep Dip","Tricep Kickback","Wrist Curl","Reverse Curl","Weighted Bar Curl","Weighted Bar Reverse Curl"]],
+ ["Legs",["Back Squat","Front Squat","Goblet Squat","Bodyweight Squat","Leg Press","Hack Squat","Romanian Deadlift","Stiff-Leg Deadlift","Sumo Deadlift","Trap Bar Deadlift","Bulgarian Split Squat","Walking Lunge","Reverse Lunge","Step-Up","Leg Extension","Lying Leg Curl","Seated Leg Curl","Nordic Curl","Hip Thrust","Glute Bridge","Standing Calf Raise","Seated Calf Raise","Hip Abduction Machine","Hip Adduction Machine","Box Jump","Wall Sit|t","Glute Bridge Hold|t","Split Squat Hold|t","Weighted Bar Front Squat","Weighted Bar Good Morning","Weighted Bar Lunge"]],
+ ["Core",["Plank|t","Side Plank|t","Hollow Hold|t","Crunch","Sit-Up","Hanging Leg Raise","Lying Leg Raise","Russian Twist","Cable Crunch","Ab Wheel Rollout","Bicycle Crunch","Mountain Climber|t","Dead Bug","Pallof Press","Cable Woodchopper","Suitcase Carry|t","Copenhagen Plank|t","Reverse Plank|t","Bear Plank Hold|t","Boat Hold|t","L-Sit|t","Plank Shoulder Taps","Weighted Bar Torso Rotation"]],
  ["Full body",["Kettlebell Swing","Power Clean","Hang Clean","Snatch","Clean and Jerk","Thruster","Burpee","Farmer's Carry|t","Front Rack Carry|t","Overhead Carry|t","Waiter's Carry|t","Turkish Get-Up","Sled Push","Battle Ropes|t","Wall Ball"]],
  ["Cardio",["Running|c","Treadmill|c","Walking|c","Outdoor Cycling|c","Stationary Bike|c","Rowing Machine|c","Elliptical|c","Stair Climber|c","Jump Rope|c","Swimming|c","Hiking|c","Assault Bike|c"]],
  ["Mobility",["Stretching|t","Foam Rolling|t","Yoga|t","Hip Flexor Stretch|t","Hamstring Stretch|t"]]
@@ -1918,7 +1971,7 @@ function renderLog(){
       ${prev ? `<p class="last">Last time (${shortDate(prev.date)}): ${esc(describeSets(prev.entry))}</p>` : ""}
       <div class="sets">${e.type === "t" ? (bw ? HEAD.t : HEAD.tw).replace("Seconds", PER_SIDE_RE.test(e.name) ? "Sec per side" : "Seconds") : bw ? HEAD.b : HEAD[e.type] || HEAD.s}${e.sets.map((s,j) => setRow(e,i,s,j,prevSets[j])).join("")}</div>
       <div class="row"><button class="link" data-act="add-set" data-i="${i}">+ Add set</button>
-        <span class="right">${inDone ? `<button class="link" data-act="fold" data-i="${i}">Collapse</button>` : ""}${e.type === "s" && camKind(e.name) ? `<button class="link" data-act="cam" data-i="${i}">${ICON_CAM}Count</button>` : ""}${e.type === "s" && !bw ? `<button class="link" data-act="plates" data-i="${i}">${ICON_PLATE}Plates</button>` : ""}<button class="link" data-act="rest">${ICON_TIMER}Rest</button></span></div>
+        <span class="right">${inDone ? `<button class="link" data-act="fold" data-i="${i}">Collapse</button>` : ""}${e.type === "s" && camKind(e.name) ? `<button class="link" data-act="cam" data-i="${i}">${ICON_CAM}Count</button>` : ""}${e.type === "s" && !bw && !/weighted bar|body ?bar|dumbbell|kettlebell|band|cable|machine/i.test(e.name) ? `<button class="link" data-act="plates" data-i="${i}">${ICON_PLATE}Plates</button>` : ""}<button class="link" data-act="rest">${ICON_TIMER}Rest</button></span></div>
     </article>`;
     const link = !inDone && linkable
       ? `<button class="ss-link${e.ss ? " on" : ""}" data-act="link" data-i="${i}" aria-pressed="${!!e.ss}" aria-label="${e.ss ? "Unlink" : "Link"} ${esc(e.name)} and ${esc(nx.name)} as a superset">${ICON_CHAIN}${e.ss ? "Superset" : "Make superset"}</button>` : "";
@@ -3831,6 +3884,7 @@ const MUSCLE_NAMES = {chest:"Chest", frontDelts:"Front shoulders", sideDelts:"Si
 const REMOTE_M = {chest:{chest:1}, lats:{lats:1}, "middle back":{midBack:1}, "lower back":{lowerBack:1}, traps:{traps:1}, neck:{traps:.5}, shoulders:{frontDelts:.8,sideDelts:.8}, biceps:{biceps:1}, triceps:{triceps:1}, forearms:{forearms:1}, quadriceps:{quads:1}, hamstrings:{hamstrings:1}, glutes:{glutes:1}, calves:{calves:1}, adductors:{adductors:1}, abductors:{glutes:.6}, abdominals:{abs:1,obliques:.5}};
 /* first match wins, so specific patterns come first */
 const RULES = [
+  [/torso rotation|bar rotation|bar twist/, {obliques:1, abs:.5, lowerBack:.3}],
   [/copenhagen|adductor|cossack|sumo squat|side.?lying adduction/, {adductors:1, obliques:.3, glutes:.3}],
   [/pull.?apart|face pull|y.?t.?w|reverse fly|rear delt/, {rearDelts:1, midBack:.6, traps:.3}],
   [/pike push|handstand/, {frontDelts:1, sideDelts:.75, triceps:.6, traps:.3}],
@@ -4564,7 +4618,7 @@ function anotherHTML(){
 const MP_VER = "0.10.14";
 const MP_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}`;
 const MP_MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
-const CAM_KINDS = [[/push.?ups?\b|press.?ups?\b/i, "pushup"], [/pull.?ups?\b|chin.?ups?\b|muscle.?ups?\b/i, "pullup"], [/\bdips?\b/i, "dip"], [/cossack/i, "cossack"], [/squat/i, "squat"]];
+const CAM_KINDS = [[/push.?ups?\b|press.?ups?\b/i, "pushup"], [/pull.?ups?\b|chin.?ups?\b|muscle.?ups?\b/i, "pullup"], [/\bdips?\b/i, "dip"], [/cossack/i, "cossack"], [/squat/i, "squat"], [/^(?!.*\b(leg|hamstring|nordic|wrist)\b).*\bcurls?\b/i, "curl"]];
 const camKind = name => { const m = CAM_KINDS.find(([re]) => re.test(name)); return m ? m[1] : null; };
 let poseLM = null, poseLoading = null;
 const cam = {active:false, stream:null, raf:0, i:-1, day:"", kind:"", facing:"user", lastT:-1, c:null, els:null, onRep:null};
@@ -4715,10 +4769,11 @@ function pullupStep(c, lm, t){
   }
   return false;
 }
-const CAM_STEP = {pushup: pushupStep, pullup: pullupStep, squat: (c, l, t) => squatStep(c, l, t), dip: (c, l, t) => dipStep(c, l, t), cossack: (c, l, t) => cossackStep(c, l, t)};
+const CAM_STEP = {pushup: pushupStep, pullup: pullupStep, squat: (c, l, t) => squatStep(c, l, t), dip: (c, l, t) => dipStep(c, l, t), cossack: (c, l, t) => cossackStep(c, l, t), curl: (c, l, t) => curlStep(c, l, t)};
 /* where to put the phone, per exercise */
 const CAM_TIPS = {
   pushup: ["Phone upright, 4 to 6 feet in front of you, low and tilted up a little.", "Side on works too. Head and shoulders must stay in view.", "Hold the top for a second before your first rep."],
+  curl: ["Phone upright, 5 to 8 feet away. Side on is best, facing you works too.", "Prop it about waist high. Shoulders, elbows and hands need to stay in view at the bottom and the top.", "Stand tall with your arms straight for a second before your first rep."],
   cossack: ["Phone upright, 6 to 8 feet away, facing you, about waist high.", "Step wide so both feet stay in the picture as you shift side to side.", "Stand tall for a second. Each side counts as one rep."],
   squat: ["Phone upright, 6 to 8 feet away, about waist high.", "In front of you or side on. Your whole body, feet included, should be in view.", "Stand tall for a second before your first rep."],
   dip: ["Phone upright, 6 to 8 feet away. Side on is best.", "Shoulders, elbows and hips should stay in view at the top and the bottom.", "Start at the top with straight arms for a second."],
@@ -4749,7 +4804,7 @@ async function camRun(els, onRep, kind){
   if (cam.els !== els || !cam.stream) return;
   cam.active = true; window.__camOn = true; syncWake();
   cam.c.ar = (v.videoWidth && v.videoHeight) ? v.videoWidth / v.videoHeight : .75;
-  camMsg({cossack:"Keep the phone upright, 6 to 8 feet away, facing you, with both feet in view.", pullup:"Keep the phone upright, 6 to 8 feet away, tilted up toward the bar.", squat:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", dip:"Keep the phone upright, 6 to 8 feet away. Side on works best."}[cam.kind] || "Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
+  camMsg({curl:"Keep the phone upright, 5 to 8 feet away, with your shoulders, elbows and hands in view.", cossack:"Keep the phone upright, 6 to 8 feet away, facing you, with both feet in view.", pullup:"Keep the phone upright, 6 to 8 feet away, tilted up toward the bar.", squat:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", dip:"Keep the phone upright, 6 to 8 feet away. Side on works best."}[cam.kind] || "Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
   const loop = () => {
     if (!cam.active || cam.els !== els) return;
     if (v.readyState >= 2 && v.currentTime !== cam.lastT){
@@ -5203,7 +5258,12 @@ function mergeStates(L, R, B){
     if (first){
       if (k === "templates" || k === "custom" || k === "mobRoutines"){ const a = clone(R[k] || []); (L[k] || []).forEach(x => { if (!a.some(y => y.name === x.name)) a.push(clone(x)); }); M[k] = a; }
       else if (k === "notes" || k === "mode" || k === "typeOver") M[k] = Object.assign({}, clone(L[k] || {}), clone(R[k] || {}));
+      else if (k === "pt") M.pt = ptPick(L.pt, R.pt);
       else M[k] = k in R ? clone(R[k]) : clone(L[k]);
+      return;
+    }
+    if (k === "pt"){
+      M.pt = ptPick(L.pt, R.pt);
       return;
     }
     M[k] = J(L[k]) === J(B[k]) && k in R ? clone(R[k]) : clone(L[k]);
@@ -5284,6 +5344,7 @@ async function syncNow(manual){
     if (changedHere){
       const keep = {}; LOCAL_ONLY.forEach(k => keep[k] = state[k]);
       state = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), merged, keep);
+      lastPtSig = ptSig(state.pt);
       syncApplying = true; save(); syncApplying = false;
       refreshAll();
     }
@@ -5528,6 +5589,37 @@ function cossackStep(c, lm, t){
   if (rep && c.downSide) c.msg = `Good. ${c.downSide === "L" ? "Left" : "Right"} side`;
   return rep;
 }
+/* Curls (bar, dumbbells, bands): the hands come up toward the shoulders while the elbows stay down by your sides.
+   Signals from each visible arm: the elbow bend, and how high the hand rises past the elbow. Works side on or facing the phone. */
+function curlStep(c, lm, t){
+  if (!lm || lm.length < 17){ c.msg = "Can't see you. Put the phone 5 to 8 feet away with your upper body in view."; return false; }
+  const P = camPts(c, lm), arms = [];
+  let over = false;
+  for (const [si, ei, wi] of [[11, 13, 15], [12, 14, 16]]){
+    const S = P(si), E = P(ei), W = P(wi);
+    if (S.v < .5 || E.v < .5 || W.v < .45) continue;
+    const U = Math.hypot(S.x - E.x, S.y - E.y);
+    c.ua = c.ua || {}; if (c.phase !== "top") c.ua[si] = Math.max(U, (c.ua[si] || 0) * .996);
+    const ua = c.ua[si] || U; if (!ua) continue;
+    if (E.y < S.y - ua * .35 || W.y < S.y - ua * .7) over = true;              /* elbows or hands overhead: a press, not a curl */
+    const bend = Math.max(0, Math.min(1, (160 - angleAt(S, E, W)) / 105));       /* 0 straight, 1 fully bent */
+    const lift = Math.max(0, Math.min(1, ((E.y - W.y) / ua + .85) / 1.35));      /* 0 hand hanging below the elbow, 1 hand up near the shoulder */
+    arms.push((bend + lift) / 2);
+  }
+  if (!arms.length){ c.msg = "Can't see your arms. Step back so your shoulders, elbows and hands are in view."; return false; }
+  if (over){ c.msg = "Keep your elbows down by your sides."; c.phase = c.phase === "top" ? "top" : "setup"; c.seen = 0; return false; }
+  const p = Math.max(...arms);
+  c.p = c.p == null ? p : c.p * .45 + p * .55;
+  c.depth = c.p;
+  c.seen = (c.seen || 0) + 1;
+  if (c.phase === "setup" || !c.phase){ if (c.p < .3 && c.seen > 4){ c.phase = "down"; c.msg = "Curl"; } else c.msg = "Arms straight to start"; return false; }
+  if (c.phase === "down"){
+    if (c.p > .74 && t - (c.lastRep || 0) > 450){ c.reps++; c.lastRep = t; c.phase = "top"; c.msg = "Good. Lower all the way"; return true; }
+    c.msg = c.p > .45 ? "Higher" : "Curl"; return false;
+  }
+  if (c.phase === "top"){ if (c.p < .3){ c.phase = "down"; c.msg = "Curl"; } else c.msg = "Lower all the way"; }
+  return false;
+}
 function dipStep(c, lm, t){
   if (!lm || lm.length < 25){ c.msg = "Can't see you. Put the phone 6 to 8 feet away, side on works best."; return false; }
   const P = camPts(c, lm), arms = [];
@@ -5652,13 +5744,15 @@ function showReveal(k, s){
 const GYM_ITEMS = [
   ["pullup", "Pull-up bar"], ["dip", "Dip bars"], ["bands", "Resistance bands"], ["db", "Dumbbells"], ["kb", "Kettlebells"],
   ["bench", "Bench"], ["barbell", "Barbell and rack"], ["cable", "Cable machine"], ["machine", "Weight machines"],
-  ["rings", "Rings or TRX"], ["box", "Plyo box or step"], ["medball", "Medicine ball"], ["roller", "Foam roller"]
+  ["rings", "Rings or TRX"], ["box", "Plyo box or step"], ["medball", "Medicine ball"], ["roller", "Foam roller"], ["wbar", "Weighted bar"]
 ];
 const GYM_DEFAULT = {pullup:true, bands:true, db:true};
 const gymHas = () => Object.assign({}, state.gym || GYM_DEFAULT);
 /* what an exercise needs: a list of options, any one is enough. [] means bodyweight */
 function equipNeeds(name, equip){
   const n = String(name).toLowerCase(), q = String(equip || "").toLowerCase();
+  if (/weighted bar|body ?bar/.test(n)) return [["wbar"], ["barbell"]];
+  if (/e-z|ez.?bar/.test(n + q) || /barbell/.test(q)) return [["barbell"]];
   if (/barbell|bench press|deadlift|rack pull|clean|snatch|jerk|back squat|front squat|good morning|overhead press|push press|thruster|hip thrust/.test(n) && !/dumbbell|kettlebell|band|single.?leg glute|glute bridge/.test(n)) return [["barbell"]];
   if (/cable|pulldown|face pull|pushdown|crossover/.test(n) || /cable/.test(q)) return [["cable"]];
   if (/machine|leg press|pec deck|leg curl|leg extension|smith|hack squat|lever|seated calf/.test(n) || /machine/.test(q)) return [["machine"]];
@@ -5675,7 +5769,7 @@ function equipNeeds(name, equip){
   if (/medicine ball|med ball|wall ball|slam/.test(n) || /medicine ball/.test(q)) return [["medball"]];
   if (/foam roll/.test(n) || /foam roll/.test(q)) return [["roller"]];
   if (/nordic/.test(n)) return [[]];
-  if (/e-z|ez.?bar/.test(n + q) || /barbell/.test(q)) return [["barbell"]];
+
   return [[]];
 }
 function canDo(name, equip){ const g = gymHas(); return equipNeeds(name, equip).some(opt => opt.every(k => g[k])); }
@@ -5783,17 +5877,19 @@ function renderPT(){
   $("#ptGoalEdit").onclick = openSettings;
   if (!c.plan){
     $("#ptPlan").innerHTML = `<h2>No plan yet</h2><p class="note">Add the exercises your physical therapist gave you. You can edit them any time.</p>
-      <div class="quick"><button class="btn pt-btn" id="ptUseCard">Use my Beyond Exercise card</button><button class="btn ghost" id="ptBlank">Start a blank plan</button></div>`;
+      <div class="quick"><button class="btn pt-btn" id="ptFromPaste">Paste from a photo of my script</button><button class="btn ghost" id="ptUseCard">Use my Beyond Exercise card</button><button class="btn ghost" id="ptBlank">Start a blank plan</button></div>`;
+    $("#ptFromPaste").onclick = openPTPaste;
     $("#ptUseCard").onclick = () => { c.plan = Object.assign(clone(PT_STARTER), {since:t, updated:t}); save(); renderPT(); toast("Plan added. Check it matches your card."); };
     $("#ptBlank").onclick = () => { c.plan = {name:"PT plan", since:t, updated:t, items:[]}; save(); openPTEdit(); };
     $("#ptTrends").innerHTML = ""; return;
   }
   const p = c.plan, ci = log && log.check;
-  $("#ptPlan").innerHTML = `<div class="pt-head"><div><h2>${esc(p.name)}</h2><p class="note">${p.items.length} exercises · updated ${shortDate(p.updated || p.since)}</p></div><button class="link" id="ptEdit">Edit</button></div>
+  $("#ptPlan").innerHTML = `<div class="pt-head"><div><h2>${esc(p.name)}</h2><p class="note">${p.items.length} exercises · updated ${shortDate(p.updated || p.since)}</p></div><div class="pt-acts"><button class="link" id="ptNew">New script</button><button class="link" id="ptEdit">Edit</button></div></div>
     ${doneToday ? `<div class="pt-today"><span class="ck">${CHECK_SVG}</span><div><b>Done today</b><span>${ci ? `Pain ${ci.pain}/10 · difficulty ${ci.diff}/10` : "No check-in yet"}</span></div>${ci ? "" : '<button class="link" id="ptCheckLater">Check in</button>'}</div>` : ""}
     <ol class="pt-list">${p.items.map(it => `<li><b>${esc(it.name)}</b><span>${esc(ptRx(it))}</span>${it.note ? `<em>${esc(it.note)}</em>` : ""}</li>`).join("")}</ol>
     ${p.items.length ? `<button class="finish-btn pt-start" id="ptStart">${doneToday ? "Do it again" : "Start PT session"}</button>` : '<p class="hint">Tap Edit to add your exercises.</p>'}`;
   $("#ptEdit").onclick = openPTEdit;
+  $("#ptNew").onclick = openPTPaste;
   const st = $("#ptStart"); if (st) st.onclick = startPT;
   const cl = $("#ptCheckLater"); if (cl) cl.onclick = () => openPTCheck(t);
   renderPTTrends();
@@ -5819,17 +5915,24 @@ function renderPTTrends(){
       <line x1="0" y1="${90 - 6 - 5 * 7.8}" x2="300" y2="${90 - 6 - 5 * 7.8}" class="pt-mid"/>${line("pain", "var(--car)")}${line("diff", "var(--pt)")}</svg>
       <div class="pt-key"><span><i style="background:var(--car)"></i>Pain ${first.pain} → ${last.pain}</span><span><i style="background:var(--pt)"></i>Difficulty ${first.diff} → ${last.diff}</span><span>${checks.length} check-ins</span></div>`
       : `<p class="hint">After a couple of sessions with a check-in, your trend shows here.</p>`}
-    <button class="btn ghost wide pt-share" id="ptShare">Summary for my PT</button>`;
+    <button class="btn ghost wide pt-share" id="ptShare">Summary for my PT</button>${pastScriptsHTML()}`;
   $("#ptShare").onclick = openPTSummary;
+  $("#ptTrends").querySelectorAll("[data-restore]").forEach(b => b.onclick = () => {
+    const c = ptCfg(), i = +b.dataset.restore, back = c.scripts[i];
+    if (!confirm(`Go back to "${back.name}"? Your current script moves to Past scripts.`)) return;
+    c.scripts.splice(i, 1);
+    if (c.plan) c.scripts.push(Object.assign(clone(c.plan), {replaced:today()}));
+    const r = clone(back); delete r.replaced; r.since = today(); r.updated = today(); c.plan = r; save(); renderPT(); toast("Switched scripts.");
+  });
 }
 
 /* ----- edit the plan ----- */
 let ptDraft = null;
-function openPTEdit(){ ptDraft = clone(ptCfg().plan); renderPTEdit(); openSheet($("#ptEditSheet")); }
+function openPTEdit(){ ptDraft = clone(ptCfg().plan); ptDraftNew = false; $("#ptEditTitle").textContent = "Edit PT plan"; $("#ptEditSave").textContent = "Save plan"; renderPTEdit(); openSheet($("#ptEditSheet")); }
 function renderPTEdit(){
   const d = ptDraft;
   $("#ptEditBody").innerHTML = `<label class="fl"><span>Plan name</span><input type="text" data-pf="name" value="${esc(d.name)}"></label>
-    ${d.items.map((it, i) => `<div class="pt-item" data-pi="${i}">
+    ${d.items.map((it, i) => `<div class="pt-item${it.check ? " chk" : ""}" data-pi="${i}">${it.check ? '<p class="pt-chk">Tally wasn\'t sure about this one. Check the numbers.</p>' : ""}
       <div class="pt-item-h"><input type="text" data-f="name" value="${esc(it.name)}" placeholder="Exercise name" aria-label="Exercise name">
         <button class="icon-btn" data-pact="up" aria-label="Move up"${i ? "" : " disabled"}>↑</button><button class="icon-btn" data-pact="del" aria-label="Remove">×</button></div>
       <div class="seg pt-kind"><button data-pact="kind" data-v="reps" aria-pressed="${it.kind === "reps"}">Sets × reps</button><button data-pact="kind" data-v="hold" aria-pressed="${it.kind === "hold"}">Timed hold</button></div>
@@ -5849,6 +5952,7 @@ $("#ptEditBody").addEventListener("input", e => {
   if (el.dataset.pf) { ptDraft[el.dataset.pf] = el.value; return; }
   const box = el.closest("[data-pi]"); if (!box || !el.dataset.f) return;
   const it = ptDraft.items[+box.dataset.pi], f = el.dataset.f;
+  delete it.check;
   it[f] = f === "side" ? el.checked : (f === "sets" || f === "sec") ? Math.max(1, Math.min(f === "sec" ? 1800 : 20, parseInt(el.value) || 1)) : el.value;
 });
 $("#ptEditBody").addEventListener("click", e => {
@@ -5864,10 +5968,12 @@ $("#ptEditBody").addEventListener("click", e => {
 $("#ptEditSave").onclick = () => {
   const c = ptCfg(), d = ptDraft;
   d.items = d.items.filter(it => String(it.name).trim());
-  if (J(c.plan) !== J(d)){
-    (c.history = c.history || []).push(Object.assign(clone(c.plan), {replaced:today()}));
-    d.updated = today(); c.plan = d; save(); toast("Plan saved.");
-  }
+  if (!d.items.length){ toast("Add at least one exercise."); return; }
+  if (ptDraftNew){
+    if (c.plan && c.plan.items.length) (c.scripts = c.scripts || []).push(Object.assign(clone(c.plan), {replaced:today()}));
+    d.since = today(); d.updated = today(); c.plan = d; ptDraftNew = false; save();
+    toast(c.scripts && c.scripts.length ? "New script saved. The old one is in Past scripts." : "Script saved.");
+  } else if (J(c.plan) !== J(d)){ d.updated = today(); c.plan = d; save(); toast("Plan saved."); }
   closeSheet($("#ptEditSheet")); renderPT();
 };
 
@@ -5999,6 +6105,8 @@ function ptSummaryText(){
     checks.length ? `Difficulty: ${checks[0].diff} → ${checks[checks.length - 1].diff} (average ${avg("diff")}/10)` : "",
     "", "Exercises:", ...per
   ];
+  const prevS = (c.scripts || []).slice(-1)[0];
+  if (prevS) lines.push("", `Previous script: ${prevS.name} (${shortDate(prevS.since)} – ${shortDate(prevS.replaced)}), ${prevS.items.length} exercises`);
   const notes = checks.filter(x => x.note).slice(-6).map(x => `• ${shortDate(x.k)}: ${x.note}`);
   if (notes.length) lines.push("", "Notes:", ...notes);
   return lines.filter((x, i, a) => x !== "" || a[i - 1] !== "").join("\n");
@@ -6035,12 +6143,131 @@ $("#ptGoalDown").onclick = () => { const c = ptCfg(); c.goal = Math.max(1, (c.go
 $("#ptGoalUp").onclick = () => { const c = ptCfg(); c.goal = Math.min(7, (c.goal || 5) + 1); save(); applyPT(); };
 $("#ptClear").onclick = () => {
   if (!confirm("Delete your PT plan and history from this device? This can't be undone.")) return;
-  state.pt = {on:false, goal:5, plan:null, history:[]}; state.ptLog = {}; save(); applyPT(); toast("PT history deleted.");
+  state.pt = {on:false, goal:5, plan:null, history:[], cleared:Date.now()}; state.ptLog = {}; save(); applyPT(); toast("PT history deleted.");
 };
+/* =========================================================
+   NEW PT SCRIPT FROM PASTED TEXT
+   iPhone reads the handwriting (Live Text); Tally turns the lines into exercises.
+   ========================================================= */
+const PT_RX_RE = /\d+\s*[x×]\s*\d+|\d+(?:\.\d+)?\s*(?:min|minute|sec|second|s\b|m\b)|\b\d+\s*x\b|\bx\s*\d+|\d+\s*reps?|\d+\s*sets?/i;
+const PT_JUNK_RE = /^(date|pt|name|patient|therapist|signature|phone|dob|notes?)\s*[:.]?\s*$/i;
+function ptCleanName(n){
+  n = n.replace(/\bw\//gi, "with ").replace(/\bKB\b/gi, "kettlebell").replace(/\bDB\b/gi, "dumbbell").replace(/\bSL\b/g, "single-leg")
+    .replace(/\bant\.?\s*tib\b/gi, "anterior tibialis").replace(/\bpost\.?\s*tib\b/gi, "posterior tibialis").replace(/\bsingle leg\b/gi, "single-leg")
+    .replace(/\s+/g, " ").replace(/[\s\-–:,]+$/, "").trim();
+  return n.charAt(0).toUpperCase() + n.slice(1);
+}
+function ptParseItem(raw){
+  let t = raw.replace(/[×]/g, "x").replace(/\s+/g, " ").trim();
+  const low = t.toLowerCase(), it = {name:"", kind:"reps", sets:1, reps:"", side:false, note:"", weight:""};
+  /* weight */
+  const w = /(\d+(?:\.\d+)?)\s*(#|lbs?\b|pounds?\b|kg\b)/i.exec(t);
+  if (w){ it.weight = w[1] + (/kg/i.test(w[2]) ? " kg" : " lb"); t = t.replace(w[0], " "); }
+  else if (/\b(band|banded|theraband)\b/i.test(t)) it.weight = "band";
+  /* time */
+  const mn = /(\d+(?:\.\d+)?)\s*(?:min|mins|minute|minutes|m)\b/i.exec(t), sc = /(\d+)\s*(?:sec|secs|second|seconds|s)\b/i.exec(t);
+  const sec = (mn ? Math.round(parseFloat(mn[1]) * 60) : 0) + (sc ? +sc[1] : 0);
+  /* sets and reps */
+  const sr = /(\d+)\s*x\s*(\d+(?:\s*(?:-|–|to)\s*\d+)?)/i.exec(t);
+  const setsW = /(\d+)\s*sets?\b/i.exec(t), repsW = /(\d+(?:\s*(?:-|–|to)\s*\d+)?)\s*reps?\b/i.exec(t);
+  const xOnly = /\b(\d+)\s*x\b(?!\s*\d)/i.exec(t) || /\bx\s*(\d+)\b/i.exec(t);
+  const srSec = sr && new RegExp(sr[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*(sec|secs|second|seconds|s|min|mins|minute|minutes|m)\\b", "i").test(t);
+  const setsOf = /(\d+)\s*sets?\s*(?:of|x)\s*(\d+(?:\s*(?:-|–|to)\s*\d+)?)/i.exec(t);
+  if (srSec){ it.sets = +sr[1]; }
+  else if (setsOf){ it.sets = +setsOf[1]; it.reps = setsOf[2].replace(/\s*(?:–|to)\s*/, "-").replace(/\s+/g, ""); }
+  else if (sr){ it.sets = +sr[1]; it.reps = sr[2].replace(/\s*(?:–|to)\s*/, "-").replace(/\s+/g, ""); }
+  else if (repsW){ it.reps = repsW[1].replace(/\s*(?:–|to)\s*/, "-").replace(/\s+/g, ""); }
+  else if (xOnly && !sec){ it.reps = xOnly[1]; }
+  if (setsW) it.sets = +setsW[1];
+  if (sec && (srSec || (!sr && !repsW && !setsOf))){
+    it.kind = "hold"; it.sec = sec; delete it.reps;
+    const hs = /(?:sec|secs|second|seconds|s|min|mins|minute|minutes|m)\b\s*x\s*(\d+)/i.exec(t) || /\b(\d+)\s*x\s*\d+\s*(?:sec|s|min|m)\b/i.exec(t);
+    if (hs) it.sets = +hs[1];
+  }
+  /* sides and directions */
+  if (/each\s*(side|leg|ankle|arm|foot|hip)|per\s*side|\/\s*side|both sides|bilateral|\bb\/l\b/i.test(low) || /\beach\b(?!\s*(direction|way|dir))/i.test(low)) it.side = true;
+  const way = /(\d)\s*-?\s*way/i.exec(low);
+  if (way && it.kind === "reps"){
+    const n = +way[1];
+    it.dirs = /ankle/.test(low) ? (n === 4 ? "Up, Down, In, Out" : "Up, Down") : n === 3 ? "Forward, Side, Back" : n === 4 ? "Forward, Back, Left, Right" : n === 2 ? "Forward, Back" : "";
+  }
+  /* name: the words before the numbers */
+  let name = t.split(/\s[-–—:]\s|\s-(?=\s*\d)/)[0];
+  const cut = name.search(/\d+\s*(x|×|min|minute|sec|s\b|m\b|reps?|sets?|#|lbs?|kg)|\bx\s*\d/i);
+  if (cut > 0) name = name.slice(0, cut);
+  name = name.replace(/\b(each|per)\s*(side|direction|leg)?\b.*$/i, "");
+  it.name = ptCleanName(name || raw);
+  if (it.kind === "reps" && !it.reps){ it.reps = "10"; it.check = true; }
+  if (!PT_RX_RE.test(raw)) it.check = true;
+  return it;
+}
+function ptParseScript(text){
+  const lines = String(text).replace(/\r/g, "").split("\n").map(l => l.trim()).filter(Boolean);
+  const BUL = /^[•·●○▪◦*\-–—]+\s*|^\d+[.)]\s+/;
+  const anyBullet = lines.some(l => BUL.test(l));
+  const chunks = [], header = [];
+  let seenBullet = false;
+  lines.forEach(l => {
+    if (PT_JUNK_RE.test(l)) return;
+    const bul = BUL.test(l), body = l.replace(BUL, "").trim();
+    if (!body) return;
+    if (anyBullet && !bul && !seenBullet){ header.push(body); return; }   /* clinic name, title, etc. */
+    if (bul) seenBullet = true;
+    const prev = chunks[chunks.length - 1];
+    const ownLine = /[a-z].*\s[-–—:]\s*\d/i.test(body) && PT_RX_RE.test(body);   /* "name - numbers" is always its own exercise */
+    const cont = prev && !bul && !ownLine && (!PT_RX_RE.test(prev) || /^(each|per|both|with|w\/|and|hold|on|\()/i.test(body));
+    if (cont) chunks[chunks.length - 1] = prev + " " + body; else chunks.push(body);
+  });
+  if (!anyBullet && chunks.length > 2 && !/\d/.test(chunks[0])) header.push(chunks.shift());   /* a title line on top */
+  return {header: header.join(" "), items: chunks.map(ptParseItem).filter(it => it.name)};
+}
+
+let ptDraftNew = false;
+function openPTPaste(){
+  $("#ptPasteText").value = "";
+  $("#ptPastePreview").innerHTML = "";
+  $("#ptPasteNext").disabled = true;
+  openSheet($("#ptPasteSheet"));
+}
+function ptPreview(){
+  const r = ptParseScript($("#ptPasteText").value);
+  $("#ptPasteNext").disabled = !r.items.length;
+  $("#ptPastePreview").innerHTML = r.items.length ? `<h3 class="md-sub">Tally found ${r.items.length} ${r.items.length === 1 ? "exercise" : "exercises"}</h3>
+    <ol class="pt-list">${r.items.map(it => `<li class="${it.check ? "chk" : ""}"><b>${esc(it.name)}</b><span>${esc(ptRx(it))}</span>${it.check ? "<em>Check this one</em>" : ""}</li>`).join("")}</ol>` : "";
+  return r;
+}
+$("#ptPasteText").addEventListener("input", ptPreview);
+$("#ptPasteBtn").onclick = async () => {
+  let txt = "";
+  try { txt = await navigator.clipboard.readText(); } catch(e){}
+  if (!txt){ $("#ptPasteText").focus(); toast("Press and hold in the box, then tap Paste."); return; }
+  $("#ptPasteText").value = txt; ptPreview();
+};
+$("#ptPasteNext").onclick = () => {
+  const r = ptPreview(); if (!r.items.length) return;
+  const old = ptCfg().plan;
+  const clinic = (r.header.match(/[a-z][a-z &'.]{2,40}/i) || [""])[0].trim();
+  const title = clinic.replace(/\b[a-z]/g, ch => ch.toUpperCase());
+  ptDraft = {name: (clinic ? title + " · " : "PT script · ") + shortDate(today()), since:today(), updated:today(), items:r.items};
+  if (old && /beyond exercise/i.test(old.name) && !clinic) ptDraft.name = "Beyond Exercise · " + shortDate(today());
+  ptDraftNew = true;
+  closeSheet($("#ptPasteSheet"));
+  $("#ptEditTitle").textContent = "Review new script";
+  $("#ptEditSave").textContent = old ? "Use this script" : "Save plan";
+  renderPTEdit(); openSheet($("#ptEditSheet"));
+};
+/* past scripts */
+function pastScriptsHTML(){
+  const P = (ptCfg().scripts || []).slice().reverse();
+  if (!P.length) return "";
+  return `<h3 class="md-sub">Past scripts</h3><div class="pt-past">${P.map((p, n) => `<details><summary><b>${esc(p.name)}</b><span>${shortDate(p.since)} – ${shortDate(p.replaced)} · ${p.items.length} exercises</span></summary>
+    <ol class="pt-list">${p.items.map(it => `<li><b>${esc(it.name)}</b><span>${esc(ptRx(it))}</span></li>`).join("")}</ol>
+    <button class="link" data-restore="${P.length - 1 - n}">Go back to this script</button></details>`).join("")}</div>`;
+}
 
 $("#openIntervals").onclick = openIntervals;
 $("#exDetailBtn").onclick = () => { const n = $("#exSelect").value; if (n) openExDetail(n); };
-window.__tally = {cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
+window.__tally = {curlStep, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
 
 /* ---------- full-height fix for iPhone home-screen apps ---------- */
 function setAppHeight(){ document.documentElement.style.setProperty("--app-h", Math.max(window.innerHeight, screen.height && window.navigator.standalone ? screen.height : 0) + "px"); }
