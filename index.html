@@ -439,7 +439,7 @@ body.timing .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .md-types .tr i{display:block;height:100%}
 .md-ex li span:first-child::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:8px;background:var(--dc,var(--str))}
 .bal .track{display:flex}
-.bal .seg-s{background:var(--str)}.bal .seg-c{background:var(--car)}.bal .seg-m{background:var(--mob)}
+.bal .seg-s{background:var(--str)}.bal .seg-c{background:var(--car)}.bal .seg-m{background:var(--mob)}.bal .seg-p{background:var(--pt)}
 .bal .track span{display:block;height:100%}
 
 /* loaded routines / templates, with undo */
@@ -959,7 +959,7 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
 .closing{animation:closeOut .17s ease-in both}
 /* rep flash */
 @keyframes repFlash{0%{box-shadow:inset 0 0 0 8px var(--accent),0 0 0 0 rgba(179,139,45,.6)}100%{box-shadow:inset 0 0 0 0 transparent,0 0 0 18px rgba(179,139,45,0)}}
-.cam-view.flash{animation:repFlash .55s ease-out}
+.cam-view.repflash{animation:repFlash .55s ease-out}
 .cam-reps.pop{animation:camPop .45s var(--spring)}
 @keyframes camPop{0%{transform:scale(1.4);color:var(--accent)}100%{transform:scale(1);color:var(--ink)}}
 @keyframes bump{0%{transform:scale(1.35);color:var(--accent)}100%{transform:scale(1)}}
@@ -1015,7 +1015,7 @@ body.timing .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 162px)}
 @keyframes musGlow{0%{filter:drop-shadow(0 0 0 transparent)}40%{filter:drop-shadow(0 0 8px rgba(242,239,232,.7))}100%{filter:drop-shadow(0 0 0 transparent)}}
 .fig .mus.sel{animation:musGlow .7s ease}
 @media (prefers-reduced-motion:reduce){
-  .enter-r,.enter-l,.stagger > *,.stagger #exList > *,.opening,.closing,.cam-view.flash,.cam-reps.pop,.bump,.wo-tally .tally .new,.rv-wrap > *,.rv-ck,.pr-chip,.goal.hit,.fill-in .mus,.fig .mus.sel{animation:none}
+  .enter-r,.enter-l,.stagger > *,.stagger #exList > *,.opening,.closing,.cam-view.repflash,.cam-reps.pop,.bump,.wo-tally .tally .new,.rv-wrap > *,.rv-ck,.pr-chip,.goal.hit,.fill-in .mus,.fig .mus.sel{animation:none}
   .rr-fg{transition:none}
 }
 /* header: one solid full-width bar (a real layer, not shadow tricks, so no seams on wide screens) */
@@ -1128,6 +1128,39 @@ input,select,textarea{font-size:16px}
 .pt-past summary span{font-size:13px;color:var(--mute)}
 .pt-past .link{margin-top:6px}
 #ptPasteNext{margin-top:10px}
+#viewSeg [data-view="p"][aria-pressed="true"]{background:var(--pt);color:#F2EFE8}
+.pt-stat b{color:var(--pt)}
+#ptGoalProg{margin-top:10px}
+@media (min-width:900px){ #progressView > #ptGoalProg{grid-column:1 / -1} }
+#viewSeg{display:flex}
+#viewSeg button{flex:1 1 0;min-width:0;padding-left:4px;padding-right:4px}
+@media (max-width:480px){ #viewSeg button{font-size:13px;letter-spacing:-.01em} }
+.pt-player .pt-cam{width:100%;min-height:230px;max-height:46vh;flex:none;height:46vh}
+.pt-player .cam-depth i{background:var(--pt)}
+.pt-player .cam-depth.deep i{background:var(--pt)}
+@media (min-width:760px){ .pt-player .pt-cam{height:min(52vh,560px);max-height:none} .pt-player .cam-reps{font-size:clamp(110px,18vh,220px)} }
+#ptBody{flex:1;min-height:0;overflow-y:auto}
+.pt-split{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px}
+.pt-media,.pt-ctl{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px}
+.pt-player .pt-cam{height:30vh;min-height:180px}
+.pt-player .cam-msg{margin:4px 0;min-height:0}
+.pt-player .wo-camlinks{margin:0}
+@media (min-width:760px){
+  #ptPlayer .panel{top:0;bottom:0;left:0;right:0;transform:none;max-width:none;width:100%;height:100%;border-radius:0;padding:calc(env(safe-area-inset-top,0px) + 14px) 28px calc(env(safe-area-inset-bottom,0px) + 14px)}
+  .pt-player .pl-name{font-size:clamp(30px,4.2vw,60px)}
+  .pt-player .pl-time{font-size:clamp(110px,15vw,220px)}
+  .pt-player .wo-step .stepper b{font-size:clamp(48px,6vw,84px);min-width:1.8em}
+  .pt-player .wo-step .stepper button{width:76px;height:76px;font-size:36px}
+  .pt-player .finish-btn{padding:24px;font-size:22px}
+  .pt-player .pl-fig{width:min(40vh,320px)}
+  .pt-player .pt-cam{height:min(52vh,560px)}
+}
+@media (min-width:900px) and (orientation:landscape){
+  .pt-split{flex-direction:row;align-items:center;gap:36px}
+  .pt-media{flex:1.65}
+  .pt-ctl{flex:1}
+  .pt-player .pt-cam{height:calc(100dvh - 330px);min-height:300px}
+}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1210,7 +1243,7 @@ input,select,textarea{font-size:16px}
     <h1 class="page-title">Body map</h1>
     <section class="card" id="recovery" hidden></section>
     <div class="body-l">
-    <div class="seg range" id="viewSeg" role="group" aria-label="Training type"><button data-view="all">All</button><button data-view="s">Strength</button><button data-view="c">Cardio</button><button data-view="m">Mobility</button></div>
+    <div class="seg range" id="viewSeg" role="group" aria-label="Training type"><button data-view="all">All</button><button data-view="s">Strength</button><button data-view="c">Cardio</button><button data-view="m">Mobility</button><button data-view="p" hidden>PT</button></div>
     <div class="seg range" id="rangeSeg" role="group" aria-label="Time range"><button data-r="30">30 days</button><button data-r="60">60 days</button><button data-r="90">90 days</button></div>
     <section class="card">
       <div class="figs">
@@ -1236,6 +1269,7 @@ input,select,textarea{font-size:16px}
     <h1 class="page-title">Progress</h1>
     <section class="goal" id="goal"></section>
     <section class="goal mob-goal" id="mobGoalCard"></section>
+    <section class="goal pt-goal" id="ptGoalProg" hidden></section>
     <section class="card recap" id="recapProg"></section>
     <div class="stats" id="stats"></div>
 
@@ -1243,7 +1277,7 @@ input,select,textarea{font-size:16px}
       <h2>Workout days</h2>
       <p class="note">One mark for each kind of workout that day. Tap a day to open it.</p>
       <div class="heat" id="heat"></div>
-      <div class="tl-legend"><span><i style="background:var(--str)"></i>Strength</span><span><i style="background:var(--car)"></i>Cardio</span><span><i style="background:var(--mob)"></i>Mobility</span></div>
+      <div class="tl-legend"><span><i style="background:var(--str)"></i>Strength</span><span><i style="background:var(--car)"></i>Cardio</span><span><i style="background:var(--mob)"></i>Mobility</span><span class="pt-only"><i style="background:var(--pt)"></i>PT</span></div>
     </section>
 
     <section class="card">
@@ -1321,11 +1355,11 @@ input,select,textarea{font-size:16px}
     <button role="tab" aria-selected="false" data-tab="mobility">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c9 0 15-6 15-16C10 5 5 11 5 20z"/><path d="M5 20l8-8"/></svg>Mobility
     </button>
-    <button role="tab" aria-selected="false" data-tab="body">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.2"/><path d="M5 8.5l7 1.5 7-1.5M12 10v5M12 15l-3 6.5M12 15l3 6.5"/></svg>Body
-    </button>
     <button role="tab" aria-selected="false" data-tab="pt" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M12 8v8M8 12h8"/></svg>PT
+    </button>
+    <button role="tab" aria-selected="false" data-tab="body">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.2"/><path d="M5 8.5l7 1.5 7-1.5M12 10v5M12 15l-3 6.5M12 15l3 6.5"/></svg>Body
     </button>
     <button role="tab" aria-selected="false" data-tab="progress">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Progress
@@ -1612,7 +1646,7 @@ input,select,textarea{font-size:16px}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "4.7.0";
+const APP_VERSION = "4.9.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -2683,8 +2717,8 @@ function baseOpts(){
 }
 
 /* ----- tally marks ----- */
-const TYPE_VAR = {s:"var(--str)", c:"var(--car)", m:"var(--mob)"};
-function dayTypes(ds){ const t = []; if (ds.ssets) t.push("s"); if (ds.cmin) t.push("c"); if (ds.msec) t.push("m"); return t; }
+const TYPE_VAR = {s:"var(--str)", c:"var(--car)", m:"var(--mob)", p:"var(--pt)"};
+function dayTypes(ds, k){ const t = []; if (ds.ssets) t.push("s"); if (ds.cmin) t.push("c"); if (ds.msec) t.push("m"); if (k && bodyTypes().includes("p") && ptEntries(k).length) t.push("p"); return t; }
 function dayMain(ds){ const pts = {s:ds.ssets, c:ds.cmin/10, m:ds.msec/60}; let best = "s", v = -1; for (const k in pts) if (pts[k] > v){ v = pts[k]; best = k; } return best; }
 /* cols: one color per mark. ghost: faint marks to show what's left. Every 5th mark slashes across the four before it. */
 function tallySVG(cols, ghost = 0){
@@ -2735,7 +2769,17 @@ function mobGoalHTML(compact){
   return `<div class="g-tally" role="img" aria-label="${done} of ${g} stretch days this week">${tallySVG(cols, Math.max(0, g - done))}<b>${done}/${g}</b></div>
     <div><h2>${head}</h2><p>${esc(sub)}</p><button class="link" id="changeMobGoal">Change goal</button></div>`;
 }
+function renderPTGoalProg(){
+  const box = $("#ptGoalProg"); if (!box) return;
+  const on = bodyTypes().includes("p"); box.hidden = !on; document.querySelectorAll(".pt-only").forEach(x => x.hidden = !on);
+  if (!on) return;
+  const g = (state.pt && state.pt.goal) || 5, mon = mondayOf(today()), n = ptDays().filter(d => d >= mon).length, gs = goalStreak(ptDays(), g);
+  box.innerHTML = `<div class="g-tally" role="img" aria-label="${n} of ${g} PT days this week">${tallySVG(Array.from({length:n}, () => "var(--pt)"), Math.max(0, g - n))}<b>${n}/${g}</b></div>
+    <div><h2>${n >= g ? "PT goal reached" : `${g - n} PT ${g - n === 1 ? "day" : "days"} to go`}</h2><p>Physical therapy has its own goal.${gs.n >= 2 ? ` ${gs.n}-week streak.` : ""}</p><button class="link" data-goto-pt>Open PT</button></div>`;
+  box.querySelector("[data-goto-pt]").onclick = () => showTab("pt");
+}
 function renderMobGoal(){
+  renderPTGoalProg();
   const box = $("#mobGoalCard"); if (box){ box.innerHTML = mobGoalHTML(false); $("#changeMobGoal").onclick = openSettings;
     const mon = mondayOf(today()); if (mobDays().filter(d => d >= mon).length >= (state.mobGoal || 3) && state.mobGoalCeleb !== mon){ state.mobGoalCeleb = mon; save(); replay(box, "hit"); } }
 }
@@ -2757,7 +2801,9 @@ function renderStats(){
     `<div class="stat"><b>${cardio30.min >= 600 ? Math.round(cardio30.min/60) + "h" : fmtHMS(cardio30.min*60)}</b><span>cardio, 30 days</span></div>` +
     `<div class="stat"><b>${Math.round(cardio30.mi*10)/10}</b><span>miles, 30 days</span></div>` +
     `<div class="stat"><b>${fmtHMS(mob30.sec)}</b><span>mobility, 30 days</span></div>` +
-    `<div class="stat"><b>${mob30.days}</b><span>stretch days, 30 days</span></div>`;
+    `<div class="stat"><b>${mob30.days}</b><span>stretch days, 30 days</span></div>` +
+    (bodyTypes().includes("p") ? (() => { const ds = ptDays().filter(d => d >= since); let sets = 0; ds.forEach(d => ptEntries(d).forEach(e => sets += e.sets.length));
+      return `<div class="stat pt-stat"><b>${ds.length}</b><span>PT days, 30 days</span></div><div class="stat pt-stat"><b>${sets}</b><span>PT sets, 30 days</span></div>`; })() : "");
 }
 
 function renderHeat(){
@@ -2768,8 +2814,8 @@ function renderHeat(){
     months += `<span>${m !== lastM ? dateOf(wkStart).toLocaleDateString(undefined,{month:"short"}) : ""}</span>`;
     lastM = m;
     for (let d=0; d<7; d++){
-      const k = addDays(wkStart, d), ds = dayStats(k), ty = dayTypes(ds);
-      const words = ty.map(x => ({s:"strength", c:"cardio", m:"mobility"})[x]).join(", ");
+      const k = addDays(wkStart, d), ds = dayStats(k), ty = dayTypes(ds, k);
+      const words = ty.map(x => ({s:"strength", c:"cardio", m:"mobility", p:"PT"})[x]).join(", ");
       if (k > t) cells += '<span class="cell future"></span>';
       else cells += `<button class="cell tl${ty.length ? " has" : ""}${k === t ? " today" : ""}" data-k="${k}" title="${shortDate(k)}${ty.length ? ": " + words : ""}" aria-label="${shortDate(k)}, ${ty.length ? words : "no workout"}">${ty.map(x => `<i style="background:${TYPE_VAR[x]}"></i>`).join("")}</button>`;
     }
@@ -3884,6 +3930,9 @@ const MUSCLE_NAMES = {chest:"Chest", frontDelts:"Front shoulders", sideDelts:"Si
 const REMOTE_M = {chest:{chest:1}, lats:{lats:1}, "middle back":{midBack:1}, "lower back":{lowerBack:1}, traps:{traps:1}, neck:{traps:.5}, shoulders:{frontDelts:.8,sideDelts:.8}, biceps:{biceps:1}, triceps:{triceps:1}, forearms:{forearms:1}, quadriceps:{quads:1}, hamstrings:{hamstrings:1}, glutes:{glutes:1}, calves:{calves:1}, adductors:{adductors:1}, abductors:{glutes:.6}, abdominals:{abs:1,obliques:.5}};
 /* first match wins, so specific patterns come first */
 const RULES = [
+  [/balance|single.?leg stand|proprioception|bosu|wobble/, {calves:.8, glutes:.6, quads:.3, abs:.3}],
+  [/ankle|dorsiflex|plantarflex|inversion|eversion|alphabet/, {calves:1}],
+  [/\btib\b|tibialis|shin/, {calves:.6}],
   [/torso rotation|bar rotation|bar twist/, {obliques:1, abs:.5, lowerBack:.3}],
   [/copenhagen|adductor|cossack|sumo squat|side.?lying adduction/, {adductors:1, obliques:.3, glutes:.3}],
   [/pull.?apart|face pull|y.?t.?w|reverse fly|rear delt/, {rearDelts:1, midBack:.6, traps:.3}],
@@ -3972,11 +4021,24 @@ function musclesFor(e){
   return muscleCache[ck] = m;
 }
 const TYPE_OF = e => e.type === "c" ? "c" : e.type === "m" ? "m" : "s";
-const TYPE_COL = {s:"var(--str)", c:"var(--car)", m:"var(--mob)"};
-const TYPE_NAME = {s:"Strength", c:"Cardio", m:"Mobility"};
+const TYPE_COL = {s:"var(--str)", c:"var(--car)", m:"var(--mob)", p:"var(--pt)"};
+const TYPE_NAME = {s:"Strength", c:"Cardio", m:"Mobility", p:"PT"};
+const bodyTypes = () => (typeof ptOn === "function" && ptOn()) ? ["s","c","m","p"] : ["s","c","m"];
+/* PT work for one day, as one entry per exercise: {name, kind, sets:[{r}|{sec}]} */
+function ptEntries(k){
+  const L = (state.ptLog || {})[k]; if (!L) return [];
+  const plan = (state.pt && state.pt.plan) || {items:[]}, by = {};
+  (L.sessions || []).forEach(se => (se.steps || []).forEach(st => {
+    const name = st.name || (plan.items[st.i] || {}).name; if (!name) return;
+    const e = by[name] = by[name] || {name, kind:st.kind, sets:[]};
+    e.sets.push(st.kind === "hold" ? {sec:String(st.v || 0)} : {r:String(st.v || 0)});
+  }));
+  return Object.values(by);
+}
+const ptMuscles = e => musclesFor({name:e.name, type: e.kind === "hold" && /stretch/i.test(e.name) ? "m" : "s", group:""});
 function bodyScores(range){
   const since = addDays(today(), -(range-1)), sc = {}, last = {}, ex = {};
-  Object.keys(MUSCLE_NAMES).forEach(k => { sc[k] = {s:0, c:0, m:0}; ex[k] = {}; });
+  Object.keys(MUSCLE_NAMES).forEach(k => { sc[k] = {s:0, c:0, m:0, p:0}; ex[k] = {}; });
   workoutDays().forEach(k => entries(k).forEach(e => {
     const sets = e.sets.filter(filled); if (!sets.length) return;
     const t = TYPE_OF(e);
@@ -3994,6 +4056,18 @@ function bodyScores(range){
         const x = ex[mk][e.name] || (ex[mk][e.name] = {t, sets:0, reps:0, secs:0});
         x.sets += sets.length; x.reps += r; x.secs += secs;
       }
+    }
+  }));
+  /* PT: a point per set of reps, a point per minute held */
+  if (bodyTypes().includes("p")) Object.keys(state.ptLog || {}).forEach(k => ptEntries(k).forEach(e => {
+    const secs = e.kind === "hold" ? e.sets.reduce((a, x) => a + num(x.sec), 0) : 0, reps = e.kind === "hold" ? 0 : e.sets.reduce((a, x) => a + num(x.r), 0);
+    const n = e.kind === "hold" ? Math.max(.5, secs / 60) : e.sets.length, m = ptMuscles(e);
+    for (const mk in m){
+      if (!(mk in sc)) continue;
+      if (m[mk] >= .5 && (!last[mk] || k > last[mk])) last[mk] = k;
+      if (k < since) continue;
+      sc[mk].p += n * m[mk];
+      if (m[mk] >= .5){ const x = ex[mk][e.name] || (ex[mk][e.name] = {t:"p", sets:0, reps:0, secs:0}); x.sets += e.sets.length; x.reps += reps; x.secs += secs; }
     }
   }));
   return {sc, last, ex};
@@ -4040,9 +4114,12 @@ function figSVG(side, fillOf, rank){
 }
 function renderBody(){
   renderRecovery();
+  const TY = bodyTypes();
+  if (!TY.includes(state.bodyView) && state.bodyView !== "all") state.bodyView = "all";
+  document.querySelector('#viewSeg [data-view="p"]').hidden = !TY.includes("p");
   const range = [30,60,90].includes(state.bodyRange) ? state.bodyRange : 30, view = state.bodyView || "all", data = bodyScores(range), sc = data.sc;
-  const val = k => view === "all" ? sc[k].s + sc[k].c + sc[k].m : sc[k][view];
-  const dom = k => ["s","c","m"].reduce((a, t) => sc[k][t] > sc[k][a] ? t : a, "s");
+  const val = k => view === "all" ? TY.reduce((a, t) => a + sc[k][t], 0) : sc[k][view];
+  const dom = k => TY.reduce((a, t) => sc[k][t] > sc[k][a] ? t : a, "s");
   const max = Math.max(1, ...Object.keys(sc).map(val));
   const fillOf = k => { const v = val(k); if (!v) return NEUTRAL; return `color-mix(in srgb, ${TYPE_COL[view === "all" ? dom(k) : view]} ${Math.round(25 + 75*v/max)}%, var(--field))`; };
   const order = Object.keys(MUSCLE_NAMES).sort((a,b) => val(b) - val(a));
@@ -4055,19 +4132,19 @@ function renderBody(){
   [$("#figFront"), $("#figBack")].forEach(f => f.classList.toggle("fill-in", enterFlag === "body" && !calm()));
   renderDoneList(range, view);
   $("#bodyLegend").innerHTML = view === "all"
-    ? `<span><i style="background:${NEUTRAL}"></i>None</span>` + ["s","c","m"].map(t => `<span><i style="background:${TYPE_COL[t]}"></i>${TYPE_NAME[t]}</span>`).join("") + "<span>Deeper = more</span>"
+    ? `<span><i style="background:${NEUTRAL}"></i>None</span>` + TY.map(t => `<span><i style="background:${TYPE_COL[t]}"></i>${TYPE_NAME[t]}</span>`).join("") + "<span>Deeper = more</span>"
     : `<span><i style="background:${NEUTRAL}"></i>None</span><span>Less</span>` + [30,55,80,100].map(p => `<i style="background:color-mix(in srgb, ${TYPE_COL[view]} ${p}%, var(--field));margin:0"></i>`).join("") + "<span>More</span>";
 
   const m = selMuscle, exs = Object.entries(data.ex[m]).filter(([,x]) => view === "all" || x.t === view).sort((a,b) => (b[1].sets + b[1].secs/60) - (a[1].sets + a[1].secs/60)).slice(0,6);
   const lastTxt = data.last[m] ? "Last worked " + (data.last[m] === today() ? "today" : shortDate(data.last[m])) : "Nothing logged for this muscle yet";
-  const typeTotals = {s:0, c:0, m:0};
-  Object.values(data.ex[m]).forEach(x => { typeTotals[x.t] += x.t === "s" ? x.sets : x.secs; });
-  const typeLabel = t => t === "s" ? `${typeTotals.s} ${typeTotals.s === 1 ? "set" : "sets"}` : fmtHMS(typeTotals[t]);
+  const typeTotals = {s:0, c:0, m:0, p:0};
+  Object.values(data.ex[m]).forEach(x => { typeTotals[x.t] += x.t === "s" || x.t === "p" ? x.sets : x.secs; });
+  const typeLabel = t => t === "s" || t === "p" ? `${typeTotals[t]} ${typeTotals[t] === 1 ? "set" : "sets"}` : fmtHMS(typeTotals[t]);
   const tmax = Math.max(.001, sc[m].s, sc[m].c, sc[m].m);
   $("#muscleDetail").innerHTML = `<div class="md-head"><div><h2>${MUSCLE_NAMES[m]}</h2><p class="note" style="margin:2px 0 0">${lastTxt}</p></div>
     <div class="md-num">${Math.round(val(m)*10)/10}<small>points, ${range} days</small></div></div>
-    <div class="md-types">${["s","c","m"].filter(t => view === "all" || t === view).map(t => `<div><span>${TYPE_NAME[t]}</span><span class="tr"><i style="width:${Math.round(100*sc[m][t]/tmax)}%;background:${TYPE_COL[t]}"></i></span><span>${sc[m][t] ? typeLabel(t) : "–"}</span></div>`).join("")}</div>
-    ${exs.length ? `<ul class="md-ex">${exs.map(([n,x]) => `<li style="--dc:${TYPE_COL[x.t]}"><span>${esc(n)}</span><span>${x.t === "s" ? x.sets + " " + (x.sets === 1 ? "set" : "sets") + (x.reps ? ", " + fmtN(x.reps) + " reps" : "") : fmtHMS(x.secs) + (x.t === "c" ? " cardio" : " held")}</span></li>`).join("")}</ul>`
+    <div class="md-types">${TY.filter(t => view === "all" || t === view).map(t => `<div><span>${TYPE_NAME[t]}</span><span class="tr"><i style="width:${Math.round(100*sc[m][t]/tmax)}%;background:${TYPE_COL[t]}"></i></span><span>${sc[m][t] ? typeLabel(t) : "–"}</span></div>`).join("")}</div>
+    ${exs.length ? `<ul class="md-ex">${exs.map(([n,x]) => `<li style="--dc:${TYPE_COL[x.t]}"><span>${esc(n)}</span><span>${x.t === "s" || (x.t === "p" && !x.secs) ? x.sets + " " + (x.sets === 1 ? "set" : "sets") + (x.reps ? ", " + fmtN(x.reps) + " reps" : "") : fmtHMS(x.secs) + (x.t === "c" ? " cardio" : " held")}</span></li>`).join("")}</ul>`
       : `<p class="hint" style="padding-bottom:0">Nothing hit this muscle in the last ${range} days.</p>`}
     ${(() => {
       const sug = suggestFor(m, 5), str = stretchesFor(m, 2);
@@ -4078,10 +4155,10 @@ function renderBody(){
     })()}`;
 
   const lows = order.slice().reverse().filter(k => suggestFor(k, 1).length).slice(0, 3);
-  $("#balanceTools").innerHTML = view === "m" ? "" : `<button class="btn" id="balanceBuild" data-lows='${JSON.stringify(lows)}'>Build a balance session</button><p class="note">Adds two exercises each for ${listWords(lows.map(k => MUSCLE_NAMES[k].toLowerCase()))} to today's session.</p>`;
+  $("#balanceTools").innerHTML = view === "m" || view === "p" ? "" : `<button class="btn" id="balanceBuild" data-lows='${JSON.stringify(lows)}'>Build a balance session</button><p class="note">Adds two exercises each for ${listWords(lows.map(k => MUSCLE_NAMES[k].toLowerCase()))} to today's session.</p>`;
   $("#balance").innerHTML = order.map(k => {
     const v = val(k), low = lows.includes(k);
-    const segs = (view === "all" ? ["s","c","m"] : [view]).map(t => `<span class="seg-${t}" style="width:${(100*sc[k][t]/max).toFixed(1)}%"></span>`).join("");
+    const segs = (view === "all" ? TY : [view]).map(t => `<span class="seg-${t}" style="width:${(100*sc[k][t]/max).toFixed(1)}%"></span>`).join("");
     return `<button class="bal${v ? "" : " zero"}${k === selMuscle ? " sel" : ""}${low ? " low" : ""}" data-m="${k}"><span>${MUSCLE_NAMES[k]}${low ? '<em class="low-tag">Low</em>' : ""}</span><span class="track">${segs}</span><span class="v">${v ? Math.round(v*10)/10 : "–"}</span></button>`;
   }).join("");
 }
@@ -4225,7 +4302,7 @@ $("#photoStr").addEventListener("click", e => {
 });
 
 /* ---------- tabs ---------- */
-const TAB_ORDER = ["log", "cardio", "mobility", "body", "pt", "progress"];
+const TAB_ORDER = ["log", "cardio", "mobility", "pt", "body", "progress"];
 let lastTab = "log";
 function showTab(tab){
   const dir = TAB_ORDER.indexOf(tab) >= TAB_ORDER.indexOf(lastTab) ? "r" : "l", moved = tab !== lastTab;
@@ -4817,7 +4894,7 @@ async function camRun(els, onRep, kind){
       drawPose(pts);
       const dp = v.parentElement && v.parentElement.querySelector(".cam-depth i");
       if (dp){ dp.style.height = Math.round((cam.c.phase === "setup" ? 0 : cam.c.depth || 0) * 100) + "%"; dp.parentElement.classList.toggle("deep", cam.c.phase === "down"); }
-      if (rep){ tones(880, 1); buzz([60]); replay(v.parentElement, "flash"); if (cam.onRep) cam.onRep(cam.c.reps); }
+      if (rep){ tones(880, 1); buzz([60]); replay(v.parentElement, "repflash"); if (cam.onRep) cam.onRep(cam.c.reps); }
       camMsg(cam.c.msg);
     }
     cam.raf = requestAnimationFrame(loop);
@@ -5805,6 +5882,10 @@ function renderDoneList(range, view){
       a.n += n; a.days.add(k); if (k > a.last) a.last = k;
     });
   });
+  if (bodyTypes().includes("p") && (view === "all" || view === "p")) Object.keys(state.ptLog || {}).forEach(k => {
+    if (k < since || k > today()) return;
+    ptEntries(k).forEach(e => { const key = "PT · " + e.name, a = agg[key] = agg[key] || {t:"p", n:0, days:new Set(), last:k}; a.n += e.sets.length; a.days.add(k); if (k > a.last) a.last = k; });
+  });
   const rows = Object.entries(agg).sort((a, b) => b[1].n - a[1].n || a[0].localeCompare(b[0]));
   const total = rows.reduce((s, [, a]) => s + a.n, 0);
   box.innerHTML = `<h2>Done in the last ${range} days</h2>
@@ -5988,15 +6069,18 @@ function startPT(){
   clearInterval(pp.iv); pp.iv = setInterval(ptTick, 200); syncWake();
 }
 function ptReady(sec){ pp.phase = "ready"; pp.end = Date.now() + sec * 1000; pp.lastBeep = -1; ptRender(); }
+const ptCamKind = st => { const k = st && st.kind === "reps" ? camKind(st.name) : null; return k && !(state.camOff || {})[k] ? k : null; };
+function ptStopCam(){ if (pp.camOn){ stopCam(); pp.camOn = false; } }
 function ptGo(){
   const st = pp.steps[pp.i]; tones(880, 1); buzz([120]);
-  if (st.kind === "hold"){ pp.phase = "hold"; pp.end = Date.now() + st.target * 1000; pp.lastBeep = -1; }
-  else { pp.phase = "reps"; pp.reps = st.target || 10; pp.end = Date.now(); }
+  if (st.kind === "hold"){ pp.phase = "hold"; pp.end = Date.now() + st.target * 1000; pp.lastBeep = -1; pp.lastMark = 0; pp.halfDone = false; }
+  else { pp.phase = "reps"; pp.reps = ptCamKind(st) ? 0 : (st.target || 10); pp.end = Date.now(); }
   ptRender();
 }
 function ptNext(record){
+  ptStopCam();
   const st = pp.steps[pp.i];
-  if (record) pp.done.push({i:st.i, side:st.side, dir:st.dir, kind:st.kind, v: st.kind === "hold" ? record : pp.reps});
+  if (record) pp.done.push({i:st.i, name:st.name, side:st.side, dir:st.dir, kind:st.kind, v: st.kind === "hold" ? record : pp.reps});
   tones(988, 2, .18); buzz([160, 100, 160]);
   pp.i++;
   if (pp.i >= pp.steps.length) return ptFinish();
@@ -6009,9 +6093,17 @@ function ptTick(){
   const left = Math.max(0, Math.ceil((pp.end - Date.now()) / 1000)), st = pp.steps[pp.i];
   const t = $("#ptTime"); if (t) t.textContent = fmtHMS(left);
   const bar = $("#ptBar"); if (bar) bar.style.width = (pp.phase === "hold" ? 100 - 100 * left / st.target : 0) + "%";
-  if (left <= 3 && left > 0 && left !== pp.lastBeep){ pp.lastBeep = left; tones(pp.phase === "hold" ? 700 : 600, 1); }
-  /* eyes closed: a soft tick every 15 seconds so you know where you are */
-  if (pp.phase === "hold" && st.eyes && left > 3 && left % 15 === 0 && left !== pp.lastBeep && left !== st.target){ pp.lastBeep = left; tones(520, 1); }
+  if (left <= 3 && left > 0 && left !== pp.lastBeep){ pp.lastBeep = left; tones(pp.phase === "hold" ? 700 : 600, 1); buzz([60]); }
+  /* during a hold: a tick every 10 seconds, two higher beeps on each half minute, three at the halfway point */
+  if (pp.phase === "hold" && left > 3){
+    const el = st.target - left, mark = Math.floor(el / 10), halfAt = Math.round(st.target / 2);
+    if (st.target >= 40 && el >= halfAt && !pp.halfDone){ pp.halfDone = true; pp.lastMark = Math.max(pp.lastMark || 0, mark); tones(1046, 3, .14); buzz([90, 70, 90, 70, 90]); }
+    else if (mark > (pp.lastMark || 0)){
+      pp.lastMark = mark;
+      if ((mark * 10) % 30 === 0){ tones(988, 2, .18); buzz([140, 90, 140]); }
+      else { tones(700, 1); buzz([70]); }
+    }
+  }
   if (left <= 0){ if (pp.phase === "ready") ptGo(); else ptNext(st.target); }
 }
 function ptRender(){
@@ -6022,42 +6114,64 @@ function ptRender(){
   const paused = pp.phase === "paused", ph = paused ? pp.was : pp.phase;
   const nextTxt = nx ? "Next: " + [nx.name === st.name ? "" : nx.name, sideTxt(nx.side).toLowerCase(), nx.dir.toLowerCase()].filter(Boolean).join(" · ") : "Last one";
   let mid;
+  const ck = ph === "reps" ? ptCamKind(st) : null;
   if (ph === "reps"){
-    mid = `<div class="wo-step"><span>Reps${st.reps && /-/.test(st.reps) ? " (aim " + st.reps + ")" : ""}</span><div class="stepper"><button data-pt="r-" aria-label="Fewer">−</button><b id="ptReps">${pp.reps}</b><button data-pt="r+" aria-label="More">+</button></div></div>
-      <button class="finish-btn pt-btn" data-pt="done">Done${nx ? " · next" : " · finish"}</button>`;
+    mid = `<div class="pt-split"><div class="pt-media">` + (ck ? `<div class="cam-view wo-cam pt-cam"><video id="ptVideo" playsinline muted autoplay></video><canvas id="ptCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="ptCount">${pp.reps}</div></div>
+        <p class="cam-msg" id="ptCamMsg">Starting the camera…</p>
+        <div class="wo-camlinks"><button class="link" data-pt="camtips">Where to put the phone</button><button class="link" data-pt="camoff">Camera off</button></div>`
+      : (camKind(st.name) ? '<button class="link wo-camlinks" data-pt="camon">Count with the camera</button>' : "")) + `</div><div class="pt-ctl"><div class="wo-step"><span>Reps${st.reps && /-/.test(st.reps) ? " (aim " + st.reps + ")" : ""}</span><div class="stepper"><button data-pt="r-" aria-label="Fewer">−</button><b id="ptReps">${pp.reps}</b><button data-pt="r+" aria-label="More">+</button></div></div>
+      <button class="finish-btn pt-btn" data-pt="done">Done${nx ? " · next" : " · finish"}</button></div></div>`;
   } else {
     mid = `<button class="pl-time${ph === "ready" ? " ready" : ""}" id="ptTime" data-pt="now">${fmtHMS(paused ? pp.left : Math.max(0, Math.ceil((pp.end - Date.now()) / 1000)))}</button>
       <div class="pl-bar pt-bar"><i id="ptBar"></i></div>
-      <div class="pl-phase">${paused ? "Paused" : ph === "ready" ? (st.eyes ? "Get set · close your eyes at the beep" : "Get set · starts by itself") : st.eyes ? "Eyes closed · beeps every 15 seconds" : "Hold"}</div>`;
+      <div class="pl-phase">${paused ? "Paused" : ph === "ready" ? (st.eyes ? "Get set · close your eyes at the beep" : "Get set · starts by itself") : (st.eyes ? "Eyes closed · " : "Hold · ") + "a beep every 10 seconds, three at halfway"}</div>`;
   }
   $("#ptBody").innerHTML = `<div class="player pt-player">
     <div class="pl-step">${pp.i + 1} / ${pp.steps.length} · <span id="ptClock">${fmtHMS(Math.round((Date.now() - pp.t0) / 1000))}</span></div>
     <div class="pl-up">${ph === "ready" ? (pp.i ? "Up next" : "First up") : ""}</div>
     <h3 class="pl-name">${esc(st.name)}</h3>
-    <div class="pl-side">${esc(where)}${st.kind === "reps" ? ` · ${esc(st.reps)} reps` : ""}</div>
-    ${FIG_SVG.replace('class="pl-fig"', `class="pl-fig${ph === "ready" ? " ready" : ""}"`)}
+    <div class="pl-side">${esc([where, st.kind === "reps" ? st.reps + " reps" : ""].filter(Boolean).join(" · "))}</div>
+    ${ck ? "" : FIG_SVG.replace('class="pl-fig"', `class="pl-fig${ph === "ready" ? " ready" : ""}"`)}
     ${mid}
     <div class="pl-next">${esc(nextTxt)}</div>
     <div class="pl-ctrl"><button class="btn ghost" data-pt="pause"${ph === "reps" ? " disabled" : ""}>${paused ? "Resume" : "Pause"}</button><button class="btn ghost" data-pt="skip">Skip</button><button class="btn ghost" data-pt="end">End</button></div>
   </div>`;
-  animSet(st.name, st.side === "R" ? "R" : "", $("#ptBody"), ptAnimKey(st.name));
+  if (ck){
+    if (!pp.camOn){
+      pp.camOn = true;
+      camRun({video:$("#ptVideo"), canvas:$("#ptCanvas"), msg:$("#ptCamMsg")}, n => {
+        pp.reps = n; const c = $("#ptCount"), r = $("#ptReps");
+        if (c){ c.textContent = n; c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
+        if (r){ r.textContent = n; replay(r, "bump"); }
+      }, ck);
+    }
+  } else animSet(st.name, st.side === "R" ? "R" : "", $("#ptBody"), ptAnimKey(st.name));
 }
 $("#ptBody").addEventListener("click", e => {
   const b = e.target.closest("[data-pt]"); if (!b) return;
   const a = b.dataset.pt, st = pp.steps[pp.i];
   if (a === "now" && pp.phase === "ready") return ptGo();
-  if (a === "r-" || a === "r+"){ pp.reps = Math.max(0, pp.reps + (a === "r+" ? 1 : -1)); $("#ptReps").textContent = pp.reps; replay($("#ptReps"), "bump"); return; }
+  if (a === "r-" || a === "r+"){ pp.reps = Math.max(0, pp.reps + (a === "r+" ? 1 : -1)); $("#ptReps").textContent = pp.reps; replay($("#ptReps"), "bump"); const c = $("#ptCount"); if (c) c.textContent = pp.reps; if (cam.c) cam.c.reps = pp.reps; return; }
+  if (a === "camtips"){ if (cam.els) camTips(cam.els, cam.kind, true); return; }
+  if (a === "camoff" || a === "camon"){
+    const k = camKind(st.name); state.camOff = state.camOff || {};
+    if (a === "camoff") state.camOff[k] = true; else delete state.camOff[k];
+    save(); ptStopCam();
+    pp.reps = a === "camon" ? 0 : (st.target || 10);
+    ptRender(); toast(a === "camoff" ? "Camera off. Set your reps with + and −." : "Camera on."); return;
+  }
   if (a === "done") return ptNext(true);
   if (a === "pause"){
     if (pp.phase === "paused"){ pp.phase = pp.was; pp.end = Date.now() + pp.left * 1000; }
     else if (pp.phase === "ready" || pp.phase === "hold"){ pp.was = pp.phase; pp.left = Math.max(0, Math.ceil((pp.end - Date.now()) / 1000)); pp.phase = "paused"; }
     return ptRender();
   }
-  if (a === "skip"){ if (pp.phase === "paused") pp.phase = pp.was; pp.i++; if (pp.i >= pp.steps.length) return ptFinish(); return ptReady(5); }
+  if (a === "skip"){ ptStopCam(); if (pp.phase === "paused") pp.phase = pp.was; pp.i++; if (pp.i >= pp.steps.length) return ptFinish(); return ptReady(5); }
   if (a === "end"){ if (!pp.done.length || confirm("End the PT session? What you've done so far is saved.")) ptFinish(); }
 });
 setInterval(() => { const c = document.getElementById("ptClock"); if (c && pp.iv) c.textContent = fmtHMS(Math.round((Date.now() - pp.t0) / 1000)); }, 1000);
 function ptFinish(){
+  ptStopCam();
   clearInterval(pp.iv); pp.iv = null; pp.phase = ""; anim.free = false; animStop(); syncWake();
   closeSheet($("#ptPlayer")); $("#ptBody").innerHTML = "";
   if (!pp.done.length){ toast("Nothing logged."); return; }
