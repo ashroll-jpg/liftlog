@@ -721,6 +721,8 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
   .wo-media .wo-cam{flex:none;height:min(46vh,460px);max-height:none}
   #mobPlayer .player{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:row dense;gap:4px 28px;align-content:center;justify-items:center}
   #mobPlayer .player > *{grid-column:2}
+  #mobPlayer .player.pl-done{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px}
+  #mobPlayer .player.pl-done .pl-ctrl{width:min(100%,560px)}
   #mobPlayer .player > .pl-fig{grid-column:1;grid-row:1 / span 9;width:min(52vh,360px);aspect-ratio:1 / 1}
   #mobPlayer .player > .pl-bar,#mobPlayer .player > .pl-ctrl{width:100%}
 }
@@ -1712,7 +1714,7 @@ input,select,textarea{font-size:16px}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "5.0.0";
+const APP_VERSION = "5.0.2";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -2455,7 +2457,26 @@ function ensureAudio(){
   } catch(e){}
 }
 /* count short tones at a given pitch */
+/* iPhone pauses ("interrupts") web audio when speech plays or another app takes the speaker; wake it before every beep */
+function wakeAudio(){
+  try { if (audioCtx && audioCtx.state !== "running" && audioCtx.state !== "closed") return audioCtx.resume().catch(() => {}); } catch(e){}
+  return Promise.resolve();
+}
+document.addEventListener("pointerdown", () => {
+  if (!audioCtx) return;
+  if (audioCtx.state === "running") return;
+  wakeAudio().then(() => {
+    if (audioCtx.state !== "running"){       /* still stuck: start fresh while we have a tap */
+      try { audioCtx.close(); } catch(e){}
+      try { const AC = window.AudioContext || window.webkitAudioContext; audioCtx = new AC(); audioCtx.resume(); } catch(e){}
+    }
+  });
+}, true);
 function tones(freq, count, gap){
+  if (audioCtx && audioCtx.state !== "running"){ wakeAudio().then(() => playTones(freq, count, gap)); return; }
+  playTones(freq, count, gap);
+}
+function playTones(freq, count, gap){
   try {
     if (!audioCtx) return;
     for (let i=0; i<count; i++){
@@ -3921,6 +3942,7 @@ function playerTick(){
   $("#plTime").textContent = fmtHMS(left);
   const total = player.phase === "hold" ? st.sec : 5;
   $("#plBar").style.width = (player.phase === "hold" ? 100 - 100*left/total : 0) + "%";
+  if (player.phase === "hold" && left === 10 && st.sec >= 25 && player.v10 !== player.end){ player.v10 = player.end; say("10 seconds left."); }
   if (left <= 3 && left > 0 && left !== player.lastBeep){ player.lastBeep = left; tones(player.phase === "hold" ? 700 : 600, 1); }
   if (left <= 0){ if (player.phase === "ready") playerHold(); else playerDone(st.sec); }
 }
@@ -3938,6 +3960,7 @@ function playerDone(secs){
   playerReady(5);   /* 5 seconds to reset before the next hold starts by itself */
 }
 function finishPlayer(){
+  if (player.i >= player.steps.length) say("Done. Routine complete.");
   clearInterval(player.iv); player.iv = null; player.phase = "done"; animStop();
   renderPlayer(); syncWake();
   if (player.date === mobDate) renderMobility();
@@ -3947,7 +3970,7 @@ function renderPlayer(){
   const p = player, st = p.steps[p.i], nx = p.steps[p.i + 1];
   const sideTxt = s => s === "L" ? "Left side" : s === "R" ? "Right side" : "";
   if (p.phase === "done"){
-    $("#plBody").innerHTML = `<div class="player"><div class="pl-step">ROUTINE COMPLETE</div><h3 class="pl-name">Done<span class="dot">.</span></h3>
+    $("#plBody").innerHTML = `<div class="player pl-done"><div class="pl-step">ROUTINE COMPLETE</div><h3 class="pl-name">Done<span class="dot">.</span></h3>
       <div class="pl-side">${fmtHMS(p.held)} of mobility</div><div class="pl-ctrl two"><button class="btn ghost" id="plAnother">Another routine</button><button class="btn" data-close-player>Close</button></div></div>`;
     $("#plAnother").onclick = () => { closeSheet($("#mobPlayer")); renderMobRoutines(); openSheet($("#mobRoutineSheet")); };
     return;
@@ -4880,7 +4903,11 @@ async function camRun(els, onRep, kind){
   if (cam.els !== els){ stream.getTracks().forEach(t => t.stop()); return; }   /* moved on while waiting */
   cam.stream = stream;
   const v = els.video; v.srcObject = stream; v.classList.toggle("mirror", cam.facing === "user");
+  v.muted = true; v.setAttribute("playsinline", ""); v.setAttribute("muted", "");
   try { await v.play(); } catch(err){}
+  /* iPhone pauses video when speech or a beep takes the speaker, and can end the camera feed: keep it running */
+  clearInterval(cam.kick); cam.kick = setInterval(() => camKick(els, onRep, kind), 600);
+  if (v.parentElement) v.parentElement.onclick = ev => { if (!ev.target.closest("button")) camKick(els, onRep, kind); };
   camMsg("Loading the rep counter… the first time takes a few seconds.");
   let lm;
   try { lm = await loadPose(); } catch(err){ camMsg("The rep counter needs an internet connection the first time. You can still set the reps by hand."); return; }
@@ -4946,7 +4973,20 @@ function drawPose(pts){
     const [x1, y1] = P(pts[a]), [x2, y2] = P(pts[b]); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
   });
 }
+function camKick(els, onRep, kind){
+  if (cam.els !== els || !cam.stream) return;
+  const v = els.video, tr = cam.stream.getVideoTracks()[0];
+  if (tr && tr.readyState === "ended"){            /* the feed died: reopen it and keep the count */
+    if (cam.restarting) return; cam.restarting = true;
+    const reps = cam.c ? cam.c.reps : 0, trace = cam.trace || "";
+    camRun(els, onRep, kind).then(() => { cam.restarting = false; if (cam.c){ cam.c.reps = reps; cam.trace = trace; } });
+    return;
+  }
+  if (v.srcObject !== cam.stream) v.srcObject = cam.stream;
+  if (v.paused || v.readyState < 2) v.play().catch(() => {});
+}
 function stopCam(){
+  clearInterval(cam.kick);
   cam.active = false; window.__camOn = false; cancelAnimationFrame(cam.raf);
   if (cam.stream) cam.stream.getTracks().forEach(t => t.stop());
   cam.stream = null;
@@ -6113,6 +6153,7 @@ function ptTick(){
   const left = Math.max(0, Math.ceil((pp.end - Date.now()) / 1000)), st = pp.steps[pp.i];
   const t = $("#ptTime"); if (t) t.textContent = fmtHMS(left);
   const bar = $("#ptBar"); if (bar) bar.style.width = (pp.phase === "hold" ? 100 - 100 * left / st.target : 0) + "%";
+  if (pp.phase === "hold" && left === 10 && st.target >= 25 && pp.v10 !== pp.end){ pp.v10 = pp.end; say("10 seconds left."); }
   if (left <= 3 && left > 0 && left !== pp.lastBeep){ pp.lastBeep = left; tones(pp.phase === "hold" ? 700 : 600, 1); buzz([60]); }
   /* during a hold: a tick every 10 seconds, two higher beeps on each half minute, three at the halfway point */
   if (pp.phase === "hold" && left > 3){
@@ -6191,6 +6232,7 @@ $("#ptBody").addEventListener("click", e => {
 });
 setInterval(() => { const c = document.getElementById("ptClock"); if (c && pp.iv) c.textContent = fmtHMS(Math.round((Date.now() - pp.t0) / 1000)); }, 1000);
 function ptFinish(){
+  if (pp.done.length) say("Done. PT complete. Nice work.");
   ptStopCam();
   clearInterval(pp.iv); pp.iv = null; pp.phase = ""; anim.free = false; animStop(); syncWake();
   closeSheet($("#ptPlayer")); $("#ptBody").innerHTML = "";
@@ -6594,27 +6636,25 @@ function say(text, queue){
     if (!queue) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     if (voicePick){ u.voice = voicePick; u.lang = voicePick.lang; } else u.lang = "en-US";
-    u.rate = 1.05; speechSynthesis.speak(u);
+    u.rate = 1.05; u.onend = u.onerror = () => { wakeAudio(); const v = cam.els && cam.els.video; if (v && cam.stream && v.paused) v.play().catch(() => {}); };
+    speechSynthesis.speak(u); setTimeout(wakeAudio, 50);
   } catch(e){}
 }
 /* iPhone only lets a page talk after a tap: say nothing once on the first one */
-document.addEventListener("pointerdown", () => {
-  if (voiceUnlocked || !hasVoice) return; voiceUnlocked = true;
-  try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch(e){}
-}, true);
+
 const secWords = s => s >= 60 && s % 60 === 0 ? `${s / 60} ${s === 60 ? "minute" : "minutes"}` : s > 60 ? `${Math.floor(s / 60)} minute ${s % 60}` : `${s} seconds`;
 const sideWord = s => s === "L" ? "left side" : s === "R" ? "right side" : "";
 function ptVoiceReady(){
   const st = pp.steps[pp.i], pv = pp.steps[pp.i - 1]; if (!st) return;
   const what = st.kind === "hold" ? secWords(st.target) : `${st.target} reps`;
-  if (pv && pv.i === st.i && pv.set === st.set && st.side && pv.side !== st.side) say(`Switch sides. ${sideWord(st.side)}.`);
-  else if (pv && pv.i === st.i && pv.set !== st.set) say(`Rest. Then set ${st.set} of ${st.sets}${st.side ? ", " + sideWord(st.side) : ""}.`);
-  else say(`${pp.i ? "Next" : "First"}: ${st.name}${st.side ? ", " + sideWord(st.side) : ""}${st.dir ? ", " + st.dir : ""}${st.sets > 1 ? `, set ${st.set} of ${st.sets}` : ""}. ${what}.`);
+  if (pv && pv.i === st.i && pv.set === st.set && st.side && pv.side !== st.side) say(`Done. Switch sides. ${sideWord(st.side)}.`);
+  else if (pv && pv.i === st.i && pv.set !== st.set) say(`Done. Rest, then set ${st.set} of ${st.sets}${st.side ? ", " + sideWord(st.side) : ""}.`);
+  else say(`${pp.i ? "Done. Next" : "First"}: ${st.name}${st.side ? ", " + sideWord(st.side) : ""}${st.dir ? ", " + st.dir : ""}${st.sets > 1 ? `, set ${st.set} of ${st.sets}` : ""}. ${what}.`);
 }
 function mobVoiceReady(){
   const st = player.steps[player.i], pv = player.steps[player.i - 1]; if (!st) return;
-  if (pv && pv.id === st.id && st.side && pv.side !== st.side) say(`Switch sides.`);
-  else say(`${player.i ? "Next" : "First"}: ${st.name}${st.side ? ", " + sideWord(st.side) : ""}. ${secWords(st.sec)}.`);
+  if (pv && pv.id === st.id && st.side && pv.side !== st.side) say(`Done. Switch sides.`);
+  else say(`${player.i ? "Done. Next" : "First"}: ${st.name}${st.side ? ", " + sideWord(st.side) : ""}. ${secWords(st.sec)}.`);
 }
 $("#voiceSeg").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
