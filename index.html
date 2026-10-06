@@ -45,8 +45,6 @@ button{cursor:pointer}
   -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.6) 45%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.6) 45%,transparent 100%)}
 .bg-photo.show{opacity:var(--bg-op,.16)}
 @media (prefers-reduced-motion:reduce){.bg-photo{transition:none}}
-.slot{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-.slot .thumb{width:64px;height:64px;border-radius:4px;background:var(--field) center/cover no-repeat;border:1px solid var(--line);filter:grayscale(1)}
 .slot b{display:block;font-size:18px}
 .slot small{display:block;color:var(--mute);font-size:14px}
 .slot .acts{display:flex;flex-direction:column;gap:2px;align-items:center}
@@ -532,7 +530,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area
 .another .tpl-go b{font-family:var(--display);font-weight:800;font-stretch:112%;text-transform:uppercase;font-size:14px}
 .another .tpl-go small{display:block;font-family:var(--mono);font-size:12px;color:var(--mute);margin-top:3px}
 .another .tpl-go .go{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--str);flex-shrink:0}
-.tools-row{display:flex;justify-content:center;margin-top:10px}
+.tools-row{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 26px;margin-top:10px}
 .tools-row .link{display:inline-flex;align-items:center;gap:6px}
 .tools-row .link svg{width:18px;height:18px}
 /* weekly recap */
@@ -1161,6 +1159,52 @@ input,select,textarea{font-size:16px}
   .pt-ctl{flex:1}
   .pt-player .pt-cam{height:calc(100dvh - 330px);min-height:300px}
 }
+/* 5.0: devices, history, report */
+.sync-more{border-bottom:1px solid var(--line);padding-bottom:6px}
+.sync-more .setting{border-bottom:0}
+.dev-list{display:grid;gap:6px;margin:-4px 0 10px}
+.dev{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:8px 12px;border-radius:10px;background:var(--field)}
+.dev span{color:var(--mute);text-align:right}
+.dev-warn{margin:2px 0 0;font-size:13px;color:var(--str);line-height:1.4}
+.hist{display:grid;gap:8px;padding-bottom:20px}
+.hist-row{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.hist-head{display:flex;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:none;border:0;color:var(--ink);font:inherit;font-size:15px;text-align:left}
+.hist-head span{color:var(--mute);font-size:13px}
+.hist-body{display:none;padding:0 14px 14px;font-size:14px;color:var(--mute)}
+.hist-row.open .hist-body{display:block}
+.hist-body ul{margin:0 0 12px;padding-left:18px;line-height:1.5}
+.report-text{flex:1;min-height:160px;overflow:auto;margin:10px 0;padding:12px;border-radius:10px;background:var(--field);border:1px solid var(--line);font:12px/1.45 ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-word;color:var(--ink);user-select:text;-webkit-user-select:text}
+/* 5.0: plan, guard, progression, keyboard */
+.plan-card{border-color:color-mix(in srgb,var(--str) 30%,var(--line))}
+.plan-card .rc-top .link{font-family:inherit;letter-spacing:0;text-transform:none;font-size:14px}
+.plan-list{display:grid;gap:8px;margin-top:8px}
+.plan-row{display:grid;grid-template-columns:6px minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 0}
+.plan-row>i{align-self:stretch;border-radius:3px;background:var(--c)}
+.plan-row b{display:block;font-size:16px}
+.plan-row small{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+.plan-row.done b{color:var(--mute)}
+.plan-done{display:inline-flex;align-items:center;gap:6px;color:var(--c);font-weight:600;font-size:14px}
+.plan-done svg{width:18px;height:18px}
+.plan-miss{color:var(--mute);font-size:13px}
+.plan-sum{margin:6px 0 0;color:var(--mute);font-size:13px}
+.plan-day{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
+.plan-day>b{padding-top:7px;font-family:var(--mono);font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--mute)}
+.plan-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.plan-chips .lchip{border-color:color-mix(in srgb,var(--c) 55%,var(--line));color:var(--ink);background:color-mix(in srgb,var(--c) 14%,transparent);padding:6px 8px 6px 10px;cursor:pointer;font-family:inherit;letter-spacing:0;text-transform:none;font-size:14px}
+.plan-chips .lchip span{color:var(--mute);margin-left:4px}
+.plan-chips select{background:var(--field);color:var(--mute);border:1px dashed var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:14px;max-width:130px}
+#planClear{margin:16px 0 24px}
+.guard-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.guard-chips .chip[aria-pressed="true"]{background:var(--pt);border-color:var(--pt);color:#fff}
+.guard-tag{display:inline-block;margin:0 6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.02em;color:#E7B04A;background:rgba(231,176,74,.14);border:1px solid rgba(231,176,74,.35);vertical-align:middle;white-space:nowrap}
+.res .meta .guard-tag{margin:0 6px 0 0}
+.exd-goal{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:14px 0 4px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.exd-goal p{margin:0;font-weight:600}
+.exd-goal small{display:block;font-weight:400;color:var(--mute);font-size:13px;margin-top:3px;line-height:1.4}
+.pl-side .aim{color:var(--str);font-weight:700}
+#ptTrends:empty,#ptGuard:empty{display:none}
+.kb-hint{display:none;margin:6px 0 0;text-align:center;font-size:12px;color:var(--mute);font-family:var(--mono);letter-spacing:.06em}
+@media (any-pointer:fine) and (min-width:900px){.kb-hint{display:block}}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1195,11 +1239,12 @@ input,select,textarea{font-size:16px}
       <div class="sub" id="daySub"></div>
     </div>
     <section class="card recap" id="recapLog" hidden></section>
+    <section class="card plan-card" id="planCard" hidden></section>
     <div id="nudge"></div>
     <div class="daytools" id="dayTools"></div>
     <div class="list" id="exList"></div>
     <button class="add-big" id="openPicker">+ Add exercise</button>
-    <div class="tools-row"><button class="link" id="openIntervals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>Interval timer</button></div>
+    <div class="tools-row"><button class="link" id="openIntervals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>Interval timer</button><button class="link" id="openPlan2">Plan my week</button></div>
   </main>
 
   <main id="cardioView" hidden>
@@ -1219,6 +1264,7 @@ input,select,textarea{font-size:16px}
     <h1 class="page-title">Physical therapy</h1>
     <section class="goal pt-goal" id="ptGoal"></section>
     <section class="card" id="ptPlan"></section>
+    <section class="card" id="ptGuard" hidden></section>
     <section class="card" id="ptTrends"></section>
   </main>
 
@@ -1409,6 +1455,33 @@ input,select,textarea{font-size:16px}
   </div>
 </div>
 
+<!-- sync history -->
+<div class="sheet" id="histSheet" role="dialog" aria-modal="true" aria-labelledby="histTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="histTitle">Sync history</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="histBody" style="flex:1;overflow-y:auto"></div>
+  </div>
+</div>
+<!-- problem report -->
+<div class="sheet" id="reportSheet" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="reportTitle">Report a problem</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <label class="field"><span>What happened? (optional)</span><input id="reportNote" placeholder="e.g. the PT plan disappeared on my iPad" autocomplete="off"></label>
+    <pre class="report-text" id="reportText"></pre>
+    <div class="cam-ctrl"><button class="btn ghost" id="reportClear">Clear log</button><button class="btn ghost" id="reportShare">Share</button><button class="btn" id="reportCopy">Copy</button></div>
+    <p class="note">Nothing is sent anywhere. Copy it and paste it into your chat with Claude. Your GitHub token is never included.</p>
+  </div>
+</div>
+<!-- weekly plan -->
+<div class="sheet" id="planSheet" role="dialog" aria-modal="true" aria-labelledby="planTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="planTitle">Weekly plan</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="planBody" style="flex:1;overflow-y:auto"></div>
+  </div>
+</div>
 <!-- settings -->
 <div class="sheet" id="settings" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
   <div class="scrim" data-close></div>
@@ -1422,9 +1495,9 @@ input,select,textarea{font-size:16px}
     <div class="setting"><p>Physical therapy<small>Adds a PT tab with your plan and its own goal. Turn it off when you're done.</small></p><div class="seg" id="ptSeg"><button data-pt="0">Off</button><button data-pt="1">On</button></div></div>
     <div class="setting" id="ptGoalRow" hidden><p>PT goal<small>PT days per week</small></p><div class="stepper"><button id="ptGoalDown" aria-label="Lower PT goal">−</button><b id="ptGoalVal">5</b><button id="ptGoalUp" aria-label="Raise PT goal">+</button></div></div>
     <div class="setting" id="ptClearRow" hidden><p>PT history<small>Kept on this device while PT is off.</small></p><button class="btn ghost" id="ptClear">Delete</button></div>
-    <div class="setting" hidden><p>Background photos<small id="photoStatus">Faded black-and-white photos behind each tab</small></p><button class="btn ghost" id="openPhotos">Set up</button></div>
     <div class="setting"><p>Workout reminders<small id="remStatus">Add alerts to your phone's calendar</small></p><button class="btn ghost" id="openRem">Set up</button></div>
-    <div class="setting" hidden><p>Workout timer beeps<small id="awakeStatus">Keeps your screen on while running</small></p><div class="seg" id="beepSeg"><button data-b="0">Off</button><button data-b="30">30s</button><button data-b="60">1 min</button></div></div>
+    <div class="setting" id="voiceRow"><p>Voice coach<small>Says each exercise, set and rest out loud, and counts camera reps</small></p><div class="seg" id="voiceSeg"><button data-voice="0">Off</button><button data-voice="1">On</button></div></div>
+    <div class="setting"><p>Weekly plan<small>Plan what you'll do each day</small></p><button class="btn ghost" id="openPlan">Plan</button></div>
     <div class="setting"><p>Vibrate with beeps<small id="vibStatus">Buzzes at each interval</small></p><div class="seg" id="vibSeg"><button data-v="0">Off</button><button data-v="1">On</button></div></div>
     <div class="setting"><p>Beep on silent (iPhone)<small>Plays beeps even with the ringer off. May pause music from other apps.</small></p><div class="seg" id="silentSeg"><button data-q="0">Off</button><button data-q="1">On</button></div></div>
     <div class="setting"><p>Rest timer length</p><div class="seg" id="restSeg"><button data-s="60">1:00</button><button data-s="90">1:30</button><button data-s="120">2:00</button><button data-s="180">3:00</button></div></div>
@@ -1441,6 +1514,13 @@ input,select,textarea{font-size:16px}
       </ol>
       <small>The token can only read and write gists. Your log is saved to a secret gist in your GitHub account, unlisted but not encrypted. The token stays on this device.</small>
     </div>
+    <div class="sync-more" id="syncMore" hidden>
+      <div class="setting"><p>Your devices<small>Each device checks in when it syncs.</small></p></div>
+      <div id="devList"></div>
+      <div class="setting"><p>Sync history<small>Every sync saves a copy you can go back to.</small></p><button class="btn ghost" id="openHistory">View</button></div>
+      <div class="setting" id="undoRow" hidden><p>Undo restore<small>Go back to how things were before you restored.</small></p><button class="btn ghost" id="undoRestore">Undo</button></div>
+    </div>
+    <div class="setting"><p>Something looked wrong?<small>Makes a report with recent errors and camera sets you marked, to send to Claude.</small></p><button class="btn ghost" id="openReport">Report</button></div>
     <div class="setting"><p>Tally <span class="version" id="versionLabel"></span><small id="updateStatus">Updates install automatically when you open the app</small></p><button class="btn ghost" id="checkUpdate">Check now</button></div>
     <div class="setting"><p>Exercise catalog<small id="catStatus"></small><small id="offlineStatus"></small></p><button class="btn ghost" id="reloadCat">Refresh</button></div>
   </div>
@@ -1492,6 +1572,7 @@ input,select,textarea{font-size:16px}
   <div class="panel">
     <div class="sheet-head"><h2 id="woTitle">Session</h2><button class="icon-btn" data-close aria-label="Minimize the session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div id="woBody"></div>
+    <p class="kb-hint">Space: done · ← →: exercises · + −: reps · S: skip rest · Esc: minimize</p>
   </div>
 </div>
 <div class="sheet" id="camSheet" role="dialog" aria-modal="true" aria-labelledby="camTitle">
@@ -1502,7 +1583,7 @@ input,select,textarea{font-size:16px}
     <div class="cam-view"><video id="camVideo" playsinline muted autoplay></video><canvas id="camCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="camReps" aria-live="polite">0</div></div>
     <p class="cam-msg" id="camMsg"></p>
     <div class="cam-ctrl"><button class="btn ghost" id="camFlip">Flip</button><button class="btn ghost" id="camReset">Reset</button><button class="btn" id="camSave" disabled>Save</button></div>
-    <p class="note cam-note"><button class="link" id="camTipsBtn">Where to put the phone</button> · Video stays on your phone.</p>
+    <p class="note cam-note"><button class="link" id="camTipsBtn">Where to put the phone</button> · <button class="link" data-camwrong>Count was off?</button> · Video stays on your phone.</p>
   </div>
 </div>
 <div class="sheet" id="ptEditSheet" role="dialog" aria-modal="true" aria-labelledby="ptEditTitle">
@@ -1590,21 +1671,6 @@ input,select,textarea{font-size:16px}
 </div>
 <input type="file" id="shotFile" accept="image/*" multiple hidden>
 
-<!-- background photos -->
-<div class="sheet" id="photoSheet" role="dialog" aria-modal="true" aria-labelledby="photoTitle">
-  <div class="scrim" data-close></div>
-  <div class="panel short">
-    <div class="sheet-head">
-      <h2 id="photoTitle">Background photos</h2>
-      <button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    </div>
-    <p class="hint" style="padding-top:0">Pick a photo for each tab. They're turned black and white and faded behind your workouts. Photos stay on this phone and are never uploaded to GitHub.</p>
-    <div id="photoSlots"></div>
-    <div class="setting"><p>Strength</p><div class="seg" id="photoStr"><button data-o="0">Off</button><button data-o="0.1">Faint</button><button data-o="0.16">Subtle</button><button data-o="0.26">Bold</button></div></div>
-    <input type="file" id="photoFile" accept="image/*" hidden>
-  </div>
-</div>
-
 <!-- reminders -->
 <div class="sheet" id="remSheet" role="dialog" aria-modal="true" aria-labelledby="remTitle">
   <div class="scrim" data-close></div>
@@ -1646,7 +1712,7 @@ input,select,textarea{font-size:16px}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "4.9.0";
+const APP_VERSION = "5.0.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -1969,6 +2035,7 @@ function renderLog(){
   renderDaySub();
   renderNudge();
   renderRecaps();
+  try { renderPlanCard(); } catch(e){}
 
   const list = entries(curDate), u = state.unit;
   const S = sessList(curDate), open = S.find(s => !s.end), ended = S.filter(s => s.end);
@@ -1998,7 +2065,7 @@ function renderLog(){
       ? `<textarea class="note-edit" data-note="${esc(e.name)}" placeholder="Grip, seat setting, how it felt…" aria-label="Note for ${esc(e.name)}">${esc(note)}</textarea>`
       : note ? `<button class="ex-note" data-act="note" data-i="${i}">${esc(note)}</button>` : "";
     const c = `<article class="ex${cls}" data-idx="${i}" style="--c:var(${GVAR[e.group] || "--mobility"})">
-      <header><div><h3 class="ex-title" data-act="detail" data-i="${i}" role="button" tabindex="0" aria-label="${esc(e.name)} history">${esc(e.name)}</h3><span class="tag">${esc(e.group)}</span>${modeBtn}${inSS ? '<span class="ss-tag">Superset</span>' : ""}</div>
+      <header><div><h3 class="ex-title" data-act="detail" data-i="${i}" role="button" tabindex="0" aria-label="${esc(e.name)} history">${esc(e.name)}</h3><span class="tag">${esc(e.group)}</span>${guardTag(e.name)}${modeBtn}${inSS ? '<span class="ss-tag">Superset</span>' : ""}</div>
         <span class="btns"><button class="icon-btn" data-act="note" data-i="${i}" aria-label="${note ? "Edit" : "Add"} note for ${esc(e.name)}">${ICON_PEN}</button>
         <button class="icon-btn" data-act="del-ex" data-i="${i}" aria-label="Remove ${esc(e.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></header>
       ${noteHtml}
@@ -2212,7 +2279,7 @@ function renderResults(){
     html += `<div class="custom"><p>Add “${esc(raw)}” as a new exercise</p><div class="ctl"><select id="customGroup" aria-label="Muscle group">${GROUPS.filter(g => g !== "Cardio" && g !== "Mobility").map(g => `<option${g === def ? " selected" : ""}>${g}</option>`).join("")}</select><button class="btn" id="addCustom">Add</button></div></div>`;
   }
   if (!shown.length && !q) html += `<p class="hint">${filterGroup === "Recent" ? "Exercises you log will show up here." : "No exercises in this group."}</p>`;
-  html += shown.map(e => `<button class="res" data-name="${esc(e.name)}" style="--c:var(${GVAR[e.group]})"><span class="nm">${esc(e.name)}</span><span class="meta">${esc(e.group)}</span></button>`).join("");
+  html += shown.map(e => `<button class="res" data-name="${esc(e.name)}" style="--c:var(${GVAR[e.group]})"><span class="nm">${esc(e.name)}</span><span class="meta">${guardTag(e.name)}${esc(e.group)}</span></button>`).join("");
   if (pool.length > shown.length) html += `<p class="hint">Showing 80 of ${pool.length}. Keep typing to narrow it down.</p>`;
   $("#results").innerHTML = html;
   const ac = $("#addCustom");
@@ -2266,7 +2333,8 @@ function loadTemplate(idx){
     if (day.length) day[day.length-1].ss = false;
     if (state.finished) delete state.finished[curDate];
     save(); closeSheet($("#tplSheet")); renderLog(); checkMilestones();
-    toast(t.name + " loaded.", false, {label:"Undo", fn: () => { restoreDay(curDate, snap); renderLog(); }});
+    const risky = t.items.filter(x => guardHit(x.name)).map(x => x.name);
+    toast(t.name + " loaded." + (risky.length ? ` ${listWords(risky)} ${risky.length === 1 ? "is" : "are"} flagged for your ${guardWord(guardHit(risky[0]))}.` : ""), false, {label:"Undo", fn: () => { restoreDay(curDate, snap); renderLog(); }});
 }
 $("#tplList").addEventListener("click", e => {
   const l = e.target.closest("[data-load]"), d = e.target.closest("[data-del]");
@@ -3844,8 +3912,8 @@ function startPlayer(steps){
   clearInterval(player.iv); player.iv = setInterval(playerTick, 200);
   syncWake();
 }
-function playerReady(sec){ player.phase = "ready"; player.end = Date.now() + sec*1000; player.lastBeep = -1; renderPlayer(); }
-function playerHold(){ player.phase = "hold"; player.end = Date.now() + player.steps[player.i].sec*1000; player.lastBeep = -1; tones(880, 1); buzz([120]); renderPlayer(); }
+function playerReady(sec){ player.phase = "ready"; player.end = Date.now() + sec*1000; player.lastBeep = -1; renderPlayer(); mobVoiceReady(); }
+function playerHold(){ player.phase = "hold"; player.end = Date.now() + player.steps[player.i].sec*1000; player.lastBeep = -1; tones(880, 1); buzz([120]); say("Go."); renderPlayer(); }
 function playerTick(){
   if (player.phase !== "ready" && player.phase !== "hold") return;
   const left = Math.max(0, Math.ceil((player.end - Date.now())/1000));
@@ -4175,7 +4243,7 @@ function suggestFor(m, n){
     .concat(catalog.filter(x => (x.type === "s" || x.type === "t") && x.group !== "Mobility" && x.group !== "Cardio"));
   pool.forEach(x => {
     const key = x.name.toLowerCase(); if (seen.has(key)) return; seen.add(key);
-    if (!canDo(x.name, x.equip)) return;
+    if (!canDo(x.name, x.equip) || guardHit(x.name)) return;
     const w = (musclesFor({name:x.name, group:x.group, type:x.type}) || {})[m] || 0;
     if (w < .7) return;
     const bw = isBW(x.name, x.type) || (x.extra && !/band|carry|pallof/i.test(x.name)), light = /band|dumbbell|kettlebell|carry/i.test(x.name) || /body only|bands|dumbbell|kettlebell/i.test(x.equip || "");
@@ -4227,36 +4295,9 @@ $("#bodyView").addEventListener("click", e => {
   if (m){ selMuscle = m.dataset.m; renderBody(); $("#muscleDetail").scrollIntoView({behavior:"smooth", block:"nearest"}); }
 });
 
-/* ---------- BACKGROUND PHOTOS (stored on this device only) ---------- */
-const PHOTO_KEY = "liftlog.photos";
-const PHOTO_TABS = [["log","Strength"],["cardio","Cardio"],["mobility","Mobility"],["body","Body"],["progress","Progress"]];
-let photos = {};
-try { photos = JSON.parse(localStorage.getItem(PHOTO_KEY)) || {}; } catch(e){ photos = {}; }
-let currentTab = "log", photoTarget = null;
-function savePhotos(){
-  try { localStorage.setItem(PHOTO_KEY, JSON.stringify(photos)); return true; }
-  catch(e){ toast("Not enough space on this device for that photo"); return false; }
-}
-/* shrink, convert to black and white, and compress so it loads instantly */
-function processPhoto(file){
-  return new Promise((resolve, reject) => {
-    const img = new Image(), url = URL.createObjectURL(file);
-    img.onload = () => {
-      const sc = Math.min(1, 1100 / Math.max(img.width, img.height));
-      const w = Math.round(img.width*sc), h = Math.round(img.height*sc);
-      const c = document.createElement("canvas"); c.width = w; c.height = h;
-      const x = c.getContext("2d"); x.drawImage(img, 0, 0, w, h);
-      const d = x.getImageData(0, 0, w, h), px = d.data;
-      for (let i=0; i<px.length; i+=4){ const g = px[i]*.299 + px[i+1]*.587 + px[i+2]*.114; px[i] = px[i+1] = px[i+2] = g; }
-      x.putImageData(d, 0, 0);
-      URL.revokeObjectURL(url);
-      resolve(c.toDataURL("image/jpeg", .62));
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("unreadable")); };
-    img.src = url;
-  });
-}
-const FOCUS_POS = {left:"22% 40%", center:"50% 40%", right:"78% 40%"};
+/* ---------- background photo (built in, centered) ---------- */
+let currentTab = "log";
+try { localStorage.removeItem("liftlog.photos"); } catch(e){}
 function applyBg(tab){
   currentTab = tab || currentTab;
   const el = $("#bgPhoto");
@@ -4264,42 +4305,6 @@ function applyBg(tab){
   el.style.setProperty("--bg-op", state.photoOp || .16);
   el.classList.add("show");
 }
-function renderPhotoSheet(){
-  $("#photoSlots").innerHTML = PHOTO_TABS.map(([k, label]) => {
-    const has = !!photos[k], f = (state.photoFocus || {})[k] || "center";
-    return `<div class="slot"><span class="thumb" style="${has ? `background-image:url('${photos[k]}');background-position:${FOCUS_POS[f]}` : ""}"></span>
-      <div><b>${label}</b><small>${has ? "Photo set" : "Uses another tab's photo, if any"}</small>
-        ${has ? `<div class="seg" role="group" aria-label="${label} photo focus">${["left","center","right"].map(x => `<button data-focus="${x}" data-k="${k}" aria-pressed="${x === f}">${x[0].toUpperCase() + x.slice(1)}</button>`).join("")}</div>` : ""}</div>
-      <div class="acts"><button class="btn ghost" data-pick="${k}">${has ? "Change" : "Choose"}</button>${has ? `<button class="link" data-rm="${k}" aria-label="Remove ${label} photo">Remove</button>` : ""}</div></div>`;
-  }).join("");
-  document.querySelectorAll("#photoStr button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.o === (state.photoOp ?? .16)));
-}
-function photoStatusText(){
-  const n = PHOTO_TABS.filter(t => photos[t[0]]).length;
-  return n ? `${n} ${n === 1 ? "photo" : "photos"} set` : "Faded black-and-white photos behind each tab";
-}
-$("#openPhotos").onclick = () => { closeSheet($("#settings")); renderPhotoSheet(); openSheet($("#photoSheet")); };
-$("#photoSlots").addEventListener("click", e => {
-  const pick = e.target.closest("[data-pick]"), rm = e.target.closest("[data-rm]"), fo = e.target.closest("[data-focus]");
-  if (pick){ photoTarget = pick.dataset.pick; $("#photoFile").click(); }
-  else if (rm){ delete photos[rm.dataset.rm]; savePhotos(); $("#bgPhoto").dataset.src = ""; renderPhotoSheet(); applyBg(); }
-  else if (fo){ state.photoFocus = Object.assign({}, state.photoFocus, {[fo.dataset.k]: fo.dataset.focus}); save(); $("#bgPhoto").dataset.src = ""; renderPhotoSheet(); applyBg(); }
-});
-$("#photoFile").addEventListener("change", async function(){
-  const f = this.files[0]; this.value = "";
-  if (!f || !photoTarget) return;
-  try {
-    const prev = photos[photoTarget];
-    photos[photoTarget] = await processPhoto(f);
-    if (!savePhotos()){ if (prev) photos[photoTarget] = prev; else delete photos[photoTarget]; }
-    $("#bgPhoto").dataset.src = "";
-    renderPhotoSheet(); applyBg(photoTarget === currentTab ? currentTab : undefined);
-  } catch(err){ toast("Couldn't read that photo. Try a different one."); }
-});
-$("#photoStr").addEventListener("click", e => {
-  const b = e.target.closest("button"); if (!b) return;
-  state.photoOp = +b.dataset.o; save(); renderPhotoSheet(); applyBg();
-});
 
 /* ---------- tabs ---------- */
 const TAB_ORDER = ["log", "cardio", "mobility", "pt", "body", "progress"];
@@ -4331,20 +4336,19 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () 
 /* ---------- settings ---------- */
 function renderCatStatus(){ const el = $("#catStatus"); if (el) el.textContent = catStatus; }
 function renderSettings(){
+  $("#voiceRow").hidden = !hasVoice;
+  document.querySelectorAll("#voiceSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.voice === "1") === (state.voice !== false)));
   document.querySelectorAll("#unitSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.u === state.unit));
   document.querySelectorAll("#restSeg button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.s === state.rest));
   document.querySelectorAll("#vibSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.v === "1") === !!state.vibrate));
   document.querySelectorAll("#silentSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.q === "1") === !!state.silentBeep));
   $("#vibStatus").textContent = navigator.vibrate ? "Buzzes at each interval" : "iPhone limits web vibration. The screen edge also flashes at each interval.";
-  document.querySelectorAll("#beepSeg button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.b === (state.beepEvery || 0)));
-  $("#awakeStatus").textContent = "wakeLock" in navigator ? "Screen stays on while a timer runs" : "This browser can't keep the screen on. Try Safari or Chrome.";
   document.querySelectorAll("#autoSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.a === "1") === !!state.autoRest));
   $("#goalVal").textContent = state.goal;
   renderSyncStatus();
   $("#mobGoalVal").textContent = state.mobGoal || 3;
   applyPT();
   $("#versionLabel").textContent = "version " + APP_VERSION;
-  $("#photoStatus").textContent = photoStatusText();
   const r = state.reminders;
   $("#remStatus").textContent = r.set ? `${DAY_ORDER.filter(d => r.days.includes(d)).map(d => DAYNAMES[d].slice(0,3)).join(", ")} at ${fmtTime(r.time)}` : "Add alerts to your phone's calendar";
   $("#openRem").textContent = r.set ? "Change" : "Set up";
@@ -4358,7 +4362,6 @@ $("#unitSeg").addEventListener("click", e => { const b = e.target.closest("butto
 $("#restSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.rest = +b.dataset.s; save(); renderSettings(); });
 $("#vibSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.vibrate = b.dataset.v === "1"; save(); renderSettings(); if (state.vibrate) buzz([180]); });
 $("#silentSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.silentBeep = b.dataset.q === "1"; save(); renderSettings(); ensureAudio(); tones(660, 1); });
-$("#beepSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.beepEvery = +b.dataset.b; resetBeepMark(); save(); renderSettings(); if (state.beepEvery){ ensureAudio(); tones(660, 1); } });
 $("#autoSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.autoRest = b.dataset.a === "1"; save(); renderSettings(); });
 $("#goalDown").onclick = () => { state.goal = Math.max(1, state.goal-1); save(); renderSettings(); refreshViews(); };
 $("#goalUp").onclick = () => { state.goal = Math.min(7, state.goal+1); save(); renderSettings(); refreshViews(); };
@@ -4498,6 +4501,7 @@ function weekRecap(mon){
   r.prev = goalDays().filter(k => k >= addDays(mon, -7) && k < mon).length;
   r.gdays = gdays; r.mdays = mdays;
   r.prs = prCountSince(mon, end);
+  r.plan = planWeek(mon, end);
   r.skipped = REGIONS.filter(([, ms]) => !ms.some(x => r.hit[x])).map(x => x[0]);
   return r;
 }
@@ -4509,7 +4513,8 @@ function recapHTML(r, closable){
     r.sets ? [fmtN(r.sets), "sets"] : null, r.reps ? [fmtN(r.reps), "reps"] : null, r.prs ? [r.prs, r.prs === 1 ? "PR" : "PRs"] : null,
     r.cmin ? [fmtHMS(r.cmin * 60), "cardio"] : null, r.cmi ? [Math.round(r.cmi * 10) / 10, "miles"] : null, r.msec ? [fmtHMS(r.msec), "mobility"] : null,
     [`${mn}/${mg}`, mn >= mg ? "stretch days · goal hit" : "stretch days"],
-    ptOn() ? [`${ptDays().filter(d => d >= r.mon && d <= r.end).length}/${ptCfg().goal || 5}`, "PT days"] : null
+    ptOn() ? [`${ptDays().filter(d => d >= r.mon && d <= r.end).length}/${ptCfg().goal || 5}`, "PT days"] : null,
+    r.plan && r.plan.planned ? [`${r.plan.done}/${r.plan.planned}`, "planned · done"] : null
   ].filter(Boolean);
   const notes = [];
   if (!n) notes.push("No workouts. Fresh start this week.");
@@ -4518,6 +4523,7 @@ function recapHTML(r, closable){
     notes.push(diff > 0 ? `${diff} more ${diff === 1 ? "day" : "days"} than the week before.` : diff < 0 ? `${-diff} fewer ${diff === -1 ? "day" : "days"} than the week before.` : "Same as the week before.");
     if (r.skipped.length && r.skipped.length < REGIONS.length) notes.push(`Nothing hit ${listWords(r.skipped.map(s => s.toLowerCase()))}.`);
   }
+  if (r.plan && r.plan.missed.length) notes.push(`Missed from the plan: ${listWords(r.plan.missed.slice(0, 3))}${r.plan.missed.length > 3 ? ` and ${r.plan.missed.length - 3} more` : ""}.`);
   return `<div class="rc-top"><span>Last week · ${range}</span>${closable ? '<button class="icon-btn" data-recap-close aria-label="Dismiss recap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' : ""}</div>
     <div class="rc-main">${n ? tallySVG(cols) : ""}<b class="${n >= goal ? "met" : ""}">${n} of ${goal} workout ${goal === 1 ? "day" : "days"}${n >= goal ? " · goal hit" : ""}</b></div>
     ${stats.length ? `<div class="rc-stats">${stats.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join("")}</div>` : ""}
@@ -4578,14 +4584,14 @@ $("#ivStart").onclick = () => {
   syncWake();
 };
 function ivPhase(ph, sec){ ivp.phase = ph; ivp.end = Date.now() + sec * 1000; ivp.lastBeep = -1; ivp.len = sec; renderIvPlayer(); }
-function ivStartWork(){ tones(880, 1); buzz([120]); ivPhase("work", ivp.cfg.mode === "emom" ? ivp.cfg.every : ivp.cfg.work); }
+function ivStartWork(){ tones(880, 1); buzz([120]); say(`Round ${ivp.round}${ivp.round === ivp.cfg.rounds && ivp.cfg.rounds > 1 ? ", last one" : ""}. Go.`); ivPhase("work", ivp.cfg.mode === "emom" ? ivp.cfg.every : ivp.cfg.work); }
 function ivAdvance(){
   const c = ivp.cfg;
   if (ivp.phase === "ready"){ ivStartWork(); return; }
   if (ivp.phase === "work"){
     ivp.done++;
     if (ivp.round >= c.rounds) return ivFinish();
-    if (c.mode === "wr" && c.rest > 0){ tones(523, 2, .15); buzz([80, 80, 80]); ivPhase("rest", c.rest); return; }
+    if (c.mode === "wr" && c.rest > 0){ tones(523, 2, .15); buzz([80, 80, 80]); say("Rest."); ivPhase("rest", c.rest); return; }
     ivp.round++; ivStartWork(); return;
   }
   if (ivp.phase === "rest"){ ivp.round++; ivStartWork(); }
@@ -4601,7 +4607,7 @@ function ivTick(){
 }
 function ivFinish(){
   clearInterval(ivp.iv); ivp.iv = null; ivp.phase = "done";
-  tones(988, 3, .18); buzz([180, 120, 180]); flash();
+  tones(988, 3, .18); buzz([180, 120, 180]); flash(); say("Done. Nice work.");
   renderIvPlayer(); syncWake();
 }
 function renderIvPlayer(){
@@ -4865,7 +4871,7 @@ function camTipsHTML(kind){
 /* ----- the camera loop, shared by the Count sheet and the session player ----- */
 async function camRun(els, onRep, kind){
   stopCam();
-  Object.assign(cam, {els, c:newCounter(), lastT:-1, onRep, kind:kind || "pushup"});
+  Object.assign(cam, {els, c:newCounter(), lastT:-1, onRep, kind:kind || "pushup", trace:"", traceT:0});
   camTips(els, cam.kind, false);
   camMsg("Starting the camera…");
   let stream;
@@ -4891,10 +4897,10 @@ async function camRun(els, onRep, kind){
       try { const r = lm.detectForVideo(v, t); pts = r && r.landmarks && r.landmarks[0]; } catch(err){}
       const rep = (CAM_STEP[cam.kind] || pushupStep)(cam.c, pts, t);
       if (screen.orientation && /landscape/.test(screen.orientation.type || "") && (v.videoHeight > v.videoWidth)) cam.c.msg = "Turn the phone upright. The counter needs a portrait picture.";
-      drawPose(pts);
+      drawPose(pts); traceFrame(t); if (rep) cam.trace += "|";
       const dp = v.parentElement && v.parentElement.querySelector(".cam-depth i");
       if (dp){ dp.style.height = Math.round((cam.c.phase === "setup" ? 0 : cam.c.depth || 0) * 100) + "%"; dp.parentElement.classList.toggle("deep", cam.c.phase === "down"); }
-      if (rep){ tones(880, 1); buzz([60]); replay(v.parentElement, "repflash"); if (cam.onRep) cam.onRep(cam.c.reps); }
+      if (rep){ tones(880, 1); buzz([60]); replay(v.parentElement, "repflash"); if (cam.onRep) cam.onRep(cam.c.reps); say(String(cam.c.reps)); }
       camMsg(cam.c.msg);
     }
     cam.raf = requestAnimationFrame(loop);
@@ -4959,7 +4965,7 @@ function saveCam(){
 }
 $("#camSave").onclick = saveCam;
 $("#camTipsBtn").onclick = () => { if (cam.els) camTips(cam.els, cam.kind, true); };
-$("#camReset").onclick = () => { if (cam.c){ const ar = cam.c.ar; cam.c = newCounter(); cam.c.ar = ar; $("#camReps").textContent = "0"; $("#camSave").disabled = true; $("#camSave").textContent = "Save"; } };
+$("#camReset").onclick = () => { cam.trace = ""; if (cam.c){ const ar = cam.c.ar; cam.c = newCounter(); cam.c.ar = ar; $("#camReps").textContent = "0"; $("#camSave").disabled = true; $("#camSave").textContent = "Save"; } };
 $("#camFlip").onclick = () => { cam.facing = cam.facing === "user" ? "environment" : "user"; openCam(cam.i); };
 document.querySelectorAll("#camSheet [data-close]").forEach(b => b.addEventListener("click", stopCam));
 
@@ -5129,9 +5135,12 @@ function wpEnter(idx){
   const s = e.sets[j], prev = e.sets.slice(0, j).reverse().find(x => x.done);
   wp.phase = "set"; wp.setStart = Date.now(); wp.holdStart = 0; wp.lastMark = 0;
   wp.reps = num(s.r) || (prev ? num(prev.r) : 0) || 10;
+  const pa = progAim(e, wp.k);
+  if (pa && !s.done) wp.reps = j > 0 && prev && num(prev.r) < pa.aim ? num(prev.r) : pa.aim;   /* aim for the target */
   if (usesCam(e)) wp.reps = 0;   /* the camera counts from zero */
   wp.w = num(s.w) || (prev ? num(prev.w) : 0);
   wpRender();
+  say(`${j === 0 ? e.name + ". " : ""}Set ${j + 1} of ${e.sets.length}.${pa ? ` Aim for ${pa.aim}.` : ""}`);
 }
 function wpNextTarget(idx){
   const list = wpList(), order = wpOrder(), pos = order.indexOf(idx), e = list[idx];
@@ -5166,11 +5175,14 @@ function wpDone(){
   tones(988, 1); buzz([80]);
   const pi = prInfo(e, wp.k);
   if (pi.j === j){ const key = wp.k + e.name + pi.val; if (!toasted[key]){ toasted[key] = 1; toast("New best. " + e.name + ", " + pi.val + " " + pi.u + ".", true); } }
+  const pg = progOf(e.name);
+  if (pg && pg.goal && e.type === "s" && num(s.r) >= pg.goal && pg.hit !== wp.k){ pg.hit = wp.k; save(); toast(`Goal reached: ${pg.goal} ${e.name}. Raise it from the exercise's page.`, true); say(`Goal reached. ${pg.goal} reps.`, true); flash(); }
   const nx = wpNextTarget(wp.idx);
   if (!nx){ wp.phase = "alldone"; return wpRender(); }
   if (nx.rest && state.rest > 0) wpRest(nx.idx, state.rest); else wpEnter(nx.idx);
 }
-function wpRest(after, sec){ wp.phase = "rest"; wp.after = after; wp.restLen = sec; wp.restEnd = Date.now() + sec * 1000; wp.lastBeep = -1; wpRender(); }
+function wpRest(after, sec){ wp.phase = "rest"; wp.after = after; wp.restLen = sec; wp.restEnd = Date.now() + sec * 1000; wp.lastBeep = -1; wpRender();
+  const nx = wpList()[after]; say(`Rest ${secWords(sec)}.${nx && after !== wp.idx ? " Next up, " + nx.name + "." : ""}`); }
 function wpAddSet(idx){
   const e = wpList()[idx]; if (!e) return;
   const last = e.sets[e.sets.length - 1], ns = last ? Object.assign({}, last) : blankSet(e.type);
@@ -5185,7 +5197,7 @@ function wpTick(){
     if (T("woSet")) T("woSet").textContent = base ? fmtHMS(Math.floor((now - base) / 1000)) : "0:00";
     if (wp.holdStart){
       const mark = Math.floor((now - wp.holdStart) / 10000);
-      if (mark > wp.lastMark){ wp.lastMark = mark; if (mark % 3 === 0){ tones(988, 2, .2); buzz([150, 100, 150]); } else tones(700, 1); }
+      if (mark > wp.lastMark){ wp.lastMark = mark; if (mark % 3 === 0){ tones(988, 2, .2); buzz([150, 100, 150]); say(secWords(mark * 10)); } else tones(700, 1); }
     }
   }
   if (wp.phase === "rest"){
@@ -5193,6 +5205,7 @@ function wpTick(){
     if (T("woRest")) T("woRest").textContent = fmtHMS(left);
     const ring = T("woRing");
     if (ring){ ring.style.strokeDashoffset = Math.min(100, Math.max(0, 100 * (1 - (wp.restEnd - now) / 1000 / wp.restLen))); ring.parentElement.parentElement.classList.toggle("end", left <= 3); }
+    if (left === 10 && wp.restLen > 20 && wp.v10 !== wp.restEnd){ wp.v10 = wp.restEnd; say("10 seconds."); }
     if (left <= 3 && left > 0 && left !== wp.lastBeep){ wp.lastBeep = left; tones(600, 1); }
     if (left <= 0){ tones(880, 1); buzz([120]); wpEnter(wp.after); }
   }
@@ -5213,11 +5226,11 @@ function wpRender(){
     const target = pset ? (e.type === "t" ? `Last time ${fmtSec(parseSec(pset.sec))}` : `Last time ${bw ? "" : (pset.w ? pset.w + "×" : "")}${pset.r || "–"}`) + " · beat it" : "";
     const doneMarks = e.sets.filter(x => x.done).length;
     const stampHTML = doneMarks ? `<div class="wo-tally">${tallySVG(Array.from({length:doneMarks}, () => "var(--accent)"))}</div>` : "";
-    const head = `<h3 class="pl-name">${esc(e.name)}</h3>${stampHTML}<div class="pl-side">${j >= 0 ? `Set ${j + 1} of ${n}` : `${doneN} ${doneN === 1 ? "set" : "sets"} done`}${target && wp.phase === "set" ? ` · ${target}` : ""}</div>`;
+    const head = `<h3 class="pl-name">${esc(e.name)}</h3>${stampHTML}<div class="pl-side">${j >= 0 ? `Set ${j + 1} of ${n}` : `${doneN} ${doneN === 1 ? "set" : "sets"} done`}${wp.phase === "set" && progAim(e, wp.k) ? ` · <b class="aim">Aim ${progAim(e, wp.k).aim} · goal ${progAim(e, wp.k).goal}</b>` : target && wp.phase === "set" ? ` · ${target}` : ""}</div>`;
     const cam = usesCam(e) && wp.phase === "set";
     const media = cam
       ? `<div class="cam-view wo-cam"><video id="woVideo" playsinline muted autoplay></video><canvas id="woCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="woCount">${wp.reps}</div></div><p class="cam-msg" id="woCamMsg">Starting the camera…</p>
-         <div class="wo-camlinks"><button class="link" data-wo="camtips">Where to put the phone</button><button class="link" data-wo="camoff">Camera off</button></div>`
+         <div class="wo-camlinks"><button class="link" data-wo="camtips">Where to put the phone</button><button class="link" data-wo="camoff">Camera off</button><button class="link" data-camwrong>Count was off?</button></div>`
       : `<div class="wo-fig${wp.phase === "rest" ? " dim" : ""}">${FIG_SVG}</div>${camKind(e.name) && e.type === "s" && wp.phase === "set" ? '<button class="link wo-camlinks" data-wo="camon">Count with the camera</button>' : ""}`;
     if (wp.phase === "set"){
       const stepper = (k, label, val, unit) => `<div class="wo-step"><span>${label}</span><div class="stepper"><button data-wo="${k}-" aria-label="Less">−</button><b>${val}${unit || ""}</b><button data-wo="${k}+" aria-label="More">+</button></div></div>`;
@@ -5332,6 +5345,7 @@ function mergeStates(L, R, B){
   /* settings, templates, notes...: whoever changed it since the last sync wins; this device wins a tie */
   const first = !Object.keys(B).length;
   keys.forEach(k => {
+    if (k === "devices"){ M.devices = mergeDevices(L.devices, R.devices); return; }
     if (first){
       if (k === "templates" || k === "custom" || k === "mobRoutines"){ const a = clone(R[k] || []); (L[k] || []).forEach(x => { if (!a.some(y => y.name === x.name)) a.push(clone(x)); }); M[k] = a; }
       else if (k === "notes" || k === "mode" || k === "typeOver") M[k] = Object.assign({}, clone(L[k] || {}), clone(R[k] || {}));
@@ -5410,6 +5424,7 @@ async function syncNow(manual){
   syncBusy = true; syncCfg.status = "syncing"; renderSyncStatus();
   try {
     if (!syncCfg.gistId){ syncCfg.gistId = await findOrCreateGist(); syncSaveCfg(); }
+    stampDevice(); store.set(KEY, JSON.stringify(state));
     const remote = await pullRemote();
     let base = null; try { base = JSON.parse(store.get(SYNC_BASE)); } catch(e){}
     const {merged, conflicts} = mergeStates(state, remote, base);
@@ -5427,6 +5442,7 @@ async function syncNow(manual){
     }
     store.set(SYNC_BASE, JSON.stringify(merged));
     Object.assign(syncCfg, {last:Date.now(), status:"ok", dirty:false, error:""}); syncSaveCfg();
+    checkDeviceVersions();
     if (manual) toast(conflicts ? "Synced. Combined changes from both devices." : changedHere ? "Synced. Pulled in new changes." : "Synced. Everything's up to date.");
   } catch(err){
     syncCfg.status = "error"; syncCfg.dirty = true;
@@ -5461,6 +5477,8 @@ function renderSyncStatus(){
   const el = $("#syncStatus"); if (!el) return;
   const on = !!syncCfg.token;
   $("#syncSetup").hidden = on; $("#syncOn").hidden = !on;
+  $("#syncMore").hidden = !on;
+  if (on){ $("#devList").innerHTML = devicesHTML(); $("#undoRow").hidden = !store.get(KEY + ".prerestore"); }
   if (!on){ el.textContent = "Keep your iPhone and iPad in step, free, through your GitHub account."; return; }
   el.textContent = syncCfg.status === "syncing" ? "Syncing…" : syncCfg.status === "error" || syncCfg.status === "offline" ? (syncCfg.error || "Offline. Will sync when you're back online.") : syncCfg.last ? "Synced " + agoText(syncCfg.last) : "Connected";
 }
@@ -5592,6 +5610,7 @@ function openExDetail(name){
   $("#exdTitle").textContent = name;
   $("#exdBody").innerHTML = `<p class="exd-tag">${esc(last.group || "")}${bw ? " · bodyweight" : ""}${type === "t" ? " · timed" : ""}</p>
     <div class="exd-stats">${stats.map(([v, l]) => `<div><b>${esc(String(v))}</b><span>${esc(l)}</span></div>`).join("")}</div>
+    ${type === "s" ? progRowHTML(name) : ""}
     <h3 class="exd-h">Best set per session</h3>
     <div class="chart">${window.Chart ? '<canvas id="chExd"></canvas>' : '<p class="hint">Charts need an internet connection the first time the app loads.</p>'}</div>
     <h3 class="exd-h">History</h3><div class="exd-list">${rows}</div>`;
@@ -5950,6 +5969,7 @@ function ptSteps(plan){
 
 /* ----- the tab ----- */
 function renderPT(){
+  try { renderGuard(); } catch(e){}
   const c = ptCfg(), t = today(), mon = mondayOf(t), wk = ptDays().filter(d => d >= mon).length, g = c.goal || 5;
   const log = ptLog()[t], doneToday = log && (log.sessions || []).some(s => s.steps);
   const gs = goalStreak(ptDays(), g);
@@ -6068,11 +6088,11 @@ function startPT(){
   ptReady(5);
   clearInterval(pp.iv); pp.iv = setInterval(ptTick, 200); syncWake();
 }
-function ptReady(sec){ pp.phase = "ready"; pp.end = Date.now() + sec * 1000; pp.lastBeep = -1; ptRender(); }
+function ptReady(sec){ pp.phase = "ready"; pp.end = Date.now() + sec * 1000; pp.lastBeep = -1; ptRender(); ptVoiceReady(); }
 const ptCamKind = st => { const k = st && st.kind === "reps" ? camKind(st.name) : null; return k && !(state.camOff || {})[k] ? k : null; };
 function ptStopCam(){ if (pp.camOn){ stopCam(); pp.camOn = false; } }
 function ptGo(){
-  const st = pp.steps[pp.i]; tones(880, 1); buzz([120]);
+  const st = pp.steps[pp.i]; tones(880, 1); buzz([120]); say(st.kind === "hold" ? "Go." : `Go. ${st.target || 10} reps.`);
   if (st.kind === "hold"){ pp.phase = "hold"; pp.end = Date.now() + st.target * 1000; pp.lastBeep = -1; pp.lastMark = 0; pp.halfDone = false; }
   else { pp.phase = "reps"; pp.reps = ptCamKind(st) ? 0 : (st.target || 10); pp.end = Date.now(); }
   ptRender();
@@ -6097,7 +6117,7 @@ function ptTick(){
   /* during a hold: a tick every 10 seconds, two higher beeps on each half minute, three at the halfway point */
   if (pp.phase === "hold" && left > 3){
     const el = st.target - left, mark = Math.floor(el / 10), halfAt = Math.round(st.target / 2);
-    if (st.target >= 40 && el >= halfAt && !pp.halfDone){ pp.halfDone = true; pp.lastMark = Math.max(pp.lastMark || 0, mark); tones(1046, 3, .14); buzz([90, 70, 90, 70, 90]); }
+    if (st.target >= 40 && el >= halfAt && !pp.halfDone){ pp.halfDone = true; pp.lastMark = Math.max(pp.lastMark || 0, mark); tones(1046, 3, .14); buzz([90, 70, 90, 70, 90]); say("Halfway."); }
     else if (mark > (pp.lastMark || 0)){
       pp.lastMark = mark;
       if ((mark * 10) % 30 === 0){ tones(988, 2, .18); buzz([140, 90, 140]); }
@@ -6118,7 +6138,7 @@ function ptRender(){
   if (ph === "reps"){
     mid = `<div class="pt-split"><div class="pt-media">` + (ck ? `<div class="cam-view wo-cam pt-cam"><video id="ptVideo" playsinline muted autoplay></video><canvas id="ptCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="ptCount">${pp.reps}</div></div>
         <p class="cam-msg" id="ptCamMsg">Starting the camera…</p>
-        <div class="wo-camlinks"><button class="link" data-pt="camtips">Where to put the phone</button><button class="link" data-pt="camoff">Camera off</button></div>`
+        <div class="wo-camlinks"><button class="link" data-pt="camtips">Where to put the phone</button><button class="link" data-pt="camoff">Camera off</button><button class="link" data-camwrong>Count was off?</button></div>`
       : (camKind(st.name) ? '<button class="link wo-camlinks" data-pt="camon">Count with the camera</button>' : "")) + `</div><div class="pt-ctl"><div class="wo-step"><span>Reps${st.reps && /-/.test(st.reps) ? " (aim " + st.reps + ")" : ""}</span><div class="stepper"><button data-pt="r-" aria-label="Fewer">−</button><b id="ptReps">${pp.reps}</b><button data-pt="r+" aria-label="More">+</button></div></div>
       <button class="finish-btn pt-btn" data-pt="done">Done${nx ? " · next" : " · finish"}</button></div></div>`;
   } else {
@@ -6379,9 +6399,395 @@ function pastScriptsHTML(){
     <button class="link" data-restore="${P.length - 1 - n}">Go back to this script</button></details>`).join("")}</div>`;
 }
 
+/* =========================================================
+   RELIABILITY: device check, sync history, problem reports, camera traces
+   ========================================================= */
+const DEV_KEY = "tally.dev", ERR_KEY = "tally.errors", TRACE_KEY = "tally.camTraces";
+let devInfo = null;
+try { devInfo = JSON.parse(store.get(DEV_KEY)); } catch(e){}
+if (!devInfo || !devInfo.id){
+  const ua = navigator.userAgent, ipad = /iPad/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
+  devInfo = {id: uid(), name: ipad ? "iPad" : /iPhone/.test(ua) ? "iPhone" : /Android/.test(ua) ? "Android" : /Macintosh/.test(ua) ? "Mac" : "This device"};
+  store.set(DEV_KEY, JSON.stringify(devInfo));
+}
+/* this device's line in the shared device list: refreshed when the version changes or every few hours */
+function stampDevice(){
+  const D = state.devices = state.devices || {}, me = D[devInfo.id];
+  if (!me || me.ver !== APP_VERSION || me.name !== devInfo.name || Date.now() - (me.last || 0) > 6 * 3600e3)
+    D[devInfo.id] = {name: devInfo.name, ver: APP_VERSION, last: Date.now()};
+}
+function mergeDevices(a, b){
+  const out = {};
+  [a || {}, b || {}].forEach(src => Object.entries(src).forEach(([id, d]) => { if (!out[id] || (d.last || 0) > (out[id].last || 0)) out[id] = clone(d); }));
+  return out;
+}
+function devicesHTML(){
+  const D = state.devices || {}, ids = Object.keys(D).sort((a, b) => (a === devInfo.id ? -1 : b === devInfo.id ? 1 : (D[b].last || 0) - (D[a].last || 0)));
+  if (!ids.length) return "";
+  const warn = [];
+  ids.forEach(id => {
+    if (id === devInfo.id) return;
+    const d = D[id];
+    if (isNewer(APP_VERSION, d.ver)) warn.push(`${esc(d.name)} is on ${esc(d.ver)}. Open Tally there to update.`);
+    else if (isNewer(d.ver, APP_VERSION)) warn.push(`Your ${esc(d.name)} has a newer version (${esc(d.ver)}). This one updates the next time you reopen Tally.`);
+  });
+  return `<div class="dev-list">${ids.map(id => { const d = D[id], me = id === devInfo.id;
+      return `<div class="dev"><b>${esc(d.name)}${me ? " (this one)" : ""}</b><span>version ${esc(d.ver)} · ${me ? "now" : "seen " + agoText(d.last || 0)}</span></div>`; }).join("")}
+    ${warn.map(w => `<p class="dev-warn">${w}</p>`).join("")}</div>`;
+}
+let updateNudged = false;
+function checkDeviceVersions(){
+  const D = state.devices || {};
+  if (!updateNudged && Object.keys(D).some(id => id !== devInfo.id && isNewer(D[id].ver, APP_VERSION))){ updateNudged = true; try { checkForUpdate(false); } catch(e){} }
+}
+
+/* ----- sync history: every sync is a revision of the gist; any of them can be restored ----- */
+async function loadHistory(){
+  const box = $("#histBody");
+  box.innerHTML = '<p class="hint">Loading your sync history…</p>';
+  try {
+    const list = await (await ghFetch(`https://api.github.com/gists/${syncCfg.gistId}/commits?per_page=40`)).json();
+    if (!list.length){ box.innerHTML = '<p class="hint">No history yet.</p>'; return; }
+    box.innerHTML = `<p class="note">Every sync saves a copy. Tap one to see what's in it, then restore it if you need to. Your data right now is saved first, so a restore can be undone.</p>
+      <div class="hist">${list.map((c, n) => { const d = new Date(c.committed_at);
+        return `<div class="hist-row" data-ver="${esc(c.version)}"><button class="hist-head" data-hprev="${esc(c.version)}"><b>${d.toLocaleDateString(undefined, {weekday:"short", month:"short", day:"numeric"})} · ${d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"})}</b><span>${n ? "" : "latest · "}${agoText(d.getTime())}</span></button><div class="hist-body"></div></div>`; }).join("")}</div>`;
+  } catch(err){ box.innerHTML = `<p class="hint">${err.code === 401 ? "GitHub didn't accept the token." : "Couldn't load history. Check your connection and try again."}</p>`; }
+}
+async function fetchRevision(ver){
+  const g = await (await ghFetch(`https://api.github.com/gists/${syncCfg.gistId}/${ver}`)).json();
+  const f = g.files && g.files[SYNC_FILE]; if (!f) return null;
+  const txt = f.truncated ? await (await fetch(f.raw_url, {cache:"no-store"})).text() : f.content;
+  return JSON.parse(txt);
+}
+function snapshotSummary(d){
+  const days = Object.keys(d.workouts || {}).sort(), ptd = Object.keys(d.ptLog || {}).length;
+  let sets = 0; days.forEach(k => (d.workouts[k] || []).forEach(e => sets += (e.sets || []).length));
+  const devs = Object.values(d.devices || {}).sort((a, b) => (b.last || 0) - (a.last || 0));
+  return [`${days.length} days logged${days.length ? `, latest ${shortDate(days[days.length - 1])}` : ""}`, `${fmtN(sets)} sets`, `${(d.templates || []).length} templates`,
+    d.pt && d.pt.plan ? `PT plan "${d.pt.plan.name}" (${d.pt.plan.items.length} exercises), ${ptd} PT days` : "no PT plan",
+    devs[0] ? `last from ${devs[0].name} on ${devs[0].ver}` : ""].filter(Boolean);
+}
+$("#histBody").addEventListener("click", async e => {
+  const pv = e.target.closest("[data-hprev]"), rs = e.target.closest("[data-hrestore]");
+  if (pv){
+    const row = pv.closest(".hist-row"), body = row.querySelector(".hist-body");
+    if (row.classList.toggle("open") && !body.innerHTML){
+      body.innerHTML = '<p class="hint">Loading…</p>';
+      try { const d = await fetchRevision(pv.dataset.hprev); row._data = d;
+        body.innerHTML = `<ul>${snapshotSummary(d).map(x => `<li>${esc(x)}</li>`).join("")}</ul><button class="btn ghost" data-hrestore="${esc(pv.dataset.hprev)}">Restore this version</button>`;
+      } catch(err){ body.innerHTML = '<p class="hint">Couldn\'t load this version.</p>'; }
+    }
+    return;
+  }
+  if (rs){
+    const row = rs.closest(".hist-row"), d = row._data; if (!d) return;
+    if (!confirm("Restore this version on all your devices? What's on this device now is saved first, so you can undo it.")) return;
+    try {
+      store.set(KEY + ".prerestore", JSON.stringify(state));
+      const latest = await pullRemote();
+      const keep = {}; LOCAL_ONLY.forEach(k => keep[k] = state[k]);
+      state = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), clone(d), keep);
+      if (state.pt) state.pt.at = Date.now();
+      lastPtSig = ptSig(state.pt);
+      store.set(SYNC_BASE, JSON.stringify(latest || {}));       /* everything restored counts as this device's change */
+      syncApplying = true; save(); syncApplying = false;
+      closeSheet($("#histSheet")); refreshAll(); await syncNow(true);
+      toast("Restored. Undo from Settings if it's not right.");
+      renderSyncStatus();
+    } catch(err){ toast("Couldn't restore. Check your connection and try again."); }
+  }
+});
+$("#openHistory").onclick = () => { closeSheet($("#settings")); openSheet($("#histSheet")); loadHistory(); };
+$("#undoRestore").onclick = () => {
+  const prev = store.get(KEY + ".prerestore"); if (!prev) return;
+  if (!confirm("Go back to how things were before the restore?")) return;
+  const latest = (() => { try { return JSON.parse(store.get(SYNC_BASE)); } catch(e){ return {}; } })();
+  state = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), JSON.parse(prev)); if (state.pt) state.pt.at = Date.now(); lastPtSig = ptSig(state.pt);
+  store.set(SYNC_BASE, JSON.stringify(latest || {})); store.set(KEY + ".prerestore", "");
+  save(); refreshAll(); renderSettings(); syncNow(true); toast("Undone.");
+};
+
+/* ----- error log and problem report ----- */
+function logErr(msg, where){
+  try {
+    const L = JSON.parse(store.get(ERR_KEY) || "[]");
+    const last = L[L.length - 1]; if (last && last.m === String(msg) && Date.now() - last.t < 5000) return;
+    L.push({t: Date.now(), v: APP_VERSION, m: String(msg).slice(0, 300), w: String(where || "").slice(-80), tab: typeof lastTab !== "undefined" ? lastTab : ""});
+    store.set(ERR_KEY, JSON.stringify(L.slice(-30)));
+  } catch(e){}
+}
+window.addEventListener("error", e => logErr(e.message, (e.filename || "").split("/").pop() + ":" + e.lineno + ":" + e.colno));
+window.addEventListener("unhandledrejection", e => logErr("Promise: " + (e.reason && (e.reason.stack || e.reason.message) || e.reason)));
+function reportText(note){
+  const errs = (() => { try { return JSON.parse(store.get(ERR_KEY) || "[]"); } catch(e){ return []; } })();
+  const traces = (() => { try { return JSON.parse(store.get(TRACE_KEY) || "[]"); } catch(e){ return []; } })();
+  const days = Object.keys(state.workouts || {});
+  const lines = [
+    "TALLY PROBLEM REPORT",
+    note ? "What happened: " + note : "",
+    `Version ${APP_VERSION} on ${devInfo.name} · ${innerWidth}×${innerHeight} · ${matchMedia("(display-mode: standalone)").matches || navigator.standalone ? "home screen app" : "browser"}`,
+    `Agent: ${navigator.userAgent}`,
+    `Sync: ${syncCfg.token ? (syncCfg.status || "?") + (syncCfg.last ? ", last " + agoText(syncCfg.last) : "") + (syncCfg.error ? ", " + syncCfg.error : "") : "off"}`,
+    "Devices: " + (Object.values(state.devices || {}).map(d => `${d.name} ${d.ver} (${agoText(d.last || 0)})`).join("; ") || "none"),
+    `Data: ${days.length} days, ${Object.keys(state.sessions || {}).length} days with sessions, ${(state.templates || []).length} templates, PT ${ptOn() ? "on" : "off"}, ${Object.keys(state.ptLog || {}).length} PT days`,
+    `Settings: unit ${state.unit}, rest ${state.rest}s, goal ${state.goal}, mobility goal ${state.mobGoal || 3}, voice ${state.voice === false ? "off" : "on"}, gym ${Object.keys(gymHas()).filter(k => gymHas()[k]).join("/")}`,
+    "",
+    errs.length ? `Recent errors (${errs.length}):` : "No errors recorded.",
+    ...errs.slice(-15).map(x => `• ${new Date(x.t).toLocaleString()} [${x.v}${x.tab ? ", " + x.tab : ""}] ${x.m} @ ${x.w}`),
+  ];
+  if (traces.length){
+    lines.push("", `Camera sets marked as miscounted (${traces.length}):`);
+    traces.slice(-4).forEach(tr => lines.push(`• ${new Date(tr.when).toLocaleString()} ${tr.kind}${tr.view ? " (" + tr.view + ")" : ""}: counted ${tr.counted}, actually ${tr.actual}, ${tr.trace.length} samples at 10/s`, "  depth 0-9, | = counted rep, - = not tracking:", "  " + tr.trace.match(/.{1,120}/g).join("\n  ")));
+  }
+  return lines.filter((x, i) => x !== "" || lines[i - 1] !== "").join("\n");
+}
+function openReport(){
+  closeSheet($("#settings"));
+  const render = () => { $("#reportText").textContent = reportText($("#reportNote").value.trim()); };
+  $("#reportNote").value = ""; render(); $("#reportNote").oninput = render;
+  openSheet($("#reportSheet"));
+}
+$("#openReport").onclick = openReport;
+$("#reportCopy").onclick = async () => { const t = reportText($("#reportNote").value.trim()); try { await navigator.clipboard.writeText(t); toast("Copied. Paste it to Claude."); } catch(e){ toast("Press and hold the report to copy it."); } };
+$("#reportShare").onclick = async () => { const t = reportText($("#reportNote").value.trim()); if (navigator.share){ try { await navigator.share({title:"Tally problem report", text:t}); } catch(e){} } else $("#reportCopy").click(); };
+$("#reportClear").onclick = () => { if (!confirm("Clear the error log and saved camera sets?")) return; store.set(ERR_KEY, "[]"); store.set(TRACE_KEY, "[]"); $("#reportText").textContent = reportText($("#reportNote").value.trim()); toast("Cleared."); };
+
+/* ----- camera: a trace of each set, kept if you say the count was off ----- */
+function traceFrame(t){
+  const c = cam.c; if (!c) return;
+  if (t - (cam.traceT || 0) < 100) return;
+  cam.traceT = t;
+  cam.trace += c.phase === "setup" || c.depth == null ? "-" : String(Math.max(0, Math.min(9, Math.round((c.depth || 0) * 9))));
+  if (cam.trace.length > 1200) cam.trace = cam.trace.slice(-1200);
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-camwrong]"); if (!b || !cam.c) return;
+  e.preventDefault(); e.stopPropagation();
+  const counted = cam.c.reps, ans = prompt(`The camera counted ${counted}. How many reps did you actually do?`, String(counted));
+  if (ans == null) return;
+  const actual = Math.max(0, parseInt(ans, 10) || 0);
+  try {
+    const L = JSON.parse(store.get(TRACE_KEY) || "[]");
+    L.push({when: Date.now(), kind: cam.kind, view: cam.c.view || cam.c.side || "", counted, actual, trace: cam.trace || ""});
+    store.set(TRACE_KEY, JSON.stringify(L.slice(-8)));
+  } catch(err){}
+  if (actual !== counted){ cam.c.reps = actual; if (cam.onRep) cam.onRep(actual); }
+  toast("Saved. Send it from Settings → Report a problem.");
+}, true);
+
+/* =========================================================
+   VOICE COACH: spoken cues in every player
+   ========================================================= */
+const hasVoice = "speechSynthesis" in window;
+const voiceOn = () => hasVoice && state.voice !== false;
+let voicePick = null, voiceUnlocked = false;
+function pickVoice(){
+  try {
+    const en = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+    voicePick = en.find(v => /en[-_]US/i.test(v.lang) && /Enhanced|Premium|Siri/i.test(v.name)) || en.find(v => /Samantha|Ava|Allison|Karen|Daniel/i.test(v.name)) || en.find(v => v.localService) || en[0] || null;
+  } catch(e){}
+}
+if (hasVoice){ pickVoice(); try { speechSynthesis.addEventListener("voiceschanged", pickVoice); } catch(e){} }
+function say(text, queue){
+  if (!voiceOn() || !text) return;
+  try {
+    if (!queue) speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (voicePick){ u.voice = voicePick; u.lang = voicePick.lang; } else u.lang = "en-US";
+    u.rate = 1.05; speechSynthesis.speak(u);
+  } catch(e){}
+}
+/* iPhone only lets a page talk after a tap: say nothing once on the first one */
+document.addEventListener("pointerdown", () => {
+  if (voiceUnlocked || !hasVoice) return; voiceUnlocked = true;
+  try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch(e){}
+}, true);
+const secWords = s => s >= 60 && s % 60 === 0 ? `${s / 60} ${s === 60 ? "minute" : "minutes"}` : s > 60 ? `${Math.floor(s / 60)} minute ${s % 60}` : `${s} seconds`;
+const sideWord = s => s === "L" ? "left side" : s === "R" ? "right side" : "";
+function ptVoiceReady(){
+  const st = pp.steps[pp.i], pv = pp.steps[pp.i - 1]; if (!st) return;
+  const what = st.kind === "hold" ? secWords(st.target) : `${st.target} reps`;
+  if (pv && pv.i === st.i && pv.set === st.set && st.side && pv.side !== st.side) say(`Switch sides. ${sideWord(st.side)}.`);
+  else if (pv && pv.i === st.i && pv.set !== st.set) say(`Rest. Then set ${st.set} of ${st.sets}${st.side ? ", " + sideWord(st.side) : ""}.`);
+  else say(`${pp.i ? "Next" : "First"}: ${st.name}${st.side ? ", " + sideWord(st.side) : ""}${st.dir ? ", " + st.dir : ""}${st.sets > 1 ? `, set ${st.set} of ${st.sets}` : ""}. ${what}.`);
+}
+function mobVoiceReady(){
+  const st = player.steps[player.i], pv = player.steps[player.i - 1]; if (!st) return;
+  if (pv && pv.id === st.id && st.side && pv.side !== st.side) say(`Switch sides.`);
+  else say(`${player.i ? "Next" : "First"}: ${st.name}${st.side ? ", " + sideWord(st.side) : ""}. ${secWords(st.sec)}.`);
+}
+$("#voiceSeg").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.voice = b.dataset.voice === "1"; save(); renderSettings();
+  if (state.voice) say("Voice coach on.");
+});
+
+/* =========================================================
+   KEYBOARD (iPad on a Magic Keyboard)
+   ========================================================= */
+const KB_MAP = {
+  ptPlayer: {go:['[data-pt="done"]', '#ptTime.ready', '[data-pt="pause"]:not([disabled])'], next:['[data-pt="skip"]'], skip:['[data-pt="skip"]'], up:['[data-pt="r+"]'], down:['[data-pt="r-"]'], pause:['[data-pt="pause"]:not([disabled])']},
+  woPlayer: {go:['[data-wo="hold"].ready', '[data-wo="done"]', '[data-wo="skiprest"]', '[data-wo-go]'], prev:['[data-wo="prev"]:not([disabled])'], next:['[data-wo="next"]:not([disabled])'], skip:['[data-wo="skiprest"]'], up:['[data-wo="r+"]'], down:['[data-wo="r-"]']},
+  mobPlayer: {go:['#plTime.ready', '#plPause'], next:['#plSkip'], skip:['#plSkip'], pause:['#plPause']},
+  ivPlayer: {go:['#ivTime.ready', '#ivPause'], next:['#ivSkip'], skip:['#ivSkip'], pause:['#ivPause']}
+};
+document.addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const tg = e.target; if (tg && (tg.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName))) return;
+  const id = Object.keys(KB_MAP).find(k => { const el = document.getElementById(k); return el && el.classList.contains("open"); });
+  if (!id) return;
+  const k = e.key, act = k === " " || k === "Enter" ? "go" : k === "ArrowLeft" ? "prev" : k === "ArrowRight" ? "next" : k === "+" || k === "=" || k === "ArrowUp" ? "up" : k === "-" || k === "_" || k === "ArrowDown" ? "down" : /^s$/i.test(k) ? "skip" : /^p$/i.test(k) ? "pause" : k === "Escape" ? "close" : "";
+  if (!act) return;
+  const sheet = document.getElementById(id);
+  const sels = act === "close" ? ["[data-close]", "[data-close-player]"] : KB_MAP[id][act] || [];
+  const btn = sels.map(s => sheet.querySelector(s)).find(b => b && b.offsetParent !== null);
+  e.preventDefault();
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  if (btn) btn.click();
+});
+
+/* =========================================================
+   PROGRESSION TARGETS: aim one rep higher once every set hits the mark
+   ========================================================= */
+const progOf = name => (state.prog || {})[name];
+function progAim(e, k){
+  const g = e && progOf(e.name); if (!g || !g.goal || e.type !== "s") return null;
+  const pv = lastTime(e.name, k || today());
+  const reps = pv ? pv.entry.sets.filter(filled).map(s => num(s.r)).filter(Boolean) : [];
+  if (!reps.length) return {aim:g.goal, goal:g.goal, reached:false};
+  const lo = Math.min(...reps), hi = Math.max(...reps);
+  return {aim:Math.min(g.goal, lo === hi ? hi + 1 : hi), goal:g.goal, reached:lo >= g.goal, last:reps};
+}
+function progRowHTML(name){
+  const g = progOf(name), pa = progAim({name, type:"s"}, addDays(today(), 1));
+  return `<div class="exd-goal"><p>Rep goal<small>${g ? (pa && pa.reached ? "Goal reached on every set. Raise it?" : `Next time, aim for ${pa ? pa.aim : g.goal} on every set. When you hit it on all of them, the aim goes up by one.`) : "Set a goal and Tally adds one rep at a time to get you there."}</small></p>
+    <div class="stepper"><button data-pg="-" aria-label="Lower goal">−</button><b>${g ? g.goal : "Off"}</b><button data-pg="+" aria-label="Raise goal">+</button></div></div>`;
+}
+$("#exdBody").addEventListener("click", e => {
+  const b = e.target.closest("[data-pg]"); if (!b) return;
+  const name = $("#exdTitle").textContent, P = state.prog = state.prog || {}, g = P[name];
+  if (b.dataset.pg === "+"){
+    if (g) g.goal++;
+    else { const pv = lastTime(name, addDays(today(), 1)), best = pv ? Math.max(...pv.entry.sets.filter(filled).map(s => num(s.r)), 0) : 0; P[name] = {goal: best ? best + 3 : 10}; }
+  } else if (g){ if (g.goal <= 1 || (g.goal <= 2)) delete P[name]; else g.goal--; }
+  save();
+  const row = $("#exdBody .exd-goal"); if (row) row.outerHTML = progRowHTML(name);
+});
+
+/* =========================================================
+   REHAB GUARD: while PT is on, keep risky moves away from a sore area
+   ========================================================= */
+const GUARD_AREAS = [["ankle", "Ankle"], ["knee", "Knee"], ["hip", "Hip"], ["shoulder", "Shoulder"], ["wrist", "Wrist"], ["back", "Low back"]];
+const GUARD_RE = {
+  ankle: /jump|hop\b|hops\b|bound|plyo|skipping|\bskips?\b|sprint|burpee|skater|pogo|agility|ladder|shuffle|carioca|high knees|cutting|lateral bound/i,
+  knee: /jump|hop\b|hops\b|bound|plyo|sprint|burpee|skater|pistol|cossack|pogo|tuck/i,
+  hip: /jump|hop\b|hops\b|bound|plyo|sprint|burpee|skater|cossack|kicks?\b/i,
+  shoulder: /overhead|snatch|jerk|handstand|\bdips?\b|muscle.?up|kipping|upright row|behind.the.neck|pullover|military press|push press|arnold/i,
+  wrist: /push.?ups?|press.?ups?|handstand|front squat|burpee|\bclean\b|\bdips?\b|bear crawl|mountain climber/i,
+  back: /deadlift|good morning|bent.?over|snatch|\bclean\b|swing|sit.?ups?|jefferson|hyperextension|back extension|superman/i
+};
+const guardAreas = () => ptOn() ? (ptCfg().guard || []) : [];
+function guardHit(name){ for (const a of guardAreas()) if (GUARD_RE[a] && GUARD_RE[a].test(name || "")) return a; return null; }
+const guardWord = a => (GUARD_AREAS.find(x => x[0] === a) || [a, a])[1].toLowerCase();
+const guardTag = name => { const a = guardHit(name); return a ? `<span class="guard-tag" title="Hard on your ${guardWord(a)}">Easy on ${guardWord(a)}</span>` : ""; };
+function renderGuard(){
+  const box = $("#ptGuard"); if (!box) return;
+  if (!ptOn()){ box.innerHTML = ""; box.hidden = true; return; }
+  box.hidden = false;
+  const g = ptCfg().guard || [];
+  box.innerHTML = `<h2>Protect while you rehab</h2><p class="note">Pick what you're rehabbing. Suggestions skip jumps, hops and other moves that are hard on it, and anything risky gets flagged.</p>
+    <div class="guard-chips">${GUARD_AREAS.map(([k, l]) => `<button class="chip" data-guard="${k}" aria-pressed="${g.includes(k)}">${l}</button>`).join("")}</div>`;
+}
+$("#ptGuard").addEventListener("click", e => {
+  const b = e.target.closest("[data-guard]"); if (!b) return;
+  const c = ptCfg(), g = new Set(c.guard || []), k = b.dataset.guard;
+  if (g.has(k)) g.delete(k); else g.add(k);
+  c.guard = [...g]; save(); renderGuard(); renderLog();
+});
+
+/* =========================================================
+   WEEKLY PLAN
+   ========================================================= */
+const WD = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], WD_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], WD_ORDER = [1, 2, 3, 4, 5, 6, 0];
+const PLAN_CARDIO = ["Run", "Walk", "Bike", "Swim", "Row", "Soccer", "Golf", "Cardio"];
+const planFor = wd => ((state.weekPlan || {})[wd] || []).filter(it => it.t !== "pt" || ptOn());
+const planTypeVar = t => t === "tpl" ? "--str" : t === "mob" ? "--mob" : t === "pt" ? "--pt" : "--car";
+const allRoutines = () => [...STARTER_ROUTINES, ...(state.mobRoutines || [])];
+function planOptions(){
+  return [["Strength templates", state.templates.map(t => ({t:"tpl", name:t.name}))],
+    ["Mobility routines", allRoutines().map(r => ({t:"mob", name:r.name}))],
+    ptOn() ? ["Physical therapy", [{t:"pt", name:"PT"}]] : null,
+    ["Cardio", PLAN_CARDIO.map(n => ({t:"cardio", name:n}))]].filter(x => x && x[1].length);
+}
+function entryDone(e, k){
+  if (e.sets.some(s => s.done)) return true;
+  const s = e.sid && ((state.sessions || {})[k] || []).find(x => x.id === e.sid);
+  return s ? !!s.end && e.sets.some(filled) : e.sets.some(filled);
+}
+function planItemDone(it, k){
+  const E = entries(k);
+  if (it.t === "tpl"){ const T = state.templates.find(t => t.name === it.name);
+    return E.some(e => isStr(e) && entryDone(e, k) && ((e.from && e.from.name === it.name) || (T && T.items.some(x => x.name === e.name)))); }
+  if (it.t === "mob"){ const R = allRoutines().find(r => r.name === it.name), names = R ? R.items.map(x => Array.isArray(x) ? x[0] : x.name) : [];
+    const ms = E.filter(e => e.type === "m" && e.sets.some(filled)); return names.length ? ms.some(e => names.includes(e.name)) : ms.length > 0; }
+  if (it.t === "pt") return ((ptLog()[k] || {}).sessions || []).some(s => s.steps && s.steps.length);
+  if (it.t === "cardio") return E.some(e => e.type === "c" && e.sets.some(filled));
+  return false;
+}
+function planWeek(mon, end){
+  let planned = 0, done = 0; const missed = [];
+  for (let k = mon; k <= end && k <= today(); k = addDays(k, 1)){
+    planFor(dateOf(k).getDay()).forEach(it => { planned++; if (planItemDone(it, k)) done++; else if (k < today()) missed.push(`${it.t === "pt" ? "PT" : it.name} (${WD[dateOf(k).getDay()]})`); });
+  }
+  return {planned, done, missed};
+}
+function renderPlanCard(){
+  const box = $("#planCard"); if (!box) return;
+  const t = today(), items = curDate === t ? planFor(dateOf(t).getDay()) : [];
+  box.hidden = !items.length;
+  if (!items.length){ box.innerHTML = ""; return; }
+  const nDone = items.filter(it => planItemDone(it, t)).length;
+  box.innerHTML = `<div class="rc-top"><span>Today's plan · ${WD_FULL[dateOf(t).getDay()]}</span><button class="link" data-plan="edit">Edit week</button></div>
+    <div class="plan-list">${items.map((it, n) => { const d = planItemDone(it, t), tpl = it.t === "tpl" && state.templates.find(x => x.name === it.name);
+      const risky = tpl ? tpl.items.map(x => guardHit(x.name)).find(Boolean) : null;
+      const btn = d ? `<span class="plan-done">${CHECK_SVG}Done</span>` : it.t === "tpl" ? (tpl ? `<button class="btn ghost" data-plan="go" data-n="${n}">Load</button>` : `<span class="plan-miss">Template not found</span>`) : it.t === "cardio" ? `<button class="btn ghost" data-plan="go" data-n="${n}">Log</button>` : `<button class="btn ghost" data-plan="go" data-n="${n}">Start</button>`;
+      return `<div class="plan-row${d ? " done" : ""}" style="--c:var(${planTypeVar(it.t)})"><i></i><span><b>${esc(it.t === "pt" ? "Physical therapy" : it.name)}</b><small>${it.t === "tpl" ? "Strength" : it.t === "mob" ? "Mobility" : it.t === "pt" ? (ptCfg().plan ? ptCfg().plan.name : "PT") : "Cardio"}${risky ? ` · has moves that are hard on your ${guardWord(risky)}` : ""}</small></span>${btn}</div>`; }).join("")}</div>
+    <p class="plan-sum">${nDone} of ${items.length} done</p>`;
+}
+$("#planCard").addEventListener("click", e => {
+  const b = e.target.closest("[data-plan]"); if (!b) return;
+  if (b.dataset.plan === "edit") return openPlan();
+  const it = planFor(dateOf(today()).getDay())[+b.dataset.n]; if (!it) return;
+  if (it.t === "tpl"){ const i = state.templates.findIndex(x => x.name === it.name); if (i >= 0){ curDate = today(); loadTemplate(i); } }
+  else if (it.t === "mob"){ const r = allRoutines().find(x => x.name === it.name); if (r){ showTab("mobility"); startRoutine(r); } }
+  else if (it.t === "pt"){ showTab("pt"); if (ptCfg().plan && ptCfg().plan.items.length) startPT(); }
+  else showTab("cardio");
+});
+function renderPlanSheet(){
+  const opts = planOptions();
+  $("#planBody").innerHTML = `<p class="note">Plan what you'll do each day. Today's plan shows up on the Strength tab, and the weekly recap counts what got done.</p>
+    ${WD_ORDER.map(wd => { const items = (state.weekPlan || {})[wd] || [];
+      return `<div class="plan-day"><b>${WD[wd]}</b><div class="plan-chips">${items.map((it, n) => `<button class="lchip" style="--c:var(${planTypeVar(it.t)})" data-prm="${wd}:${n}" aria-label="Remove ${esc(it.name)}">${esc(it.t === "pt" ? "PT" : it.name)}<span aria-hidden="true">×</span></button>`).join("")}
+        <select data-wd="${wd}" aria-label="Add to ${WD_FULL[wd]}"><option value="">+ Add</option>${opts.map(([g, xs]) => `<optgroup label="${esc(g)}">${xs.map(x => `<option value="${esc(x.t + "|" + x.name)}">${esc(x.t === "pt" ? "PT session" : x.name)}</option>`).join("")}</optgroup>`).join("")}</select></div></div>`; }).join("")}
+    <button class="link" id="planClear">Clear the whole week</button>`;
+}
+function openPlan(){ closeSheet($("#settings")); renderPlanSheet(); openSheet($("#planSheet")); }
+$("#planBody").addEventListener("change", e => {
+  const s = e.target.closest("select[data-wd]"); if (!s || !s.value) return;
+  const [t, ...rest] = s.value.split("|"), wd = s.dataset.wd, P = state.weekPlan = state.weekPlan || {};
+  (P[wd] = P[wd] || []).push({t, name:rest.join("|")}); save(); renderPlanSheet(); renderPlanCard();
+});
+$("#planBody").addEventListener("click", e => {
+  const r = e.target.closest("[data-prm]");
+  if (r){ const [wd, n] = r.dataset.prm.split(":"); state.weekPlan[wd].splice(+n, 1); if (!state.weekPlan[wd].length) delete state.weekPlan[wd]; save(); renderPlanSheet(); renderPlanCard(); return; }
+  if (e.target.id === "planClear" && confirm("Clear your weekly plan?")){ state.weekPlan = {}; save(); renderPlanSheet(); renderPlanCard(); }
+});
+$("#openPlan").onclick = openPlan;
+$("#openPlan2").onclick = openPlan;
+
 $("#openIntervals").onclick = openIntervals;
 $("#exDetailBtn").onclick = () => { const n = $("#exSelect").value; if (n) openExDetail(n); };
-window.__tally = {curlStep, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
+window.__tally = {curlStep, openCam, stopCam, suggestFor, guardHit, progAim, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
 
 /* ---------- full-height fix for iPhone home-screen apps ---------- */
 function setAppHeight(){ document.documentElement.style.setProperty("--app-h", Math.max(window.innerHeight, screen.height && window.navigator.standalone ? screen.height : 0) + "px"); }
