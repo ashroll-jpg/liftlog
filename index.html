@@ -1227,6 +1227,37 @@ input,select,textarea{font-size:16px}
 @media (min-width:900px){.cam-state{font-size:18px;padding:10px 22px;top:18px}.cam-view.ready{box-shadow:inset 0 0 0 10px var(--mob),0 0 40px rgba(78,154,107,.5)}.cam-tools .btn{font-size:15px;padding:12px 18px}}
 @media (prefers-reduced-motion:reduce){.cam-state{animation:none}}
 .pl-skipex{display:block;margin:10px auto 0;color:var(--mute);font-size:14px}
+/* 5.2: last / average / goal */
+.wo-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(100%,520px);margin:8px auto 4px}
+.wo-stats>div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;border-radius:12px;background:var(--surface-2,#1D1D20);border:1px solid var(--line)}
+.wo-stats span{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);white-space:nowrap}
+.wo-stats b{font-family:var(--mono);font-size:24px;line-height:1.1;font-variant-numeric:tabular-nums}
+.wo-stats .g{border-color:color-mix(in srgb,var(--str) 60%,transparent);background:color-mix(in srgb,var(--str) 14%,transparent)}
+.wo-stats .g b{color:var(--str)}
+.wo-stats.hit .g{background:var(--mob);border-color:var(--mob);animation:pop .4s var(--spring,ease)}
+.wo-stats.hit .g b,.wo-stats.hit .g span{color:#fff}
+.wo-stats.in-ctl{display:none}
+@media (min-width:900px) and (orientation:landscape){.wo-stats.in-head{display:none}.wo-stats.in-ctl{display:grid;margin:0 auto 10px}}
+@media (min-width:900px){.wo-stats{width:min(100%,640px);gap:12px}.wo-stats>div{padding:12px 8px}.wo-stats span{font-size:13px}.wo-stats b{font-size:clamp(30px,3.6vw,46px)}}
+/* 5.2: keep the whole control column on screen on a landscape iPad */
+@media (min-width:900px) and (orientation:landscape) and (max-height:1000px){
+  .wo-stats.in-ctl{margin:0 auto 4px;gap:8px}
+  .wo-stats>div{padding:6px 6px}
+  .wo-stats span{font-size:11px}
+  .wo-stats b{font-size:clamp(24px,2.8vw,34px)}
+  .wo-ctl .wo-step .stepper button{width:56px;height:56px;font-size:28px}
+  .wo-ctl .wo-step .stepper b{font-size:clamp(40px,4.6vw,60px)}
+  .wo-ctl .wo-step{padding:6px 0}
+  .wo-ctl .cam-tools{margin:0 0 2px}
+  .wo-ctl .cam-tools .btn{padding:8px 12px;font-size:13px}
+  .wo-ctl .wo-settime{font-size:15px}.wo-ctl .wo-settime b{font-size:22px}
+  .wo-ctl .wo-actions .finish-btn{padding:18px;font-size:20px}
+  .wo-ctl{gap:2px}
+}
+@media (max-width:600px){
+  .wo-stats{gap:6px;margin:4px auto 2px}.wo-stats>div{padding:5px 4px}.wo-stats b{font-size:21px}.wo-stats span{font-size:9.5px}
+  .wo-ctl .wo-actions{position:sticky;bottom:0;z-index:3;width:100%;padding-top:10px;background:linear-gradient(transparent,var(--bg) 30%)}
+}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1734,7 +1765,7 @@ input,select,textarea{font-size:16px}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "5.1.1";
+const APP_VERSION = "5.2.2";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -4804,7 +4835,8 @@ function pushupStep(c, lm, t){
        model often guesses hips below the shoulders too, but the knees and ankles are hidden behind you */
     const hipV = (lH.v + rH.v) / 2, hipDrop = ((lH.y + rH.y)/2 - (lS.y + rS.y)/2) / sw;
     const legV = Math.min(vis(lm[25]) + vis(lm[26]), vis(lm[27]) + vis(lm[28])) / 2;
-    if (hipV > .65 && hipDrop > 1.05 && legV > .55) upright = true;      /* standing or kneeling tall */
+    const ankD = ((lm[27].y + lm[28].y) / 2 - (lm[25].y + lm[26].y) / 2) / sw;
+    if (hipV > .65 && hipDrop > 1.05 && legV > .55 && ankD > .8) upright = true;   /* standing: hips, knees and ankles stacked below you */
     const wrV = (lW.v + rW.v) / 2 > .5;
     if (wrV && (lW.y + rW.y)/2 < (lS.y + rS.y)/2) upright = true;       /* hands above shoulders: not a pushup */
     y = (lS.y + rS.y) / 2; scale = sw; need = .45;
@@ -4829,10 +4861,20 @@ function pushupStep(c, lm, t){
     c.upN = (c.upN || 0) + 1;
     if (c.upN > 12 || c.phase === "setup"){ c.msg = view === "front" ? "Get into a plank facing the phone." : "Get into a plank, side on to the phone."; c.phase = "setup"; c.seen = 0; c.topY = null; return false; }
   } else c.upN = 0;
+  /* facing the phone, your hands must be in view below your shoulders (stops counts while you walk up to the phone) */
+  if (view === "front"){
+    const wv = (lW.v + rW.v) / 2, wy = (lW.y + rW.y) / 2;
+    if (wv < .5 || wy < (lS.y + rS.y) / 2 + .3 * sw){ c.handsOut = (c.handsOut || 0) + 1; if (c.handsOut > 10){ c.msg = "Put your hands on the floor or handles, in view of the camera."; if (c.phase === "down") c.phase = "up"; c.topY = null; return false; } }
+    else c.handsOut = 0;
+  }
 
   c.y = c.y == null ? y : c.y * .5 + y * .5;
   if (c.phase !== "down") c.scale = c.scale == null ? scale : c.scale * .9 + scale * .1;
   /* your top position: follows you up instantly, drifts down slowly only while you're at the top, frozen during a rep */
+  /* stuck in the bottom half for over 3.5 s means the starting height was wrong (you got set up after the camera
+     started, or moved the phone): measure it again from the last couple of seconds */
+  c.hist = (c.hist || []).filter(h => t - h.t < 2500); c.hist.push({t, y:c.y});
+  if (c.phase === "down"){ if (!c.downAt) c.downAt = t; else if (t - c.downAt > 3500){ c.topY = Math.min(...c.hist.map(h => h.y)); c.phase = "up"; c.downAt = 0; } }
   if (c.topY == null) c.topY = c.y;
   else if (c.phase === "down") c.topY = Math.min(c.topY, c.y);
   else c.topY = Math.min(c.y, c.topY + (c.y - c.topY < need * .5 * (c.scale || scale) ? .002 * (c.scale || scale) : 0));
@@ -4843,7 +4885,7 @@ function pushupStep(c, lm, t){
   const angDown = c.ang != null && c.angTop > 140 && c.ang < c.angTop - 55;
   const angUp = c.ang != null && c.ang > c.angTop - 18;
   if (c.phase === "up"){
-    if (drop > need || angDown){ c.phase = "down"; c.msg = "Push up"; c.wr0 = view === "front" && (lW.v + rW.v) / 2 > .5 ? (lW.y + rW.y) / 2 : null; }
+    if (drop > need || angDown){ c.phase = "down"; c.downAt = t; c.msg = "Push up"; c.wr0 = view === "front" && (lW.v + rW.v) / 2 > .5 ? (lW.y + rW.y) / 2 : null; }
     else c.msg = drop > need * .5 ? "Lower" : "Go down";
     return false;
   }
@@ -5230,6 +5272,7 @@ function closeWoPlayer(silent){
   if (!silent) renderLog();
 }
 function wpEnter(idx){
+  wp.ready = false;
   if (wp.camOn){ stopCam(); wp.camOn = false; }
   const e = wpList()[idx]; if (!e){ wp.phase = "alldone"; return wpRender(); }
   wp.idx = idx;
@@ -5238,12 +5281,14 @@ function wpEnter(idx){
   const s = e.sets[j], prev = e.sets.slice(0, j).reverse().find(x => x.done);
   wp.phase = "set"; wp.setStart = Date.now(); wp.holdStart = 0; wp.lastMark = 0;
   wp.reps = num(s.r) || (prev ? num(prev.r) : 0) || 10;
-  const pa = progAim(e, wp.k);
+  const pa = progAim(e, wp.k), sst = setStats(e, j, wp.k);
+  wp.goalSaid = false;
   if (pa && !s.done) wp.reps = j > 0 && prev && num(prev.r) < pa.aim ? num(prev.r) : pa.aim;   /* aim for the target */
+  else if (sst && !s.done && e.type === "s") wp.reps = sst.goal;                                 /* start the stepper at your goal */
   if (usesCam(e)) wp.reps = 0;   /* the camera counts from zero */
   wp.w = num(s.w) || (prev ? num(prev.w) : 0);
   wpRender();
-  say(`${j === 0 ? e.name + ". " : ""}Set ${j + 1} of ${e.sets.length}.${pa ? ` Aim for ${pa.aim}.` : ""}`);
+  say(`${j === 0 ? e.name + ". " : ""}Set ${j + 1} of ${e.sets.length}.${sst ? ` Goal: ${sst.timed ? secWords(sst.goal) : sst.goal}.` : ""}`);
 }
 function wpNextTarget(idx){
   const list = wpList(), order = wpOrder(), pos = order.indexOf(idx), e = list[idx];
@@ -5282,9 +5327,51 @@ function wpDone(){
   if (pg && pg.goal && e.type === "s" && num(s.r) >= pg.goal && pg.hit !== wp.k){ pg.hit = wp.k; save(); toast(`Goal reached: ${pg.goal} ${e.name}. Raise it from the exercise's page.`, true); say(`Goal reached. ${pg.goal} reps.`, true); flash(); }
   const nx = wpNextTarget(wp.idx);
   if (!nx){ wp.phase = "alldone"; return wpRender(); }
-  if (nx.rest && state.rest > 0) wpRest(nx.idx, state.rest); else wpEnter(nx.idx);
+  if (nx.rest && state.rest > 0) wpRest(nx.idx, state.rest);
+  else if (nx.idx !== wp.idx) wpGetReady(nx.idx);       /* new exercise with no rest planned: 5 seconds to move and grab equipment */
+  else wpEnter(nx.idx);
 }
-function wpRest(after, sec){ wp.phase = "rest"; wp.after = after; wp.restLen = sec; wp.restEnd = Date.now() + sec * 1000; wp.lastBeep = -1; wpRender();
+/* last time, your average and a goal for this set, from up to 6 earlier sessions of the same exercise.
+   Goal: if you matched or beat your average last time, one more rep (or 5 more seconds); if you fell below it,
+   get back to your average. A rep goal you set on the exercise's page wins. */
+function setStats(e, j, k){
+  if (!e || (e.type !== "s" && e.type !== "t")) return null;
+  const timed = e.type === "t", val = x => timed ? parseSec(x.sec) : num(x.r);
+  const days = Object.keys(state.workouts).filter(d => d < k).sort().reverse(), sess = [];
+  for (const d of days){
+    const x = entries(d).find(y => y.name === e.name && y.sets.some(filled));
+    if (x){ const v = x.sets.filter(filled).map(val).filter(n => n > 0); if (v.length) sess.push(v); if (sess.length >= 6) break; }
+  }
+  if (!sess.length) return null;
+  const at = a => a[Math.min(Math.max(0, j), a.length - 1)];
+  const last = at(sess[0]), vals = sess.map(at), avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+  const step = timed ? 5 : 1, pa = progAim(e, k);
+  let goal = pa ? pa.aim : last >= avg - .01 ? last + step : Math.max(last + step, Math.ceil(avg));
+  if (!pa && !timed && last < avg) goal = Math.ceil(avg);
+  return {last, avg, goal, timed, n:sess.length, set:goal && pa ? pa.goal : null};
+}
+function statsHTML(st, where){
+  if (!st) return "";
+  const f = v => st.timed ? fmtSec(Math.round(v)) : Math.abs(v - Math.round(v)) < .05 ? String(Math.round(v)) : v.toFixed(1);
+  return `<div class="wo-stats ${where || "in-head"}" data-goal="${st.goal}">
+    <div><span>Last time</span><b>${f(st.last)}</b></div>
+    <div><span>Average${st.n > 1 ? ` · ${st.n}` : ""}</span><b>${f(st.avg)}</b></div>
+    <div class="g"><span>${st.set ? `Goal · aim ${st.set}` : "Goal"}</span><b>${f(st.goal)}</b></div></div>`;
+}
+function wpGoalMark(){
+  const gs = document.querySelectorAll("#woBody .wo-stats"), g = gs[0]; if (!g) return;
+  const goal = +g.dataset.goal, e = wpList()[wp.idx];
+  const v = e && e.type === "t" ? (wp.holdStart ? Math.floor((Date.now() - wp.holdStart) / 1000) : 0) : wp.reps;
+  const hit = goal > 0 && v >= goal;
+  gs.forEach(x => { if (hit !== x.classList.contains("hit")) x.classList.toggle("hit", hit); });
+  if (hit && !wp.goalSaid && (wp.camOn || (e && e.type === "t"))){ wp.goalSaid = true; tones(1318, 2, .1); buzz([80, 60, 80]); say("Goal!", true); }
+}
+function wpGetReady(idx){
+  if (wp.camOn){ stopCam(); wp.camOn = false; }
+  wp.idx = idx; wp.phase = "rest"; wp.ready = true; wp.after = idx; wp.restLen = 5; wp.restEnd = Date.now() + 5000; wp.lastBeep = -1; wpRender();
+  const e = wpList()[idx]; if (e) say(`Next up, ${e.name}. Get ready.`);
+}
+function wpRest(after, sec){ wp.ready = false; wp.phase = "rest"; wp.after = after; wp.restLen = sec; wp.restEnd = Date.now() + sec * 1000; wp.lastBeep = -1; wpRender();
   const nx = wpList()[after]; say(`Rest ${secWords(sec)}.${nx && after !== wp.idx ? " Next up, " + nx.name + "." : ""}`); }
 function wpAddSet(idx){
   const e = wpList()[idx]; if (!e) return;
@@ -5298,6 +5385,7 @@ function wpTick(){
   if (wp.phase === "set"){
     const base = wpList()[wp.idx] && wpList()[wp.idx].type === "t" ? wp.holdStart : wp.setStart;
     if (T("woSet")) T("woSet").textContent = base ? fmtHMS(Math.floor((now - base) / 1000)) : "0:00";
+    wpGoalMark();
     if (wp.holdStart){
       const mark = Math.floor((now - wp.holdStart) / 10000);
       if (mark > wp.lastMark){ wp.lastMark = mark; if (mark % 3 === 0){ tones(988, 2, .2); buzz([150, 100, 150]); say(secWords(mark * 10)); } else tones(700, 1); }
@@ -5329,7 +5417,7 @@ function wpRender(){
     const target = pset ? (e.type === "t" ? `Last time ${fmtSec(parseSec(pset.sec))}` : `Last time ${bw ? "" : (pset.w ? pset.w + "×" : "")}${pset.r || "–"}`) + " · beat it" : "";
     const doneMarks = e.sets.filter(x => x.done).length;
     const stampHTML = doneMarks ? `<div class="wo-tally">${tallySVG(Array.from({length:doneMarks}, () => "var(--accent)"))}</div>` : "";
-    const head = `<h3 class="pl-name">${esc(e.name)}</h3>${stampHTML}<div class="pl-side">${j >= 0 ? `Set ${j + 1} of ${n}` : `${doneN} ${doneN === 1 ? "set" : "sets"} done`}${wp.phase === "set" && progAim(e, wp.k) ? ` · <b class="aim">Aim ${progAim(e, wp.k).aim} · goal ${progAim(e, wp.k).goal}</b>` : target && wp.phase === "set" ? ` · ${target}` : ""}</div>`;
+    const head = `<h3 class="pl-name">${esc(e.name)}</h3>${stampHTML}<div class="pl-side">${j >= 0 ? `Set ${j + 1} of ${n}` : `${doneN} ${doneN === 1 ? "set" : "sets"} done`}${wp.phase !== "set" && target ? ` · ${target}` : ""}</div>${wp.phase === "set" ? statsHTML(setStats(e, j, wp.k)) : ""}`;
     const cam = usesCam(e) && wp.phase === "set";
     const media = cam
       ? `<div class="cam-view wo-cam"><video id="woVideo" playsinline muted autoplay></video><canvas id="woCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="woCount">${wp.reps}</div></div><p class="cam-msg" id="woCamMsg">Starting the camera…</p>`
@@ -5339,15 +5427,15 @@ function wpRender(){
       const inputs = e.type === "t"
         ? `<div class="wo-hold"><button class="pl-time${wp.holdStart ? "" : " ready"}" data-wo="hold" id="woSet">${wp.holdStart ? fmtHMS(Math.floor((Date.now() - wp.holdStart) / 1000)) : "0:00"}</button><span class="pl-phase">${wp.holdStart ? "Holding · tap Done when you stop" : "Tap the time to start the hold"}${PER_SIDE_RE.test(e.name) ? " · per side" : ""}</span></div>${bw ? "" : stepper("w", "Weight", wp.w, " " + state.unit)}`
         : `${stepper("r", cam ? "Reps (counted for you)" : "Reps", wp.reps)}${cam ? CAM_TOOLS("wo") : ""}${bw ? "" : stepper("w", "Weight", wp.w, " " + state.unit)}<div class="wo-settime">Set time <b id="woSet">0:00</b></div>`;
-      mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl">${inputs}<div class="wo-actions"><button class="finish-btn" data-wo="done">Done · next set</button></div></div>`;
+      mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl">${statsHTML(setStats(e, j, wp.k), "in-ctl")}${inputs}<div class="wo-actions"><button class="finish-btn" data-wo="done">Done · next set</button></div></div>`;
     } else if (wp.phase === "rest"){
       const nxE = list[wp.after], nxJ = nxE ? undoneJ(nxE) : -1;
-      const nxt = nxE ? (wp.after === wp.idx ? `Next: set ${nxJ + 1}` : `Next: ${esc(nxE.name)}`) : "";
-      mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl"><div class="wo-rest"><span class="iv-label rest">Rest</span>
+      const nxt = wp.ready ? `Up next · set ${nxJ + 1} of ${nxE ? nxE.sets.length : 1}${nxE && usesCam(nxE) ? " · get in front of the camera" : ""}` : nxE ? (wp.after === wp.idx ? `Next: set ${nxJ + 1}` : `Next: ${esc(nxE.name)}`) : "";
+      mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl"><div class="wo-rest"><span class="iv-label rest">${wp.ready ? "Get ready" : "Rest"}</span>
         <div class="rest-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="rr-bg" cx="60" cy="60" r="54"/><circle class="rr-fg" id="woRing" cx="60" cy="60" r="54" pathLength="100"/></svg><div class="pl-time" id="woRest">${fmtHMS(Math.max(0, Math.ceil((wp.restEnd - Date.now()) / 1000)))}</div></div>
         <div class="pl-next">${nxt}</div></div>
-        <div class="wo-row3"><button class="btn ghost" data-wo="rest-">−15s</button><button class="btn ghost" data-wo="rest+">+15s</button><button class="btn" data-wo="skiprest">Skip rest</button></div>
-        <button class="link wo-addset" data-wo="addset">+ Add another set of ${esc(e.name)}</button></div>`;
+        <div class="wo-row3"><button class="btn ghost" data-wo="rest-">−15s</button><button class="btn ghost" data-wo="rest+">+15s</button><button class="btn" data-wo="skiprest">${wp.ready ? "Start now" : "Skip rest"}</button></div>
+        ${wp.ready ? "" : `<button class="link wo-addset" data-wo="addset">+ Add another set of ${esc(e.name)}</button>`}</div>`;
     } else if (wp.phase === "exdone"){
       mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl"><div class="wo-actions"><button class="btn ghost wide" data-wo="addset">+ Add a set</button></div></div>`;
     }
@@ -5367,6 +5455,7 @@ function wpCam(){
   camRun({video:$("#woVideo"), canvas:$("#woCanvas"), msg:$("#woCamMsg")}, n => {
     wp.reps = n; const c = $("#woCount"); if (c){ c.textContent = n; c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
     const b = document.querySelector('#woBody .wo-step b'); if (b){ b.textContent = n; replay(b, "bump"); }
+    wpGoalMark();
   }, e ? camKind(e.name) : "pushup");
 }
 $("#woBody").addEventListener("click", ev => {
@@ -5377,7 +5466,7 @@ $("#woBody").addEventListener("click", ev => {
   if (a === "end"){ if (confirm("End this session?")) endSession(wp.k, wpSess()); return; }
   if (a === "prev" && pos > 0) return wpEnter(order[pos - 1]);
   if (a === "next" && pos < order.length - 1) return wpEnter(order[pos + 1]);
-  if (a === "skiprest") return wpEnter(wp.after);
+  if (a === "skiprest") return !wp.ready && wp.after !== wp.idx ? wpGetReady(wp.after) : wpEnter(wp.after);   /* skipping a rest into a new exercise still gives you 5 seconds to get there */
   if (a === "rest-" || a === "rest+"){ wp.restEnd += (a === "rest+" ? 15 : -15) * 1000; wp.restLen = Math.max(1, wp.restLen + (a === "rest+" ? 15 : -15)); wpTick(); return; }
   if (a === "addset") return wpAddSet(wp.idx >= 0 ? wp.idx : order[order.length - 1]);
   if (a === "addex"){ closeWoPlayer(); $("#openPicker").click(); return; }
@@ -5391,7 +5480,7 @@ $("#woBody").addEventListener("click", ev => {
     wpRender(); toast(a === "camoff" ? "Camera off. Set your reps with + and −." : "Camera on."); return;
   }
   if (a === "hold"){ if (!wp.holdStart){ wp.holdStart = Date.now(); wp.lastMark = 0; tones(880, 1); wpRender(); } return; }
-  if (a === "r-" || a === "r+"){ wp.reps = Math.max(0, wp.reps + (a === "r+" ? 1 : -1)); b.parentElement.querySelector("b").textContent = wp.reps; const c = $("#woCount"); if (c) c.textContent = wp.reps; if (cam.c){ cam.c.reps = wp.reps; cam.manual = (cam.manual || 0) + (a === "r+" ? 1 : -1); } return; }
+  if (a === "r-" || a === "r+"){ wp.reps = Math.max(0, wp.reps + (a === "r+" ? 1 : -1)); b.parentElement.querySelector("b").textContent = wp.reps; const c = $("#woCount"); if (c) c.textContent = wp.reps; if (cam.c){ cam.c.reps = wp.reps; cam.manual = (cam.manual || 0) + (a === "r+" ? 1 : -1); } wpGoalMark(); return; }
   if (a === "w-" || a === "w+"){ const st = state.unit === "kg" ? 2.5 : 5; wp.w = Math.max(0, Math.round((wp.w + (a === "w+" ? st : -st)) * 10) / 10); b.parentElement.querySelector("b").textContent = wp.w + " " + state.unit; return; }
 });
 document.querySelectorAll("#woPlayer [data-close]").forEach(b => b.addEventListener("click", () => closeWoPlayer()));
@@ -5732,6 +5821,10 @@ function dropCount(c, y, scale, need, t, angDown, angUp){
   c.y = c.y == null ? y : c.y * .5 + y * .5;
   if (c.phase !== "down") c.scale = c.scale == null ? scale : c.scale * .9 + scale * .1;
   const S = c.scale || scale;
+  /* stuck in the bottom half for over 3.5 s means the starting height was wrong (you got set up after the camera
+     started, or moved the phone): measure it again from the last couple of seconds */
+  c.hist = (c.hist || []).filter(h => t - h.t < 2500); c.hist.push({t, y:c.y});
+  if (c.phase === "down"){ if (!c.downAt) c.downAt = t; else if (t - c.downAt > 3500){ c.topY = Math.min(...c.hist.map(h => h.y)); c.phase = "up"; c.downAt = 0; } }
   if (c.topY == null) c.topY = c.y;
   else if (c.phase === "down") c.topY = Math.min(c.topY, c.y);
   else c.topY = Math.min(c.y, c.topY + (c.y - c.topY < need * .5 * S ? .002 * S : 0));
@@ -5739,7 +5832,7 @@ function dropCount(c, y, scale, need, t, angDown, angUp){
   c.depth = Math.max(0, Math.min(1, drop / need));
   c.seen = (c.seen || 0) + 1;
   if (c.phase === "setup" || !c.phase){ if (c.seen > 4){ c.phase = "up"; c.msg = "Go down"; } else c.msg = "Stand tall for a second"; return false; }
-  if (c.phase === "up"){ if (drop > need || angDown){ c.phase = "down"; c.msg = "Up"; } else c.msg = drop > need * .5 ? "Lower" : "Go down"; return false; }
+  if (c.phase === "up"){ if (drop > need || angDown){ c.phase = "down"; c.downAt = t; c.msg = "Up"; } else c.msg = drop > need * .5 ? "Lower" : "Go down"; return false; }
   if ((drop < need * .35 || (angUp && drop < need * .7)) && t - (c.lastRep || 0) > 450){ c.reps++; c.lastRep = t; c.phase = "up"; c.msg = "Good"; return true; }
   c.msg = "Up";
   return false;
