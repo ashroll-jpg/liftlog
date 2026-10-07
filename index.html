@@ -1226,6 +1226,7 @@ input,select,textarea{font-size:16px}
 @keyframes camPulse{0%,100%{opacity:1}50%{opacity:.55}}
 @media (min-width:900px){.cam-state{font-size:18px;padding:10px 22px;top:18px}.cam-view.ready{box-shadow:inset 0 0 0 10px var(--mob),0 0 40px rgba(78,154,107,.5)}.cam-tools .btn{font-size:15px;padding:12px 18px}}
 @media (prefers-reduced-motion:reduce){.cam-state{animation:none}}
+.pl-skipex{display:block;margin:10px auto 0;color:var(--mute);font-size:14px}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1733,7 +1734,7 @@ input,select,textarea{font-size:16px}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "5.1.0";
+const APP_VERSION = "5.1.1";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -4005,7 +4006,8 @@ function renderPlayer(){
     <div class="pl-bar"><i id="plBar" style="width:0%"></i></div>
     <div class="pl-phase">${paused ? "Paused" : p.phase === "ready" ? "Reset · starts by itself · tap the time to start now" : "Hold"}</div>
     <div class="pl-next">${nx ? "Next: " + esc(nx.name) + (nx.side ? " · " + sideTxt(nx.side).toLowerCase() : "") : "Last one"}</div>
-    <div class="pl-ctrl"><button class="btn ghost" id="plPause">${paused ? "Resume" : "Pause"}</button><button class="btn ghost" id="plSkip">Skip</button><button class="btn ghost" id="plEnd">End</button></div>
+    <div class="pl-ctrl"><button class="btn ghost" id="plPause">${paused ? "Resume" : "Pause"}</button>${ready ? '<button class="btn" id="plSkipRest">Skip rest</button>' : '<button class="btn ghost" id="plSkip">Skip</button>'}<button class="btn ghost" id="plEnd">End</button></div>
+    ${ready ? '<button class="link pl-skipex" id="plSkip">Skip this one</button>' : ""}
   </div>`;
   animSet(st.name, st.side, $("#plBody"));
 }
@@ -4018,6 +4020,7 @@ $("#plBody").addEventListener("click", e => {
     else if (p.phase === "ready" || p.phase === "hold"){ p.was = p.phase; p.left = Math.max(0, Math.ceil((p.end - Date.now())/1000)); p.phase = "paused"; }
     renderPlayer(); return;
   }
+  if (e.target.closest("#plSkipRest")){ if (p.phase === "paused") p.phase = p.was; if (p.phase === "ready") playerHold(); return; }
   if (e.target.closest("#plSkip")){
     const st = p.steps[p.i];
     const heldFor = p.phase === "hold" ? st.sec - Math.max(0, (p.end - Date.now())/1000) : p.phase === "paused" && p.was === "hold" ? st.sec - p.left : 0;
@@ -6266,7 +6269,8 @@ function ptRender(){
     ${ck ? "" : FIG_SVG.replace('class="pl-fig"', `class="pl-fig${ph === "ready" ? " ready" : ""}"`)}
     ${mid}
     <div class="pl-next">${esc(nextTxt)}</div>
-    <div class="pl-ctrl"><button class="btn ghost" data-pt="pause"${ph === "reps" ? " disabled" : ""}>${paused ? "Resume" : "Pause"}</button><button class="btn ghost" data-pt="skip">Skip</button><button class="btn ghost" data-pt="end">End</button></div>
+    <div class="pl-ctrl"><button class="btn ghost" data-pt="pause"${ph === "reps" ? " disabled" : ""}>${paused ? "Resume" : "Pause"}</button>${ph === "ready" ? '<button class="btn" data-pt="skiprest">Skip rest</button>' : '<button class="btn ghost" data-pt="skip">Skip</button>'}<button class="btn ghost" data-pt="end">End</button></div>
+    ${ph === "ready" ? '<button class="link pl-skipex" data-pt="skip">Skip this exercise</button>' : ""}
   </div>`;
   if (ck){
     if (!pp.camOn){
@@ -6283,6 +6287,7 @@ $("#ptBody").addEventListener("click", e => {
   const b = e.target.closest("[data-pt]"); if (!b) return;
   const a = b.dataset.pt, st = pp.steps[pp.i];
   if (a === "now" && pp.phase === "ready") return ptGo();
+  if (a === "skiprest"){ if (pp.phase === "paused") pp.phase = pp.was; if (pp.phase === "ready") return ptGo(); return; }
   if (a === "r-" || a === "r+"){ pp.reps = Math.max(0, pp.reps + (a === "r+" ? 1 : -1)); $("#ptReps").textContent = pp.reps; replay($("#ptReps"), "bump"); const c = $("#ptCount"); if (c) c.textContent = pp.reps; if (cam.c){ cam.c.reps = pp.reps; cam.manual = (cam.manual || 0) + (a === "r+" ? 1 : -1); } return; }
   if (a === "camtips"){ if (cam.els) camTips(cam.els, cam.kind, true); return; }
   if (a === "camoff" || a === "camon"){
@@ -6298,7 +6303,10 @@ $("#ptBody").addEventListener("click", e => {
     else if (pp.phase === "ready" || pp.phase === "hold"){ pp.was = pp.phase; pp.left = Math.max(0, Math.ceil((pp.end - Date.now()) / 1000)); pp.phase = "paused"; }
     return ptRender();
   }
-  if (a === "skip"){ ptStopCam(); if (pp.phase === "paused") pp.phase = pp.was; pp.i++; if (pp.i >= pp.steps.length) return ptFinish(); return ptReady(5); }
+  if (a === "skip"){ ptStopCam(); if (pp.phase === "paused") pp.phase = pp.was;
+    const cur = pp.steps[pp.i].i, all = b.classList.contains("pl-skipex");   /* the link skips every set left of this exercise */
+    pp.i++; while (all && pp.i < pp.steps.length && pp.steps[pp.i].i === cur) pp.i++;
+    if (pp.i >= pp.steps.length) return ptFinish(); return ptReady(5); }
   if (a === "end"){ if (!pp.done.length || confirm("End the PT session? What you've done so far is saved.")) ptFinish(); }
 });
 setInterval(() => { const c = document.getElementById("ptClock"); if (c && pp.iv) c.textContent = fmtHMS(Math.round((Date.now() - pp.t0) / 1000)); }, 1000);
@@ -6733,9 +6741,9 @@ $("#voiceSeg").addEventListener("click", e => {
    KEYBOARD (iPad on a Magic Keyboard)
    ========================================================= */
 const KB_MAP = {
-  ptPlayer: {go:['[data-pt="done"]', '#ptTime.ready', '[data-pt="pause"]:not([disabled])'], next:['[data-pt="skip"]'], skip:['[data-pt="skip"]'], up:['[data-pt="r+"]'], down:['[data-pt="r-"]'], pause:['[data-pt="pause"]:not([disabled])']},
+  ptPlayer: {go:['[data-pt="done"]', '#ptTime.ready', '[data-pt="pause"]:not([disabled])'], next:['[data-pt="skip"]'], skip:['[data-pt="skiprest"]', '[data-pt="skip"]'], up:['[data-pt="r+"]'], down:['[data-pt="r-"]'], pause:['[data-pt="pause"]:not([disabled])']},
   woPlayer: {go:['[data-wo="hold"].ready', '[data-wo="done"]', '[data-wo="skiprest"]', '[data-wo-go]'], prev:['[data-wo="prev"]:not([disabled])'], next:['[data-wo="next"]:not([disabled])'], skip:['[data-wo="skiprest"]'], up:['[data-wo="r+"]'], down:['[data-wo="r-"]']},
-  mobPlayer: {go:['#plTime.ready', '#plPause'], next:['#plSkip'], skip:['#plSkip'], pause:['#plPause']},
+  mobPlayer: {go:['#plTime.ready', '#plPause'], next:['#plSkip'], skip:['#plSkipRest', '#plSkip'], pause:['#plPause']},
   ivPlayer: {go:['#ivTime.ready', '#ivPause'], next:['#ivSkip'], skip:['#ivSkip'], pause:['#ivPause']}
 };
 document.addEventListener("keydown", e => {
