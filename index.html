@@ -1215,6 +1215,17 @@ input,select,textarea{font-size:16px}
 .ss-link.on svg{color:#151515}
 .ss-tag{font-size:12px;color:var(--str)}
 @media (min-width:900px){.ss-link{font-size:14px;padding:11px 22px;margin:14px auto}.ss-link svg{width:18px;height:18px}}
+/* 5.1: camera tools + ready light */
+.cam-tools{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:2px 0 6px}
+.cam-tools .btn{padding:7px 12px;font-size:12px;min-height:0}
+@media (max-width:600px){.cam-tools{margin:0 0 2px;gap:6px}}
+.cam-state{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:2;padding:7px 16px;border-radius:999px;font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(231,176,74,.92);color:#151515;box-shadow:0 4px 16px rgba(0,0,0,.4);pointer-events:none;animation:camPulse 1.6s ease-in-out infinite}
+.cam-view{transition:box-shadow .25s}
+.cam-view.ready{box-shadow:inset 0 0 0 6px var(--mob),0 0 28px rgba(78,154,107,.45)}
+.cam-view.ready .cam-state{background:var(--mob);color:#fff;animation:none}
+@keyframes camPulse{0%,100%{opacity:1}50%{opacity:.55}}
+@media (min-width:900px){.cam-state{font-size:18px;padding:10px 22px;top:18px}.cam-view.ready{box-shadow:inset 0 0 0 10px var(--mob),0 0 40px rgba(78,154,107,.5)}.cam-tools .btn{font-size:15px;padding:12px 18px}}
+@media (prefers-reduced-motion:reduce){.cam-state{animation:none}}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1593,7 +1604,7 @@ input,select,textarea{font-size:16px}
     <div class="cam-view"><video id="camVideo" playsinline muted autoplay></video><canvas id="camCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="camReps" aria-live="polite">0</div></div>
     <p class="cam-msg" id="camMsg"></p>
     <div class="cam-ctrl"><button class="btn ghost" id="camFlip">Flip</button><button class="btn ghost" id="camReset">Reset</button><button class="btn" id="camSave" disabled>Save</button></div>
-    <p class="note cam-note"><button class="link" id="camTipsBtn">Where to put the phone</button> · <button class="link" data-camwrong>Count was off?</button> · Video stays on your phone.</p>
+    <p class="note cam-note"><button class="link" id="camTipsBtn">Where to put the phone</button> · <button class="link" data-camwrong>Fix count</button> · Video stays on your phone.</p>
   </div>
 </div>
 <div class="sheet" id="ptEditSheet" role="dialog" aria-modal="true" aria-labelledby="ptEditTitle">
@@ -1722,7 +1733,7 @@ input,select,textarea{font-size:16px}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "5.0.3";
+const APP_VERSION = "5.1.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -4770,14 +4781,27 @@ function pushupStep(c, lm, t){
   const sw = Math.hypot(lS.x - rS.x, lS.y - rS.y);
   const frontOK = lS.v > .5 && rS.v > .5 && sw > .06;
   const sideScore = q => q === "L" ? lS.v + lE.v + lW.v : rS.v + rE.v + rW.v;
+  /* which way you face: decided once, and only changed if the other view holds for over half a second while
+     you're not mid-rep. At the bottom of a rep facing a low phone the shoulders often blur out for a few frames,
+     which used to flip the view and throw the rep away */
   let view = c.view;
-  if (!view || (view === "front" && !frontOK) || (view === "side" && frontOK && sw > .1)) view = frontOK ? "front" : "side";
-  if (view !== c.view){ Object.assign(c, {view, phase:"setup", seen:0, topY:null, scale:null, ang:null, angTop:0}); }
+  const want = frontOK ? "front" : "side";
+  if (!view) view = want;
+  else if (want !== view && !(view === "side" && sw <= .1)){ c.vsw = (c.vsw || 0) + 1; if (c.phase === "setup" || (c.vsw > 18 && c.phase !== "down") || c.vsw > 60) view = want; }
+  else c.vsw = 0;
+  if (view !== c.view){ c.vsw = 0; Object.assign(c, {view, phase:"setup", seen:0, topY:null, scale:null, ang:null, angTop:0}); }
+  if (view === "front" && !frontOK){                    /* lost the shoulders for a moment: keep the rep going */
+    if (c.phase !== "down") c.msg = "Keep your head and shoulders in view.";
+    return false;
+  }
 
   let y, scale, need, upright = false, angRep = false;
   if (view === "front"){
+    /* standing: hips well below the shoulders AND the legs clearly in view. In a plank facing a low phone the
+       model often guesses hips below the shoulders too, but the knees and ankles are hidden behind you */
     const hipV = (lH.v + rH.v) / 2, hipDrop = ((lH.y + rH.y)/2 - (lS.y + rS.y)/2) / sw;
-    if (hipV > .65 && hipDrop > 1.05) upright = true;                    /* standing or kneeling tall */
+    const legV = Math.min(vis(lm[25]) + vis(lm[26]), vis(lm[27]) + vis(lm[28])) / 2;
+    if (hipV > .65 && hipDrop > 1.05 && legV > .55) upright = true;      /* standing or kneeling tall */
     const wrV = (lW.v + rW.v) / 2 > .5;
     if (wrV && (lW.y + rW.y)/2 < (lS.y + rS.y)/2) upright = true;       /* hands above shoulders: not a pushup */
     y = (lS.y + rS.y) / 2; scale = sw; need = .45;
@@ -4816,12 +4840,15 @@ function pushupStep(c, lm, t){
   const angDown = c.ang != null && c.angTop > 140 && c.ang < c.angTop - 55;
   const angUp = c.ang != null && c.ang > c.angTop - 18;
   if (c.phase === "up"){
-    if (drop > need || angDown){ c.phase = "down"; c.msg = "Push up"; }
+    if (drop > need || angDown){ c.phase = "down"; c.msg = "Push up"; c.wr0 = view === "front" && (lW.v + rW.v) / 2 > .5 ? (lW.y + rW.y) / 2 : null; }
     else c.msg = drop > need * .5 ? "Lower" : "Go down";
     return false;
   }
   if (c.phase === "down"){
-    if ((drop < need * .35 || (angUp && drop < need * .7)) && t - c.lastRep > 400){ c.reps++; c.lastRep = t; c.phase = "up"; c.msg = "Good"; return true; }
+    if ((drop < need * .35 || (angUp && drop < need * .7)) && t - c.lastRep > 400){
+      /* facing the phone, your hands stay planted through a rep; if they moved a lot you were getting up or reaching for the phone */
+      if (c.wr0 != null && (lW.v + rW.v) / 2 > .5 && Math.abs((lW.y + rW.y) / 2 - c.wr0) > .6 * (c.scale || scale)){ c.phase = "up"; c.msg = "Go down"; return false; }
+      c.reps++; c.lastRep = t; c.phase = "up"; c.msg = "Good"; return true; }
     c.msg = "Push up";
   }
   return false;
@@ -4902,7 +4929,8 @@ function camTipsHTML(kind){
 /* ----- the camera loop, shared by the Count sheet and the session player ----- */
 async function camRun(els, onRep, kind){
   stopCam();
-  Object.assign(cam, {els, c:newCounter(), lastT:-1, onRep, kind:kind || "pushup", trace:"", traceT:0});
+  Object.assign(cam, {els, c:newCounter(), lastT:-1, onRep, kind:kind || "pushup", trace:"", traceT:0, ready:false, rN:0, lN:0, traced:false, manual:0});
+  if (els.video && els.video.parentElement){ els.video.parentElement.classList.remove("ready"); const pl = els.video.parentElement.querySelector(".cam-state"); if (pl) pl.textContent = "Starting…"; }
   camTips(els, cam.kind, false);
   camMsg("Starting the camera…");
   let stream;
@@ -4932,7 +4960,7 @@ async function camRun(els, onRep, kind){
       try { const r = lm.detectForVideo(v, t); pts = r && r.landmarks && r.landmarks[0]; } catch(err){}
       const rep = (CAM_STEP[cam.kind] || pushupStep)(cam.c, pts, t);
       if (screen.orientation && /landscape/.test(screen.orientation.type || "") && (v.videoHeight > v.videoWidth)) cam.c.msg = "Turn the phone upright. The counter needs a portrait picture.";
-      drawPose(pts); traceFrame(t); if (rep) cam.trace += "|";
+      drawPose(pts); traceFrame(t); if (rep) cam.trace += "|"; camReadyState(v);
       const dp = v.parentElement && v.parentElement.querySelector(".cam-depth i");
       if (dp){ dp.style.height = Math.round((cam.c.phase === "setup" ? 0 : cam.c.depth || 0) * 100) + "%"; dp.parentElement.classList.toggle("deep", cam.c.phase === "down"); }
       if (rep){ tones(880, 1); buzz([60]); replay(v.parentElement, "repflash"); if (cam.onRep) cam.onRep(cam.c.reps); say(String(cam.c.reps)); }
@@ -4980,6 +5008,30 @@ function drawPose(pts){
     g.strokeStyle = side.includes(a) && side.includes(b) ? "#B38B2D" : "rgba(242,239,232,.55)";
     const [x1, y1] = P(pts[a]), [x2, y2] = P(pts[b]); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
   });
+}
+const CAM_TOOLS = k => `<div class="cam-tools"><button class="btn ghost" data-camwrong>Fix count</button><button class="btn ghost" data-${k}="camtips">Phone tips</button><button class="btn ghost" data-${k}="camoff">Camera off</button></div>`;
+/* "ready" light: amber while you get into position, green with a chime (and "Ready, go") once the counter is armed */
+function camReadyState(v){
+  const box = v && v.parentElement; if (!box || !cam.c) return;
+  let pill = box.querySelector(".cam-state");
+  if (!pill){ box.insertAdjacentHTML("beforeend", '<div class="cam-state" aria-live="polite"></div>'); pill = box.querySelector(".cam-state"); }
+  const armed = cam.c.phase && cam.c.phase !== "setup";
+  cam.rN = armed ? (cam.rN || 0) + 1 : 0; cam.lN = armed ? 0 : (cam.lN || 0) + 1;
+  if (!cam.ready && cam.rN >= 6){
+    cam.ready = true; box.classList.add("ready");
+    tones(1175, 2, .11); buzz([60, 40, 60]);
+    if (!cam.c.reps) say("Ready. Go.");
+  } else if (cam.ready && cam.lN >= 24){ cam.ready = false; box.classList.remove("ready"); }
+  const txt = cam.ready ? (cam.c.reps ? "Tracking" : "Ready · go") : "Get in position";
+  if (pill.textContent !== txt) pill.textContent = txt;
+}
+function saveTrace(actual, counted){
+  if (!cam.c) return;
+  try {
+    const L = JSON.parse(store.get(TRACE_KEY) || "[]");
+    L.push({when:Date.now(), kind:cam.kind, view:cam.c.view || cam.c.side || "", counted:counted == null ? cam.c.reps : counted, actual, trace:cam.trace || ""});
+    store.set(TRACE_KEY, JSON.stringify(L.slice(-8)));
+  } catch(err){}
 }
 function camKick(els, onRep, kind){
   if (cam.els !== els || !cam.stream) return;
@@ -5277,14 +5329,13 @@ function wpRender(){
     const head = `<h3 class="pl-name">${esc(e.name)}</h3>${stampHTML}<div class="pl-side">${j >= 0 ? `Set ${j + 1} of ${n}` : `${doneN} ${doneN === 1 ? "set" : "sets"} done`}${wp.phase === "set" && progAim(e, wp.k) ? ` · <b class="aim">Aim ${progAim(e, wp.k).aim} · goal ${progAim(e, wp.k).goal}</b>` : target && wp.phase === "set" ? ` · ${target}` : ""}</div>`;
     const cam = usesCam(e) && wp.phase === "set";
     const media = cam
-      ? `<div class="cam-view wo-cam"><video id="woVideo" playsinline muted autoplay></video><canvas id="woCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="woCount">${wp.reps}</div></div><p class="cam-msg" id="woCamMsg">Starting the camera…</p>
-         <div class="wo-camlinks"><button class="link" data-wo="camtips">Where to put the phone</button><button class="link" data-wo="camoff">Camera off</button><button class="link" data-camwrong>Count was off?</button></div>`
+      ? `<div class="cam-view wo-cam"><video id="woVideo" playsinline muted autoplay></video><canvas id="woCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="woCount">${wp.reps}</div></div><p class="cam-msg" id="woCamMsg">Starting the camera…</p>`
       : `<div class="wo-fig${wp.phase === "rest" ? " dim" : ""}">${FIG_SVG}</div>${camKind(e.name) && e.type === "s" && wp.phase === "set" ? '<button class="link wo-camlinks" data-wo="camon">Count with the camera</button>' : ""}`;
     if (wp.phase === "set"){
       const stepper = (k, label, val, unit) => `<div class="wo-step"><span>${label}</span><div class="stepper"><button data-wo="${k}-" aria-label="Less">−</button><b>${val}${unit || ""}</b><button data-wo="${k}+" aria-label="More">+</button></div></div>`;
       const inputs = e.type === "t"
         ? `<div class="wo-hold"><button class="pl-time${wp.holdStart ? "" : " ready"}" data-wo="hold" id="woSet">${wp.holdStart ? fmtHMS(Math.floor((Date.now() - wp.holdStart) / 1000)) : "0:00"}</button><span class="pl-phase">${wp.holdStart ? "Holding · tap Done when you stop" : "Tap the time to start the hold"}${PER_SIDE_RE.test(e.name) ? " · per side" : ""}</span></div>${bw ? "" : stepper("w", "Weight", wp.w, " " + state.unit)}`
-        : `${stepper("r", cam ? "Reps (counted for you)" : "Reps", wp.reps)}${bw ? "" : stepper("w", "Weight", wp.w, " " + state.unit)}<div class="wo-settime">Set time <b id="woSet">0:00</b></div>`;
+        : `${stepper("r", cam ? "Reps (counted for you)" : "Reps", wp.reps)}${cam ? CAM_TOOLS("wo") : ""}${bw ? "" : stepper("w", "Weight", wp.w, " " + state.unit)}<div class="wo-settime">Set time <b id="woSet">0:00</b></div>`;
       mid = `${head}<div class="wo-media">${media}</div><div class="wo-ctl">${inputs}<div class="wo-actions"><button class="finish-btn" data-wo="done">Done · next set</button></div></div>`;
     } else if (wp.phase === "rest"){
       const nxE = list[wp.after], nxJ = nxE ? undoneJ(nxE) : -1;
@@ -5319,7 +5370,7 @@ $("#woBody").addEventListener("click", ev => {
   const go = ev.target.closest("[data-wo-go]"); if (go){ wpEnter(+go.dataset.woGo); return; }
   const b = ev.target.closest("[data-wo]"); if (!b) return;
   const a = b.dataset.wo, order = wpOrder(), pos = order.indexOf(wp.idx), e = wpList()[wp.idx];
-  if (a === "done") return wpDone();
+  if (a === "done"){ if (wp.camOn && cam.c && !cam.traced && cam.manual) saveTrace(wp.reps, wp.reps - cam.manual); cam.traced = false; return wpDone(); }
   if (a === "end"){ if (confirm("End this session?")) endSession(wp.k, wpSess()); return; }
   if (a === "prev" && pos > 0) return wpEnter(order[pos - 1]);
   if (a === "next" && pos < order.length - 1) return wpEnter(order[pos + 1]);
@@ -5337,7 +5388,7 @@ $("#woBody").addEventListener("click", ev => {
     wpRender(); toast(a === "camoff" ? "Camera off. Set your reps with + and −." : "Camera on."); return;
   }
   if (a === "hold"){ if (!wp.holdStart){ wp.holdStart = Date.now(); wp.lastMark = 0; tones(880, 1); wpRender(); } return; }
-  if (a === "r-" || a === "r+"){ wp.reps = Math.max(0, wp.reps + (a === "r+" ? 1 : -1)); b.parentElement.querySelector("b").textContent = wp.reps; const c = $("#woCount"); if (c) c.textContent = wp.reps; if (cam.c) cam.c.reps = wp.reps; return; }
+  if (a === "r-" || a === "r+"){ wp.reps = Math.max(0, wp.reps + (a === "r+" ? 1 : -1)); b.parentElement.querySelector("b").textContent = wp.reps; const c = $("#woCount"); if (c) c.textContent = wp.reps; if (cam.c){ cam.c.reps = wp.reps; cam.manual = (cam.manual || 0) + (a === "r+" ? 1 : -1); } return; }
   if (a === "w-" || a === "w+"){ const st = state.unit === "kg" ? 2.5 : 5; wp.w = Math.max(0, Math.round((wp.w + (a === "w+" ? st : -st)) * 10) / 10); b.parentElement.querySelector("b").textContent = wp.w + " " + state.unit; return; }
 });
 document.querySelectorAll("#woPlayer [data-close]").forEach(b => b.addEventListener("click", () => closeWoPlayer()));
@@ -5735,8 +5786,21 @@ function cossackStep(c, lm, t){
 }
 /* Curls (bar, dumbbells, bands): the hands come up toward the shoulders while the elbows stay down by your sides.
    Signals from each visible arm: the elbow bend, and how high the hand rises past the elbow. Works side on or facing the phone. */
+/* true while you're walking into place or toward the phone: your shoulders slide sideways or grow/shrink
+   (getting closer or farther) by a lot within about half a second */
+function bodyMoving(c, lm, t){
+  const ar = c.ar || .75, a = lm[11], b = lm[12];
+  if (!a || !b || (a.visibility ?? 1) < .5 || (b.visibility ?? 1) < .5) return false;
+  const sw = Math.hypot((a.x - b.x) * ar, a.y - b.y); if (sw < .03) return false;
+  const H = c.mv = (c.mv || []).filter(h => t - h.t < 600);
+  H.push({t, x:(a.x + b.x) / 2 * ar, sw});
+  const xs = H.map(h => h.x), ws = H.map(h => h.sw);
+  const slide = (Math.max(...xs) - Math.min(...xs)) / sw, grow = Math.max(...ws) / Math.min(...ws);
+  return slide > .45 || grow > 1.25;
+}
 function curlStep(c, lm, t){
   if (!lm || lm.length < 17){ c.msg = "Can't see you. Put the phone 5 to 8 feet away with your upper body in view."; return false; }
+  if (bodyMoving(c, lm, t)){ c.msg = "Get in place and stand still with your arms straight."; c.phase = "setup"; c.seen = 0; c.still = 0; return false; }
   const P = camPts(c, lm), arms = [];
   let over = false;
   for (const [si, ei, wi] of [[11, 13, 15], [12, 14, 16]]){
@@ -5756,7 +5820,7 @@ function curlStep(c, lm, t){
   c.p = c.p == null ? p : c.p * .45 + p * .55;
   c.depth = c.p;
   c.seen = (c.seen || 0) + 1;
-  if (c.phase === "setup" || !c.phase){ if (c.p < .3 && c.seen > 4){ c.phase = "down"; c.msg = "Curl"; } else c.msg = "Arms straight to start"; return false; }
+  if (c.phase === "setup" || !c.phase){ if (c.p < .3 && c.seen > 15){ c.phase = "down"; c.msg = "Curl"; } else c.msg = "Arms straight to start"; return false; }
   if (c.phase === "down"){
     if (c.p > .74 && t - (c.lastRep || 0) > 450){ c.reps++; c.lastRep = t; c.phase = "top"; c.msg = "Good. Lower all the way"; return true; }
     c.msg = c.p > .45 ? "Higher" : "Curl"; return false;
@@ -6186,9 +6250,8 @@ function ptRender(){
   const ck = ph === "reps" ? ptCamKind(st) : null;
   if (ph === "reps"){
     mid = `<div class="pt-split"><div class="pt-media">` + (ck ? `<div class="cam-view wo-cam pt-cam"><video id="ptVideo" playsinline muted autoplay></video><canvas id="ptCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="ptCount">${pp.reps}</div></div>
-        <p class="cam-msg" id="ptCamMsg">Starting the camera…</p>
-        <div class="wo-camlinks"><button class="link" data-pt="camtips">Where to put the phone</button><button class="link" data-pt="camoff">Camera off</button><button class="link" data-camwrong>Count was off?</button></div>`
-      : (camKind(st.name) ? '<button class="link wo-camlinks" data-pt="camon">Count with the camera</button>' : "")) + `</div><div class="pt-ctl"><div class="wo-step"><span>Reps${st.reps && /-/.test(st.reps) ? " (aim " + st.reps + ")" : ""}</span><div class="stepper"><button data-pt="r-" aria-label="Fewer">−</button><b id="ptReps">${pp.reps}</b><button data-pt="r+" aria-label="More">+</button></div></div>
+        <p class="cam-msg" id="ptCamMsg">Starting the camera…</p>`
+      : (camKind(st.name) ? '<button class="link wo-camlinks" data-pt="camon">Count with the camera</button>' : "")) + `</div><div class="pt-ctl"><div class="wo-step"><span>Reps${st.reps && /-/.test(st.reps) ? " (aim " + st.reps + ")" : ""}</span><div class="stepper"><button data-pt="r-" aria-label="Fewer">−</button><b id="ptReps">${pp.reps}</b><button data-pt="r+" aria-label="More">+</button></div></div>${ck ? CAM_TOOLS("pt") : ""}
       <button class="finish-btn pt-btn" data-pt="done">Done${nx ? " · next" : " · finish"}</button></div></div>`;
   } else {
     mid = `<button class="pl-time${ph === "ready" ? " ready" : ""}" id="ptTime" data-pt="now">${fmtHMS(paused ? pp.left : Math.max(0, Math.ceil((pp.end - Date.now()) / 1000)))}</button>
@@ -6220,7 +6283,7 @@ $("#ptBody").addEventListener("click", e => {
   const b = e.target.closest("[data-pt]"); if (!b) return;
   const a = b.dataset.pt, st = pp.steps[pp.i];
   if (a === "now" && pp.phase === "ready") return ptGo();
-  if (a === "r-" || a === "r+"){ pp.reps = Math.max(0, pp.reps + (a === "r+" ? 1 : -1)); $("#ptReps").textContent = pp.reps; replay($("#ptReps"), "bump"); const c = $("#ptCount"); if (c) c.textContent = pp.reps; if (cam.c) cam.c.reps = pp.reps; return; }
+  if (a === "r-" || a === "r+"){ pp.reps = Math.max(0, pp.reps + (a === "r+" ? 1 : -1)); $("#ptReps").textContent = pp.reps; replay($("#ptReps"), "bump"); const c = $("#ptCount"); if (c) c.textContent = pp.reps; if (cam.c){ cam.c.reps = pp.reps; cam.manual = (cam.manual || 0) + (a === "r+" ? 1 : -1); } return; }
   if (a === "camtips"){ if (cam.els) camTips(cam.els, cam.kind, true); return; }
   if (a === "camoff" || a === "camon"){
     const k = camKind(st.name); state.camOff = state.camOff || {};
@@ -6229,7 +6292,7 @@ $("#ptBody").addEventListener("click", e => {
     pp.reps = a === "camon" ? 0 : (st.target || 10);
     ptRender(); toast(a === "camoff" ? "Camera off. Set your reps with + and −." : "Camera on."); return;
   }
-  if (a === "done") return ptNext(true);
+  if (a === "done"){ if (pp.camOn && cam.c && !cam.traced && cam.manual) saveTrace(pp.reps, pp.reps - cam.manual); cam.traced = false; return ptNext(true); }
   if (a === "pause"){
     if (pp.phase === "paused"){ pp.phase = pp.was; pp.end = Date.now() + pp.left * 1000; }
     else if (pp.phase === "ready" || pp.phase === "hold"){ pp.was = pp.phase; pp.left = Math.max(0, Math.ceil((pp.end - Date.now()) / 1000)); pp.phase = "paused"; }
@@ -6616,13 +6679,9 @@ document.addEventListener("click", e => {
   const counted = cam.c.reps, ans = prompt(`The camera counted ${counted}. How many reps did you actually do?`, String(counted));
   if (ans == null) return;
   const actual = Math.max(0, parseInt(ans, 10) || 0);
-  try {
-    const L = JSON.parse(store.get(TRACE_KEY) || "[]");
-    L.push({when: Date.now(), kind: cam.kind, view: cam.c.view || cam.c.side || "", counted, actual, trace: cam.trace || ""});
-    store.set(TRACE_KEY, JSON.stringify(L.slice(-8)));
-  } catch(err){}
+  saveTrace(actual); cam.traced = true;
   if (actual !== counted){ cam.c.reps = actual; if (cam.onRep) cam.onRep(actual); }
-  toast("Saved. Send it from Settings → Report a problem.");
+  toast("Fixed and saved. It goes in Settings → Report a problem.");
 }, true);
 
 /* =========================================================
