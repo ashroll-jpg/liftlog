@@ -1258,6 +1258,13 @@ input,select,textarea{font-size:16px}
   .wo-stats{gap:6px;margin:4px auto 2px}.wo-stats>div{padding:5px 4px}.wo-stats b{font-size:21px}.wo-stats span{font-size:9.5px}
   .wo-ctl .wo-actions{position:sticky;bottom:0;z-index:3;width:100%;padding-top:10px;background:linear-gradient(transparent,var(--bg) 30%)}
 }
+/* 5.3: reorder + swap */
+.ex header .btns .icon-btn.mv,.ex header .btns .icon-btn.swap{color:var(--mute)}
+.ex header .btns .icon-btn.swap{color:var(--str)}
+.ex header .btns .icon-btn.mv svg,.ex header .btns .icon-btn.swap svg{width:20px;height:20px}
+.setting.col{flex-direction:column;align-items:stretch;gap:10px}
+#noSugList .lchip{cursor:pointer;font-family:inherit;letter-spacing:0;text-transform:none;font-size:14px;padding:6px 8px 6px 10px}
+#noSugList .lchip span{color:var(--mute);margin-left:4px}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1550,6 +1557,7 @@ input,select,textarea{font-size:16px}
     <div class="setting" id="ptClearRow" hidden><p>PT history<small>Kept on this device while PT is off.</small></p><button class="btn ghost" id="ptClear">Delete</button></div>
     <div class="setting"><p>Workout reminders<small id="remStatus">Add alerts to your phone's calendar</small></p><button class="btn ghost" id="openRem">Set up</button></div>
     <div class="setting" id="voiceRow"><p>Voice coach<small>Says each exercise, set and rest out loud, and counts camera reps</small></p><div class="seg" id="voiceSeg"><button data-voice="0">Off</button><button data-voice="1">On</button></div></div>
+    <div class="setting col" id="noSugRow" hidden><p>Never suggest<small>Exercises you swapped out. Tap one to allow it again.</small></p><div class="plan-chips" id="noSugList"></div></div>
     <div class="setting"><p>Weekly plan<small>Plan what you'll do each day</small></p><button class="btn ghost" id="openPlan">Plan</button></div>
     <div class="setting"><p>Vibrate with beeps<small id="vibStatus">Buzzes at each interval</small></p><div class="seg" id="vibSeg"><button data-v="0">Off</button><button data-v="1">On</button></div></div>
     <div class="setting"><p>Beep on silent (iPhone)<small>Plays beeps even with the ringer off. May pause music from other apps.</small></p><div class="seg" id="silentSeg"><button data-q="0">Off</button><button data-q="1">On</button></div></div>
@@ -1765,7 +1773,7 @@ input,select,textarea{font-size:16px}
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "5.2.2";
+const APP_VERSION = "5.3.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -2119,7 +2127,7 @@ function renderLog(){
       : note ? `<button class="ex-note" data-act="note" data-i="${i}">${esc(note)}</button>` : "";
     const c = `<article class="ex${cls}" data-idx="${i}" style="--c:var(${GVAR[e.group] || "--mobility"})">
       <header><div><h3 class="ex-title" data-act="detail" data-i="${i}" role="button" tabindex="0" aria-label="${esc(e.name)} history">${esc(e.name)}</h3><span class="tag">${esc(e.group)}</span>${guardTag(e.name)}${modeBtn}${inSS ? '<span class="ss-tag">Superset</span>' : ""}</div>
-        <span class="btns"><button class="icon-btn" data-act="note" data-i="${i}" aria-label="${note ? "Edit" : "Add"} note for ${esc(e.name)}">${ICON_PEN}</button>
+        <span class="btns">${!inDone && isStr(e) && e.group !== "Mobility" ? `<button class="icon-btn mv" data-act="move-up" data-i="${i}" aria-label="Move ${esc(e.name)} up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button class="icon-btn mv" data-act="move-down" data-i="${i}" aria-label="Move ${esc(e.name)} down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><button class="icon-btn swap" data-act="swap" data-i="${i}" aria-label="Swap ${esc(e.name)} for something similar" title="Swap for something similar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></button>` : ""}<button class="icon-btn" data-act="note" data-i="${i}" aria-label="${note ? "Edit" : "Add"} note for ${esc(e.name)}">${ICON_PEN}</button>
         <button class="icon-btn" data-act="del-ex" data-i="${i}" aria-label="Remove ${esc(e.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></header>
       ${noteHtml}
       ${prev ? `<p class="last">Last time (${shortDate(prev.date)}): ${esc(describeSets(prev.entry))}</p>` : ""}
@@ -2235,6 +2243,8 @@ $("#exList").addEventListener("click", ev => {
   if (act === "rest"){ startTimer(state.rest); return; }
   if (act === "note"){ if (justClosed.name === e.name && Date.now() - justClosed.at < 400) return; openNote = openNote === e.name ? null : e.name; renderLog(); return; }
   if (act === "link"){ e.ss = !e.ss; save(); renderLog(); return; }
+  if (act === "move-up" || act === "move-down"){ moveEntry(curDate, i, act === "move-up" ? -1 : 1); return; }
+  if (act === "swap"){ swapEntry(curDate, i); return; }
   if (act === "track"){
     const to = e.type === "t" ? "s" : "t";
     if (hold.iv) stopHold(true);
@@ -4319,7 +4329,7 @@ function suggestFor(m, n){
     .concat(catalog.filter(x => (x.type === "s" || x.type === "t") && x.group !== "Mobility" && x.group !== "Cardio"));
   pool.forEach(x => {
     const key = x.name.toLowerCase(); if (seen.has(key)) return; seen.add(key);
-    if (!canDo(x.name, x.equip) || guardHit(x.name)) return;
+    if (!canDo(x.name, x.equip) || guardHit(x.name) || (state.noSuggest || []).includes(x.name)) return;
     const w = (musclesFor({name:x.name, group:x.group, type:x.type}) || {})[m] || 0;
     if (w < .7) return;
     const bw = isBW(x.name, x.type) || (x.extra && !/band|carry|pallof/i.test(x.name)), light = /band|dumbbell|kettlebell|carry/i.test(x.name) || /body only|bands|dumbbell|kettlebell/i.test(x.equip || "");
@@ -4335,7 +4345,7 @@ function stretchesFor(m, n){
 function addSuggested(x, quiet){
   const day = today(), o = ensureOpen(day), L = state.workouts[day] = state.workouts[day] || [];
   if (L.some(e => e.sid === o.id && e.name === x.name)){ if (!quiet) toast(x.name + " is already in today's session."); return false; }
-  L.push({name:x.name, group:x.group, type:x.type, sid:o.id, sets:setsFor(x.name, x.type)});
+  L.push({name:x.name, group:x.group, type:x.type, sid:o.id, sug:true, sets:setsFor(x.name, x.type)});
   save();
   if (!quiet) toast(`Added ${x.name} to today's session.`, false, {label:"Open", fn: () => { curDate = today(); showTab("log"); }});
   return true;
@@ -4412,6 +4422,7 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () 
 /* ---------- settings ---------- */
 function renderCatStatus(){ const el = $("#catStatus"); if (el) el.textContent = catStatus; }
 function renderSettings(){
+  try { renderNoSuggest(); } catch(e){}
   $("#voiceRow").hidden = !hasVoice;
   document.querySelectorAll("#voiceSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.voice === "1") === (state.voice !== false)));
   document.querySelectorAll("#unitSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.u === state.unit));
@@ -6993,9 +7004,54 @@ $("#planBody").addEventListener("click", e => {
 $("#openPlan").onclick = openPlan;
 $("#openPlan2").onclick = openPlan;
 
+/* ----- reorder and swap exercises in a session ----- */
+function moveEntry(k, i, dir){
+  const L = state.workouts[k], e = L && L[i]; if (!e) return;
+  const peers = L.map((x, n) => [x, n]).filter(([x]) => isStr(x) && x.sid === e.sid).map(([, n]) => n);
+  const at = peers.indexOf(i), to = peers[at + dir]; if (to == null) return;
+  if (peers[at - 1] != null) L[peers[at - 1]].ss = false;          /* moving breaks a superset link around it */
+  e.ss = false; L[to].ss = false;
+  [L[i], L[to]] = [L[to], L[i]];
+  save(); renderLog();
+  const card = document.querySelector(`#exList [data-act="move-up"][data-i="${to}"]`); if (card) replay(card.closest(".ex") || card, "pop");
+}
+const noSuggest = () => state.noSuggest || [];
+function swapOptions(e, k){
+  const m = musclesFor(e) || {}, top = Object.keys(m).sort((a, b) => m[b] - m[a]).slice(0, 2);
+  const inDay = new Set(entries(k).map(x => x.name)), tried = new Set([...(e.tried || []), e.name]), seen = new Set(), out = [];
+  const ok = x => x && !inDay.has(x.name) && !tried.has(x.name) && !noSuggest().includes(x.name) && !seen.has(x.name) && (seen.add(x.name), true);
+  top.forEach(mk => suggestFor(mk, 20).forEach(x => { if ((x.type === e.type || e.type === "s") && ok(x)) out.push(x); }));
+  if (out.length < 3) catalog.filter(x => x.group === e.group && x.type === e.type && canDo(x.name, x.equip) && !guardHit(x.name)).forEach(x => { if (ok(x)) out.push(x); });
+  return out;
+}
+function swapEntry(k, i){
+  const L = state.workouts[k], e = L && L[i]; if (!e) return;
+  if (e.sets.some(x => x.done)){ toast("You've already done sets of " + e.name + ". Add a different exercise instead."); return; }
+  const opts = swapOptions(e, k);
+  if (!opts.length){ toast("No other exercises for that muscle with your equipment."); return; }
+  const x = opts[0], old = clone(e), orig = e.orig || e.name;
+  const prevBlock = clone(state.noSuggest || []);
+  /* Tally suggested it and you swapped it out: stop suggesting it. Your own picks and template exercises aren't hidden. */
+  const hide = (e.sug || (e.tried || []).length) && !noSuggest().includes(e.name);
+  if (hide) state.noSuggest = [...noSuggest(), e.name];
+  const was = curDate; curDate = k;
+  L[i] = {name:x.name, group:x.group, type:x.type || "s", sid:e.sid, ss:e.ss, from:e.from, orig, sug:true, tried:[...(e.tried || []), e.name], sets:setsFor(x.name, x.type || "s", e.sets.map(s => ({w:"", r:s.r || "", sec:s.sec || ""})))};
+  curDate = was;
+  save(); renderLog();
+  toast(`Swapped ${e.name} for ${x.name}.${hide ? ` ${e.name} won't be suggested again.` : ""}`, false, {label:"Undo", fn: () => { state.workouts[k][i] = old; state.noSuggest = prevBlock; save(); renderLog(); }});
+}
+function renderNoSuggest(){
+  const row = $("#noSugRow"), L = noSuggest(); if (!row) return;
+  row.hidden = !L.length;
+  $("#noSugList").innerHTML = L.map(n => `<button class="lchip" data-unsug="${esc(n)}">${esc(n)}<span aria-hidden="true">×</span></button>`).join("");
+}
+$("#noSugList").addEventListener("click", e => {
+  const b = e.target.closest("[data-unsug]"); if (!b) return;
+  state.noSuggest = noSuggest().filter(n => n !== b.dataset.unsug); save(); renderNoSuggest(); toast(b.dataset.unsug + " can be suggested again.");
+});
 $("#openIntervals").onclick = openIntervals;
 $("#exDetailBtn").onclick = () => { const n = $("#exSelect").value; if (n) openExDetail(n); };
-window.__tally = {curlStep, openCam, stopCam, suggestFor, guardHit, progAim, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
+window.__tally = {buildBalance: l => buildBalanceSession(l), curlStep, openCam, stopCam, suggestFor, guardHit, progAim, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
 
 /* ---------- full-height fix for iPhone home-screen apps ---------- */
 function setAppHeight(){ document.documentElement.style.setProperty("--app-h", Math.max(window.innerHeight, screen.height && window.navigator.standalone ? screen.height : 0) + "px"); }
