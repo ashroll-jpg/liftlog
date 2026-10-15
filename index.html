@@ -8,13 +8,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tally">
+<script>/* theme before first paint: light unless you picked dark */
+(function(){ var t = "light"; try { t = (JSON.parse(localStorage.getItem("liftlog.v1")) || {}).theme || "light"; } catch(e){}
+  document.documentElement.dataset.theme = t;
+  if (t === "light"){ var m = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]'); if (m) m.content = "default";
+    document.querySelector('meta[name="theme-color"]').content = "#F4F0E8"; document.querySelector('meta[name="color-scheme"]').content = "light"; } })();
+</script>
 <title>Tally</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:opsz,wght@9..40,400..800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root{
@@ -1265,6 +1271,150 @@ input,select,textarea{font-size:16px}
 .setting.col{flex-direction:column;align-items:stretch;gap:10px}
 #noSugList .lchip{cursor:pointer;font-family:inherit;letter-spacing:0;text-transform:none;font-size:14px;padding:6px 8px 6px 10px}
 #noSugList .lchip span{color:var(--mute);margin-left:4px}
+/* 5.4: how to + swap picker */
+.howto-chip{border:0;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);font:600 12px/1 var(--font);padding:5px 9px;border-radius:999px;margin:0 6px;vertical-align:middle;cursor:pointer}
+.res{position:relative}
+.res-how{display:inline-grid;place-items:center;width:28px;height:28px;margin-left:8px;border-radius:50%;background:var(--surface-2,var(--field));color:var(--mute);font-weight:700;font-size:14px;flex-shrink:0}
+.pl-how{display:block;margin:-2px auto 2px;font-size:14px;color:var(--accent)}
+.wo-main > .pl-how{grid-column:1 / -1}
+.exd-how{margin:12px 0 4px}
+.ht-body{flex:1;overflow-y:auto;padding-bottom:20px}
+.ht-photos{position:relative;border-radius:16px;overflow:hidden;background:#fff;aspect-ratio:3 / 2;max-height:46vh;margin:0 auto 12px;width:100%}
+.ht-photos img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:opacity .45s ease}
+.ht-photos img.b{opacity:0}.ht-photos img.b.on{opacity:1}
+.ht-phase{position:absolute;left:10px;bottom:10px;background:rgba(43,39,33,.72);color:#fff;font:600 12px/1 var(--font);padding:6px 10px;border-radius:999px}
+.ht-anim{display:grid;place-items:center;background:var(--surface);border-radius:16px;margin-bottom:12px;box-shadow:var(--shadow,none)}
+.ht-anim .ht-fig{width:min(70vw,260px);height:auto}
+.ht-fig polyline,.ht-fig path,.ht-fig line{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ht-fig .near{stroke:var(--ink);stroke-width:9}.ht-fig .far{stroke:var(--mute);stroke-width:8;opacity:.6}
+.ht-fig .head{fill:var(--ink);stroke:none}.ht-fig .ground{stroke:var(--line-2);stroke-width:3}.ht-fig .wt{fill:var(--accent)}
+.ht-tags{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
+.ht-tags span{font-size:13px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--surface-2,var(--field));color:var(--ink-2,var(--ink))}
+.ht-h{font-size:17px;margin:16px 0 8px}
+.ht-steps{margin:0;padding-left:22px;display:grid;gap:10px;line-height:1.5}
+.ht-steps li::marker{color:var(--accent);font-weight:700}
+.ht-tips{margin:0;padding-left:20px;display:grid;gap:6px;color:var(--ink-2,var(--ink));line-height:1.45}
+.ht-warn{margin:14px 0 0;color:#B0741C;font-weight:600}
+.ht-vid{display:block;text-align:center;margin-top:18px;text-decoration:none}
+.sw-list{flex:1;overflow-y:auto;padding:4px 0 12px}
+.sw-label{margin:6px 2px 8px;font-size:13px;color:var(--mute);font-weight:600}
+.sw-row{display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--line)}
+.sw-pick{flex:1;display:flex;align-items:center;gap:12px;padding:10px 4px;background:none;border:0;color:var(--ink);text-align:left;font:inherit;min-width:0}
+.sw-pick b{display:block;font-size:16px}.sw-pick small{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+.sw-pick span{min-width:0}
+.sw-thumb{width:56px;height:42px;border-radius:10px;object-fit:cover;background:#fff;flex-shrink:0;box-shadow:var(--shadow,none)}
+.sw-thumb.dot{display:block;background:color-mix(in srgb,var(--c) 30%,var(--surface))}
+.sw-how{flex-shrink:0;padding:8px;color:var(--accent);font-size:14px}
+.sw-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--line);font-size:14px}
+.sw-check{display:flex;align-items:center;gap:8px}.sw-check input{width:20px;height:20px;accent-color:var(--accent)}
+/* =====================================================================
+   LIGHT THEME (5.4): warm paper, soft cards, rounded type. Same tally marks.
+   ===================================================================== */
+html[data-theme="light"]{
+  --bg:#F4F0E8; --surface:#FFFFFF; --surface-2:#F3EEE5; --field:#F7F3EC;
+  --ink:#2B2721; --ink-2:rgba(43,39,33,.72); --mute:#8A8478;
+  --line:rgba(43,39,33,.09); --line-2:rgba(43,39,33,.16);
+  --accent:#C08A2C; --accent-ink:#fff; --gold:#C08A2C;
+  --str:#C08A2C; --car:#B9546A; --mob:#4F9A73; --pt:#4D86BC;
+  --on-c:#fff;
+  --back:#2B2721; --legs:#8A8478; --shoulders:#D9B977; --arms:#8C6620; --full:#B6AE9F; --cardio:#9C9488; --mobility:#C9C1B3;
+  --font:"DM Sans",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --display:"DM Sans",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono:"DM Mono",ui-monospace,Menlo,monospace;
+  --r:18px; --r-sm:12px;
+  --shadow:0 1px 2px rgba(70,55,30,.05),0 6px 22px rgba(70,55,30,.07);
+  --shadow-lg:0 2px 6px rgba(70,55,30,.06),0 18px 48px rgba(70,55,30,.12);
+  color-scheme:light;
+}
+html[data-theme="light"] body{background:var(--bg);color:var(--ink);letter-spacing:-.005em}
+html[data-theme="light"] .grain{display:none}
+html[data-theme="light"] .bg-photo{filter:grayscale(1) sepia(.35) contrast(.9) brightness(1.08);mix-blend-mode:multiply}
+html[data-theme="light"] .bg-photo.show{opacity:calc(var(--bg-op,.16) * .55)}
+/* type: soft, sentence case */
+html[data-theme="light"] .day h1,html[data-theme="light"] .page-title,html[data-theme="light"] .goal h2,html[data-theme="light"] .cele h2,html[data-theme="light"] .sheet-head h2,html[data-theme="light"] .md-head h2,
+html[data-theme="light"] .pl-name{font-family:var(--display);font-weight:800;font-stretch:100%;text-transform:none;letter-spacing:-.03em}
+html[data-theme="light"] .day h1{font-size:clamp(34px,10vw,48px)}
+html[data-theme="light"] .page-title{font-size:clamp(32px,9vw,44px)}
+html[data-theme="light"] .sheet-head h2{font-size:24px}
+html[data-theme="light"] .btn,html[data-theme="light"] .finish-btn,html[data-theme="light"] .add-big,html[data-theme="light"] .go-btn,html[data-theme="light"] .mob .go,html[data-theme="light"] .start-routine,
+html[data-theme="light"] .rt .go-btn,html[data-theme="light"] .ss-link,html[data-theme="light"] .tabs button,html[data-theme="light"] .tag,html[data-theme="light"] .ss-tag,html[data-theme="light"] .set.head,
+html[data-theme="light"] .cam-state,html[data-theme="light"] .wo-stats span,html[data-theme="light"] .rc-top,html[data-theme="light"] .iv-label,html[data-theme="light"] .pl-step,html[data-theme="light"] .lchip{font-family:var(--font);font-stretch:100%;text-transform:none;letter-spacing:0}
+html[data-theme="light"] .btn,html[data-theme="light"] .finish-btn,html[data-theme="light"] .add-big{font-weight:700;font-size:16px}
+html[data-theme="light"] .finish-btn{font-size:17px}
+html[data-theme="light"] .tag,html[data-theme="light"] .set.head{font-size:12px;font-weight:600}
+/* surfaces: white cards, soft shadows, rounder corners */
+html[data-theme="light"] .card,html[data-theme="light"] .goal,html[data-theme="light"] .ex,html[data-theme="light"] .recap,html[data-theme="light"] .sess,html[data-theme="light"] .sess-build,html[data-theme="light"] .mob-row,
+html[data-theme="light"] .rt,html[data-theme="light"] .hist-row,html[data-theme="light"] .exd-goal,html[data-theme="light"] .plan-card{background:var(--surface);border:0;border-radius:var(--r);box-shadow:var(--shadow)}
+html[data-theme="light"] .ex{box-shadow:var(--shadow),inset 4px 0 0 var(--c)}
+html[data-theme="light"] .sheet .panel{background:var(--bg);box-shadow:var(--shadow-lg)}
+html[data-theme="light"] .scrim{background:rgba(60,50,35,.28)}
+html[data-theme="light"] .btn.ghost,html[data-theme="light"] .wo-end,html[data-theme="light"] .add-big{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+html[data-theme="light"] .btn.ghost:hover,html[data-theme="light"] .add-big:hover{background:#FBF8F2}
+html[data-theme="light"] .seg{background:var(--surface-2)}
+html[data-theme="light"] .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(70,55,30,.15)}
+html[data-theme="light"] .stepper button{background:var(--surface);box-shadow:var(--shadow);color:var(--ink)}
+html[data-theme="light"] .set input:focus,html[data-theme="light"] .fl input:focus,html[data-theme="light"] .fl select:focus{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent);border-color:var(--accent)}
+html[data-theme="light"] .chip{background:var(--surface);color:var(--ink-2);border-color:var(--line)}
+html[data-theme="light"] .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* colored buttons: white text */
+html[data-theme="light"] .finish-btn,html[data-theme="light"] .mob .go,html[data-theme="light"] .start-routine,html[data-theme="light"] .rt .go-btn,html[data-theme="light"] .mob-done .ck,html[data-theme="light"] .set.beat .n,
+html[data-theme="light"] .wo-done .ck,html[data-theme="light"] .fold-row .pr,html[data-theme="light"] .sess-head .ck,html[data-theme="light"] .wo-big-ck,html[data-theme="light"] .exd-row .pr,html[data-theme="light"] .rv-ck,
+html[data-theme="light"] .pr-chip,html[data-theme="light"] .low-tag,html[data-theme="light"] .gym-item[aria-pressed="true"] .gym-ck,html[data-theme="light"] .wo-chip.on,html[data-theme="light"] .wo-chip.on.done,
+html[data-theme="light"] .ss-link.on,html[data-theme="light"] .ss-link.on svg,html[data-theme="light"] .btn:not(.ghost){color:#fff}
+html[data-theme="light"] .finish-btn{box-shadow:0 10px 24px -12px color-mix(in srgb,var(--str) 80%,transparent)}
+html[data-theme="light"] .mode.bw,html[data-theme="light"] #ivLadder[aria-pressed="true"]{color:#8C6620}
+html[data-theme="light"] #viewSeg [data-view="all"][aria-pressed="true"]{background:var(--ink);color:#fff}
+/* header + floating tab bar */
+html[data-theme="light"] .top::before{background:color-mix(in srgb,var(--bg) 82%,transparent)!important;border-bottom:1px solid var(--line)}
+html[data-theme="light"] .brand .tally g{fill:var(--ink)}
+html[data-theme="light"] .tabs{background:rgba(255,255,255,.86);box-shadow:0 10px 30px rgba(70,55,30,.14),0 1px 2px rgba(70,55,30,.08);border:0}
+html[data-theme="light"] .tabs button{color:var(--mute)}
+html[data-theme="light"] .tabs button[aria-selected="true"]{color:#fff}
+html[data-theme="light"] .toast{background:var(--ink);color:#fff;box-shadow:var(--shadow-lg)}
+/* players and camera */
+html[data-theme="light"] .cam-view{border-radius:16px}
+html[data-theme="light"] .cam-reps{color:#fff}
+html[data-theme="light"] .wo-stats>div{background:var(--surface);border:0;box-shadow:var(--shadow)}
+html[data-theme="light"] .wo-stats .g{background:color-mix(in srgb,var(--str) 12%,var(--surface))}
+html[data-theme="light"] .cam-tips{box-shadow:var(--shadow-lg)}
+html[data-theme="light"] .dev,html[data-theme="light"] .report-text{background:var(--surface-2)}
+html[data-theme="light"] .guard-tag{color:#9A6512;background:rgba(214,150,40,.12);border-color:rgba(214,150,40,.35)}
+html[data-theme="light"] .pl-fig .ground{stroke:var(--line-2)}
+html[data-theme="light"] .rest-ring .rr-fg{stroke:var(--str)}
+html[data-theme="light"] .rest-ring .rr-bg{stroke:var(--line-2)}
+
+/* 5.4.1: exercise card header + add button */
+.exh{display:flex;align-items:flex-start;gap:10px}
+.exh-main{flex:1;min-width:0}
+.ex .exh h3.ex-title{margin:0;font-size:20px;line-height:1.2;overflow-wrap:anywhere}
+.exh-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px}
+.exh-meta .grp{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--mute)}
+.exh-meta .grp::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.exh-meta .ss-tag{margin:0;font-size:11px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--str) 14%,transparent);color:var(--str);letter-spacing:.04em}
+.exh-meta .guard-tag{margin:0}
+.exh .btns{display:flex;gap:0;margin:-6px -6px 0 0}
+.exh .btns .icon-btn{width:38px;height:38px;margin:0;color:var(--mute)}
+.exh .btns .icon-btn.swap{color:var(--accent)}
+.exh .btns .icon-btn svg{width:20px;height:20px}
+.exh-mv{display:flex;flex-direction:column;gap:2px;margin:-2px 0 0 -6px;flex-shrink:0}
+.exh-mv button{width:28px;height:22px;display:grid;place-items:center;border:0;border-radius:7px;background:var(--surface-2,var(--field));color:var(--ink-2,var(--ink));padding:0}
+.exh-mv button svg{width:16px;height:16px}
+.exh-mv button:disabled{opacity:.3}
+.ex-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.ex-chips .howto-chip,.ex-chips .mode{margin:0;display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:999px;font:600 13px/1 var(--font);letter-spacing:0;text-transform:none;vertical-align:middle}
+.ex-chips .howto-chip svg{width:15px;height:15px}
+.ex-chips .mode{border:1px solid var(--line-2);background:transparent;color:var(--ink-2,var(--ink))}
+.ex-chips .mode.bw{border-color:color-mix(in srgb,var(--accent) 55%,transparent);color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.ex-title::after{content:" ›";color:var(--mute);font-weight:400}
+.ex .last{margin-top:8px}
+.add-big{display:flex;align-items:center;justify-content:center;gap:10px}
+.add-ic{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff}
+.add-ic svg{width:16px;height:16px}
+html[data-theme="light"] .add-big{background:color-mix(in srgb,var(--accent) 10%,var(--surface));color:var(--accent);border:1.5px solid color-mix(in srgb,var(--accent) 45%,transparent);box-shadow:none;font-size:17px;padding:16px;border-radius:var(--r)}
+html[data-theme="light"] .add-big:hover{background:color-mix(in srgb,var(--accent) 16%,var(--surface))}
+html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;border-radius:0}
+.empty .quick{margin-left:-12px;margin-right:-12px}
+.empty .quick .btn{width:100%;padding:15px;border-radius:var(--r,12px)}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1303,7 +1453,7 @@ input,select,textarea{font-size:16px}
     <div id="nudge"></div>
     <div class="daytools" id="dayTools"></div>
     <div class="list" id="exList"></div>
-    <button class="add-big" id="openPicker">+ Add exercise</button>
+    <button class="add-big" id="openPicker"><span class="add-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Add exercise</button>
     <div class="tools-row"><button class="link" id="openIntervals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>Interval timer</button><button class="link" id="openPlan2">Plan my week</button></div>
   </main>
 
@@ -1556,6 +1706,7 @@ input,select,textarea{font-size:16px}
     <div class="setting" id="ptGoalRow" hidden><p>PT goal<small>PT days per week</small></p><div class="stepper"><button id="ptGoalDown" aria-label="Lower PT goal">−</button><b id="ptGoalVal">5</b><button id="ptGoalUp" aria-label="Raise PT goal">+</button></div></div>
     <div class="setting" id="ptClearRow" hidden><p>PT history<small>Kept on this device while PT is off.</small></p><button class="btn ghost" id="ptClear">Delete</button></div>
     <div class="setting"><p>Workout reminders<small id="remStatus">Add alerts to your phone's calendar</small></p><button class="btn ghost" id="openRem">Set up</button></div>
+    <div class="setting"><p>Look<small>Light and soft, or the original dark</small></p><div class="seg" id="themeSeg"><button data-th="light">Light</button><button data-th="dark">Dark</button></div></div>
     <div class="setting" id="voiceRow"><p>Voice coach<small>Says each exercise, set and rest out loud, and counts camera reps</small></p><div class="seg" id="voiceSeg"><button data-voice="0">Off</button><button data-voice="1">On</button></div></div>
     <div class="setting col" id="noSugRow" hidden><p>Never suggest<small>Exercises you swapped out. Tap one to allow it again.</small></p><div class="plan-chips" id="noSugList"></div></div>
     <div class="setting"><p>Weekly plan<small>Plan what you'll do each day</small></p><button class="btn ghost" id="openPlan">Plan</button></div>
@@ -1768,12 +1919,30 @@ input,select,textarea{font-size:16px}
 <div class="grain" id="grain" aria-hidden="true"></div>
 <div class="flash" id="flash" aria-hidden="true"></div>
 
+<!-- swap picker -->
+<div class="sheet" id="swapSheet" role="dialog" aria-modal="true" aria-labelledby="swapTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="swapTitle">Swap</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <input class="search" id="swapSearch" type="search" placeholder="Search all exercises" autocomplete="off">
+    <div id="swapList" class="sw-list"></div>
+    <div class="sw-foot"><label class="sw-check"><input type="checkbox" id="swapHide"><span id="swapHideTxt">Stop suggesting this</span></label><button class="link" id="swapRemove">Remove instead</button></div>
+  </div>
+</div>
+<!-- how to -->
+<div class="sheet" id="howtoSheet" role="dialog" aria-modal="true" aria-labelledby="howtoTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="howtoTitle">How to</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="howtoBody" class="ht-body"></div>
+  </div>
+</div>
 <script>
 (() => {
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "5.3.0";
+const APP_VERSION = "5.4.1";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -1888,7 +2057,7 @@ function loadRemote(force){
   catStatus = "Loading full catalog…"; renderCatStatus();
   fetch(REMOTE_URL).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(list => {
-      const mapped = mapRemote(list);
+      const mapped = mapRemote(list); try { saveHowto(list); } catch(err){}
       store.set(CAT_KEY, JSON.stringify(mapped));
       buildCatalog(mapped);
       catStatus = catalog.length + " exercises"; renderCatStatus();
@@ -2122,13 +2291,18 @@ function renderLog(){
     const inSS = (e.ss && linkable) || (pv && pv.ss && pv.sid === e.sid);
     const cls = (e.ss && linkable ? " ss-top" : "") + (pv && pv.ss && pv.sid === e.sid ? " ss-bottom" : "");
     const note = (state.notes || {})[e.name] || "";
+    const peers = list.map((x, n) => [x, n]).filter(([x]) => isStr(x) && x.sid === e.sid).map(([, n]) => n), at = peers.indexOf(i);
+    const movable = !inDone && isStr(e) && e.group !== "Mobility" && peers.length > 1;
+    const mvHTML = movable ? `<div class="exh-mv"><button data-act="move-up" data-i="${i}" aria-label="Move ${esc(e.name)} up"${at <= 0 ? " disabled" : ""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button data-act="move-down" data-i="${i}" aria-label="Move ${esc(e.name)} down"${at >= peers.length - 1 ? " disabled" : ""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></div>` : "";
     const noteHtml = openNote === e.name
       ? `<textarea class="note-edit" data-note="${esc(e.name)}" placeholder="Grip, seat setting, how it felt…" aria-label="Note for ${esc(e.name)}">${esc(note)}</textarea>`
       : note ? `<button class="ex-note" data-act="note" data-i="${i}">${esc(note)}</button>` : "";
     const c = `<article class="ex${cls}" data-idx="${i}" style="--c:var(${GVAR[e.group] || "--mobility"})">
-      <header><div><h3 class="ex-title" data-act="detail" data-i="${i}" role="button" tabindex="0" aria-label="${esc(e.name)} history">${esc(e.name)}</h3><span class="tag">${esc(e.group)}</span>${guardTag(e.name)}${modeBtn}${inSS ? '<span class="ss-tag">Superset</span>' : ""}</div>
-        <span class="btns">${!inDone && isStr(e) && e.group !== "Mobility" ? `<button class="icon-btn mv" data-act="move-up" data-i="${i}" aria-label="Move ${esc(e.name)} up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button class="icon-btn mv" data-act="move-down" data-i="${i}" aria-label="Move ${esc(e.name)} down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><button class="icon-btn swap" data-act="swap" data-i="${i}" aria-label="Swap ${esc(e.name)} for something similar" title="Swap for something similar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></button>` : ""}<button class="icon-btn" data-act="note" data-i="${i}" aria-label="${note ? "Edit" : "Add"} note for ${esc(e.name)}">${ICON_PEN}</button>
-        <button class="icon-btn" data-act="del-ex" data-i="${i}" aria-label="Remove ${esc(e.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></header>
+      <header class="exh">${mvHTML}
+        <div class="exh-main"><h3 class="ex-title" data-act="detail" data-i="${i}" role="button" tabindex="0" aria-label="${esc(e.name)} history">${esc(e.name)}</h3>
+          <div class="exh-meta"><span class="grp">${esc(e.group)}</span>${inSS ? '<span class="ss-tag">Superset</span>' : ""}${guardTag(e.name)}</div></div>
+        <span class="btns">${!inDone && isStr(e) && e.group !== "Mobility" ? `<button class="icon-btn swap" data-act="swap" data-i="${i}" aria-label="Swap ${esc(e.name)} for something similar" title="Swap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></button>` : ""}<button class="icon-btn" data-act="note" data-i="${i}" aria-label="${note ? "Edit" : "Add"} note for ${esc(e.name)}">${ICON_PEN}</button><button class="icon-btn" data-act="del-ex" data-i="${i}" aria-label="Remove ${esc(e.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></header>
+      <div class="ex-chips"><button class="howto-chip" data-howto="${esc(e.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>How to</button>${modeBtn}</div>
       ${noteHtml}
       ${prev ? `<p class="last">Last time (${shortDate(prev.date)}): ${esc(describeSets(prev.entry))}</p>` : ""}
       <div class="sets">${e.type === "t" ? (bw ? HEAD.t : HEAD.tw).replace("Seconds", PER_SIDE_RE.test(e.name) ? "Sec per side" : "Seconds") : bw ? HEAD.b : HEAD[e.type] || HEAD.s}${e.sets.map((s,j) => setRow(e,i,s,j,prevSets[j])).join("")}</div>
@@ -2244,7 +2418,7 @@ $("#exList").addEventListener("click", ev => {
   if (act === "note"){ if (justClosed.name === e.name && Date.now() - justClosed.at < 400) return; openNote = openNote === e.name ? null : e.name; renderLog(); return; }
   if (act === "link"){ e.ss = !e.ss; save(); renderLog(); return; }
   if (act === "move-up" || act === "move-down"){ moveEntry(curDate, i, act === "move-up" ? -1 : 1); return; }
-  if (act === "swap"){ swapEntry(curDate, i); return; }
+  if (act === "swap"){ openSwap(curDate, i); return; }
   if (act === "track"){
     const to = e.type === "t" ? "s" : "t";
     if (hold.iv) stopHold(true);
@@ -2342,7 +2516,7 @@ function renderResults(){
     html += `<div class="custom"><p>Add “${esc(raw)}” as a new exercise</p><div class="ctl"><select id="customGroup" aria-label="Muscle group">${GROUPS.filter(g => g !== "Cardio" && g !== "Mobility").map(g => `<option${g === def ? " selected" : ""}>${g}</option>`).join("")}</select><button class="btn" id="addCustom">Add</button></div></div>`;
   }
   if (!shown.length && !q) html += `<p class="hint">${filterGroup === "Recent" ? "Exercises you log will show up here." : "No exercises in this group."}</p>`;
-  html += shown.map(e => `<button class="res" data-name="${esc(e.name)}" style="--c:var(${GVAR[e.group]})"><span class="nm">${esc(e.name)}</span><span class="meta">${guardTag(e.name)}${esc(e.group)}</span></button>`).join("");
+  html += shown.map(e => `<button class="res" data-name="${esc(e.name)}" style="--c:var(${GVAR[e.group]})"><span class="nm">${esc(e.name)}</span><span class="meta">${guardTag(e.name)}${esc(e.group)}</span><span class="res-how" data-howto="${esc(e.name)}" role="button" aria-label="How to do ${esc(e.name)}">?</span></button>`).join("");
   if (pool.length > shown.length) html += `<p class="hint">Showing 80 of ${pool.length}. Keep typing to narrow it down.</p>`;
   $("#results").innerHTML = html;
   const ac = $("#addCustom");
@@ -4422,6 +4596,7 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () 
 /* ---------- settings ---------- */
 function renderCatStatus(){ const el = $("#catStatus"); if (el) el.textContent = catStatus; }
 function renderSettings(){
+  document.querySelectorAll("#themeSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.th === (state.theme || "light")));
   try { renderNoSuggest(); } catch(e){}
   $("#voiceRow").hidden = !hasVoice;
   document.querySelectorAll("#voiceSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.voice === "1") === (state.voice !== false)));
@@ -5373,7 +5548,7 @@ function wpGoalMark(){
   const gs = document.querySelectorAll("#woBody .wo-stats"), g = gs[0]; if (!g) return;
   const goal = +g.dataset.goal, e = wpList()[wp.idx];
   const v = e && e.type === "t" ? (wp.holdStart ? Math.floor((Date.now() - wp.holdStart) / 1000) : 0) : wp.reps;
-  const hit = goal > 0 && v >= goal;
+  const hit = goal > 0 && v >= goal && (wp.camOn || (e && e.type === "t"));
   gs.forEach(x => { if (hit !== x.classList.contains("hit")) x.classList.toggle("hit", hit); });
   if (hit && !wp.goalSaid && (wp.camOn || (e && e.type === "t"))){ wp.goalSaid = true; tones(1318, 2, .1); buzz([80, 60, 80]); say("Goal!", true); }
 }
@@ -5428,7 +5603,7 @@ function wpRender(){
     const target = pset ? (e.type === "t" ? `Last time ${fmtSec(parseSec(pset.sec))}` : `Last time ${bw ? "" : (pset.w ? pset.w + "×" : "")}${pset.r || "–"}`) + " · beat it" : "";
     const doneMarks = e.sets.filter(x => x.done).length;
     const stampHTML = doneMarks ? `<div class="wo-tally">${tallySVG(Array.from({length:doneMarks}, () => "var(--accent)"))}</div>` : "";
-    const head = `<h3 class="pl-name">${esc(e.name)}</h3>${stampHTML}<div class="pl-side">${j >= 0 ? `Set ${j + 1} of ${n}` : `${doneN} ${doneN === 1 ? "set" : "sets"} done`}${wp.phase !== "set" && target ? ` · ${target}` : ""}</div>${wp.phase === "set" ? statsHTML(setStats(e, j, wp.k)) : ""}`;
+    const head = `<h3 class="pl-name">${esc(e.name)}</h3><button class="link pl-how" data-howto="${esc(e.name)}">How to do it</button>${stampHTML}<div class="pl-side">${j >= 0 ? `Set ${j + 1} of ${n}` : `${doneN} ${doneN === 1 ? "set" : "sets"} done`}${wp.phase !== "set" && target ? ` · ${target}` : ""}</div>${wp.phase === "set" ? statsHTML(setStats(e, j, wp.k)) : ""}`;
     const cam = usesCam(e) && wp.phase === "set";
     const media = cam
       ? `<div class="cam-view wo-cam"><video id="woVideo" playsinline muted autoplay></video><canvas id="woCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="woCount">${wp.reps}</div></div><p class="cam-msg" id="woCamMsg">Starting the camera…</p>`
@@ -5812,6 +5987,7 @@ function openExDetail(name){
   $("#exdTitle").textContent = name;
   $("#exdBody").innerHTML = `<p class="exd-tag">${esc(last.group || "")}${bw ? " · bodyweight" : ""}${type === "t" ? " · timed" : ""}</p>
     <div class="exd-stats">${stats.map(([v, l]) => `<div><b>${esc(String(v))}</b><span>${esc(l)}</span></div>`).join("")}</div>
+    <button class="btn ghost wide exd-how" data-howto="${esc(name)}">How to do it</button>
     ${type === "s" ? progRowHTML(name) : ""}
     <h3 class="exd-h">Best set per session</h3>
     <div class="chart">${window.Chart ? '<canvas id="chExd"></canvas>' : '<p class="hint">Charts need an internet connection the first time the app loads.</p>'}</div>
@@ -7020,19 +7196,19 @@ function swapOptions(e, k){
   const m = musclesFor(e) || {}, top = Object.keys(m).sort((a, b) => m[b] - m[a]).slice(0, 2);
   const inDay = new Set(entries(k).map(x => x.name)), tried = new Set([...(e.tried || []), e.name]), seen = new Set(), out = [];
   const ok = x => x && !inDay.has(x.name) && !tried.has(x.name) && !noSuggest().includes(x.name) && !seen.has(x.name) && (seen.add(x.name), true);
-  top.forEach(mk => suggestFor(mk, 20).forEach(x => { if ((x.type === e.type || e.type === "s") && ok(x)) out.push(x); }));
+  const PLYO = /jump|hop\b|hops\b|bound|butt kick|sprint|skip|burpee|plyo/i, plyoOK = PLYO.test(e.name);
+  top.forEach(mk => suggestFor(mk, 30).forEach(x => { if ((x.type === e.type || e.type === "s") && (plyoOK || !PLYO.test(x.name)) && ok(x)) out.push(x); }));
+  /* easier, more familiar moves first; expert-level ones last */
+  const lvl = n => { const h = typeof htFind === "function" && htFind(n), lv = h && h.db ? h.db.lv : ""; return lv === "expert" ? 2 : lv === "intermediate" ? 1 : 0; };
+  out.sort((a, z) => lvl(a.name) - lvl(z.name));
   if (out.length < 3) catalog.filter(x => x.group === e.group && x.type === e.type && canDo(x.name, x.equip) && !guardHit(x.name)).forEach(x => { if (ok(x)) out.push(x); });
   return out;
 }
-function swapEntry(k, i){
-  const L = state.workouts[k], e = L && L[i]; if (!e) return;
-  if (e.sets.some(x => x.done)){ toast("You've already done sets of " + e.name + ". Add a different exercise instead."); return; }
-  const opts = swapOptions(e, k);
-  if (!opts.length){ toast("No other exercises for that muscle with your equipment."); return; }
-  const x = opts[0], old = clone(e), orig = e.orig || e.name;
+function swapEntry(k, i, x, hideIt){
+  const L = state.workouts[k], e = L && L[i]; if (!e || !x) return;
+  const old = clone(e), orig = e.orig || e.name;
   const prevBlock = clone(state.noSuggest || []);
-  /* Tally suggested it and you swapped it out: stop suggesting it. Your own picks and template exercises aren't hidden. */
-  const hide = (e.sug || (e.tried || []).length) && !noSuggest().includes(e.name);
+  const hide = hideIt && !noSuggest().includes(e.name);
   if (hide) state.noSuggest = [...noSuggest(), e.name];
   const was = curDate; curDate = k;
   L[i] = {name:x.name, group:x.group, type:x.type || "s", sid:e.sid, ss:e.ss, from:e.from, orig, sug:true, tried:[...(e.tried || []), e.name], sets:setsFor(x.name, x.type || "s", e.sets.map(s => ({w:"", r:s.r || "", sec:s.sec || ""})))};
@@ -7049,6 +7225,221 @@ $("#noSugList").addEventListener("click", e => {
   const b = e.target.closest("[data-unsug]"); if (!b) return;
   state.noSuggest = noSuggest().filter(n => n !== b.dataset.unsug); save(); renderNoSuggest(); toast(b.dataset.unsug + " can be suggested again.");
 });
+/* ----- light / dark ----- */
+function applyTheme(){
+  const t = state.theme || "light", root = document.documentElement;
+  if (root.dataset.theme !== t) root.dataset.theme = t;
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "light" ? "#F4F0E8" : "#0E0E0E";
+  const cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.content = t;
+}
+$("#themeSeg").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.theme = b.dataset.th; save(); applyTheme(); renderSettings();
+  try { if (!$("#progressView").hidden) renderProgress(); if (!$("#bodyView").hidden) renderBody(); } catch(err){}
+  toast(b.dataset.th === "light" ? "Light look on." : "Dark look on." + " Reopen the app to update the status bar.");
+});
+/* =========================================================
+   HOW TO: step-by-step explainers with photos or an animation
+   ========================================================= */
+const HOWTO_KEY = "tally.howto", HOWTO_IMG = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
+let howtoDB = null;
+try { howtoDB = JSON.parse(store.get(HOWTO_KEY) || "null"); } catch(e){ howtoDB = null; }
+const htNorm = s => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "").replace(/s$/, "");
+function saveHowto(list){
+  const m = {};
+  list.forEach(e => { if (e && e.name && (e.instructions || []).length) m[htNorm(e.name)] = {n:e.name, i:e.instructions, img:(e.images || []).slice(0, 2), lv:e.level || "", eq:e.equipment || "", pm:e.primaryMuscles || [], sm:e.secondaryMuscles || []}; });
+  howtoDB = m;
+  try { store.set(HOWTO_KEY, JSON.stringify(m)); } catch(err){}
+}
+function ensureHowto(){
+  if (howtoDB || ensureHowto.busy || !navigator.onLine) return;
+  ensureHowto.busy = true;
+  fetch(REMOTE_URL).then(r => r.json()).then(saveHowto).catch(() => {}).finally(() => ensureHowto.busy = false);
+}
+/* exercises in Tally's own list, matched to the photo library where it has the same move */
+const HOWTO_ALIAS = {
+  "Ab Wheel Rollout":"Ab Roller", "Arnold Press":"Arnold Dumbbell Press", "Assisted Pull-Up":"Band Assisted Pull-Up", "Back Extension":"Hyperextensions (Back Extensions)",
+  "Back Squat":"Barbell Squat", "Barbell Bench Press":"Barbell Bench Press - Medium Grip", "Barbell Row":"Bent Over Barbell Row", "Box Jump":"Front Box Jump",
+  "Cable Curl":"High Cable Curls", "Cable Lateral Raise":"Cable Seated Lateral Raise", "Cable Woodchopper":"Standing Cable Wood Chop", "Chest Dip":"Dips - Chest Version",
+  "Chest Press Machine":"Leverage Chest Press", "Close-Grip Bench Press":"Close-Grip Barbell Bench Press", "Close-Grip Lat Pulldown":"Close-Grip Front Lat Pulldown", "Crunch":"Crunches",
+  "Deadlift":"Barbell Deadlift", "Dumbbell Curl":"Dumbbell Bicep Curl", "Dumbbell Fly":"Dumbbell Flyes", "Dumbbell Row":"One-Arm Dumbbell Row", "Farmer's Carry":"Farmer's Walk",
+  "Front Raise":"Front Dumbbell Raise", "Front Squat":"Front Barbell Squat", "Glute Bridge":"Butt Lift (Bridge)", "Glute Bridge Hold":"Butt Lift (Bridge)", "Hip Thrust":"Barbell Hip Thrust",
+  "Incline Barbell Bench Press":"Barbell Incline Bench Press - Medium Grip", "Incline Dumbbell Fly":"Incline Dumbbell Flyes", "Jump Rope":"Rope Jumping", "Kettlebell Swing":"One-Arm Kettlebell Swings",
+  "Lat Pulldown":"Wide-Grip Lat Pulldown", "Lateral Raise":"Side Lateral Raise", "Lying Leg Raise":"Flat Bench Lying Leg Raise", "Overhead Press":"Barbell Shoulder Press",
+  "Overhead Tricep Extension":"Standing Dumbbell Triceps Extension", "Rear Delt Fly":"Bent Over Dumbbell Rear Delt Raise With Head On Bench", "Reverse Curl":"Reverse Barbell Curl",
+  "Reverse Lunge":"Crossover Reverse Lunge", "Rope Pushdown":"Triceps Pushdown - Rope Attachment", "Seated Dumbbell Shoulder Press":"Dumbbell Shoulder Press",
+  "Shoulder Press Machine":"Machine Shoulder (Military) Press", "Skull Crusher":"EZ-Bar Skullcrusher", "Step-Up":"Dumbbell Step Ups", "Stiff-Leg Deadlift":"Stiff-Legged Dumbbell Deadlift",
+  "Superman Hold":"Superman", "T-Bar Row":"T-Bar Row with Handle", "Tricep Kickback":"Tricep Dumbbell Kickback", "Tricep Pushdown":"Triceps Pushdown", "Tricep Dip":"Dips - Triceps Version",
+  "Turkish Get-Up":"Kettlebell Turkish Get-Up (Squat style)", "Upright Row":"Standing Dumbbell Upright Row", "Walking Lunge":"Bodyweight Walking Lunge", "Wrist Curl":"Palms-Up Dumbbell Wrist Curl Over A Bench",
+  "Pushups":"Pushups", "Bulgarian Split Squat":"Split Squat with Dumbbells", "Weighted Bar Curl":"Barbell Curl", "Weighted Bar Reverse Curl":"Reverse Barbell Curl",
+  "Weighted Bar Overhead Press":"Barbell Shoulder Press", "Weighted Bar Upright Row":"Upright Barbell Row", "Weighted Bar Bent-Over Row":"Bent Over Barbell Row",
+  "Weighted Bar Front Squat":"Front Barbell Squat", "Weighted Bar Good Morning":"Good Morning", "Weighted Bar Lunge":"Barbell Lunge", "Single-Leg Calf Raise":"Standing Calf Raises"
+};
+/* written for Tally: moves the photo library doesn't cover */
+const HOWTO_OWN = {
+  "Wall Sit":{m:"Quads, glutes", s:["Stand with your back flat against a wall, feet about two feet out in front, hip-width apart.","Slide down until your thighs are about parallel to the floor and your knees are over your ankles.","Keep your back and head on the wall and your weight in your heels.","Hold for the time, breathing steadily, then slide back up."], t:["Knees shouldn't drift past your toes. Move your feet out if they do.","Too hard? Hold a little higher. Going lower is harder."]},
+  "Split Squat Hold":{m:"Quads, glutes", s:["Take a long step forward with one foot, back heel lifted.","Lower your back knee until it's just above the floor, front shin about vertical.","Stay tall with your hands on your hips and hold.","Switch legs and repeat."], t:["Keep most of your weight in the front heel.","Don't let the front knee cave inward."]},
+  "Cossack Squat":{m:"Inner thighs, quads, glutes", s:["Stand with your feet wide, toes turned slightly out.","Shift your weight to one side and sit down into that hip, bending that knee.","Keep the other leg straight with its toes pointing up.","Push back up through the bent leg and switch sides."], t:["Keep the bent-leg heel flat on the floor.","Hold a counterweight in front of you if you tip backward."]},
+  "Bird Dog":{m:"Core, lower back, glutes", s:["Start on hands and knees: hands under shoulders, knees under hips.","Reach one arm forward and the opposite leg back until both are level with your body.","Pause for a second without letting your hips tilt.","Return slowly and switch sides."], t:["Imagine a glass of water on your lower back. Don't spill it.","Move slowly; speed hides wobbling."]},
+  "Dead Bug":{m:"Deep core", s:["Lie on your back with arms reaching to the ceiling and knees bent at 90° above your hips.","Press your lower back into the floor.","Slowly lower one arm overhead and the opposite leg toward the floor.","Bring them back and switch sides."], t:["If your lower back lifts, don't lower as far.","Breathe out as you reach."]},
+  "Clamshells":{m:"Outer hip (glute medius)", s:["Lie on your side with knees bent and stacked, feet together.","Keep your feet touching and lift your top knee as high as you can without rolling your hips back.","Pause, then lower slowly.","Do all reps, then switch sides."], t:["A band just above the knees makes it harder.","Keep your top hip stacked over the bottom one."]},
+  "Lateral Band Walk":{m:"Outer hips, glutes", s:["Put a band around your legs just above the knees or ankles.","Bend your knees slightly into a quarter squat.","Step sideways, keeping tension on the band and your toes forward.","Take all your steps one way, then come back."], t:["Don't let your feet snap together between steps.","Stay low the whole time."]},
+  "Copenhagen Plank":{m:"Inner thighs, core", s:["Lie on your side next to a bench. Rest your top leg on the bench at the knee (easier) or ankle (harder).","Prop yourself up on your forearm.","Lift your hips so your body forms a straight line, bottom leg hanging or lifted.","Hold, then switch sides."], t:["Start with the knee on the bench until it feels easy."]},
+  "Side Plank":{m:"Obliques, core", s:["Lie on your side with your elbow under your shoulder and legs stacked.","Lift your hips so your body is a straight line from head to feet.","Hold without letting your hips sag.","Switch sides."], t:["Bend your bottom knee to make it easier."]},
+  "Hollow Hold":{m:"Abs", s:["Lie on your back, arms overhead and legs straight.","Press your lower back into the floor.","Lift your shoulders and legs a few inches off the floor into a shallow banana shape.","Hold while breathing."], t:["Bend your knees or bring your arms to your sides to make it easier."]},
+  "Boat Hold":{m:"Abs, hip flexors", s:["Sit with knees bent and feet on the floor.","Lean back slightly with a tall chest and lift your feet so your shins are level.","Reach your arms forward and hold.","Straighten your legs to make it harder."], t:["Don't round your back. Stay tall through the chest."]},
+  "Bear Plank Hold":{m:"Core, shoulders", s:["Start on hands and knees.","Tuck your toes and lift your knees an inch off the floor.","Keep your back flat and hold.","Breathe slowly."], t:["Hands under shoulders, knees under hips."]},
+  "Reverse Plank":{m:"Glutes, hamstrings, shoulders", s:["Sit with legs straight and hands on the floor behind your hips, fingers forward.","Press up so your body forms a straight line from shoulders to heels.","Squeeze your glutes and hold."], t:["Keep your neck neutral, looking up."]},
+  "Plank Shoulder Taps":{m:"Core, shoulders", s:["Start in a high plank with feet a bit wider than hips.","Lift one hand and tap the opposite shoulder.","Put it down and switch hands.","Keep your hips as still as you can."], t:["Wider feet make it easier to stay still."]},
+  "Superman Hold":{m:"Lower back, glutes", s:["Lie face down with arms straight overhead.","Lift your arms, chest and legs off the floor together.","Hold, looking at the floor to keep your neck neutral.","Lower and rest."], t:["It's a small lift. Don't crank your neck up."]},
+  "Y-T-W Raises":{m:"Upper back, rear shoulders", s:["Lie face down on a bench or floor (or hinge forward) with arms hanging.","Raise your arms into a Y shape, thumbs up, then lower.","Raise them straight out to the sides in a T, then lower.","Pull elbows back into a W, squeezing your shoulder blades, then lower. That's one rep."], t:["Use no weight or very light weight."]},
+  "Pike Push-Up":{m:"Shoulders, triceps", s:["Start in a push-up position, then walk your feet in and lift your hips high into an upside-down V.","Bend your elbows to lower your head toward the floor between your hands.","Press back up.","Keep your hips high the whole time."], t:["Feet on a box makes it harder."]},
+  "Diamond Push-Up":{m:"Triceps, chest", s:["Get into a push-up position with your hands together under your chest, thumbs and index fingers making a diamond.","Lower your chest to your hands, elbows close to your sides.","Press back up."], t:["Do them on your knees if your form breaks."]},
+  "Bench Dips":{m:"Triceps", s:["Sit on the edge of a bench, hands next to your hips, fingers forward.","Slide your hips off the bench with legs out in front.","Bend your elbows to lower until they're about 90°.","Press back up."], t:["Keep your back close to the bench.","Bend your knees to make it easier."]},
+  "Inverted Row":{m:"Upper back, biceps", s:["Lie under a sturdy bar or table edge set about waist height.","Grab it with hands a bit wider than shoulders.","Keep your body straight and pull your chest to the bar.","Lower slowly."], t:["Bend your knees and walk your feet in to make it easier."]},
+  "Chin-Up":{m:"Lats, biceps", s:["Hang from a bar with palms facing you, hands shoulder-width.","Pull your chest toward the bar until your chin clears it.","Lower all the way to straight arms."], t:["Use a band under your feet or knees for help."]},
+  "Single-Leg Glute Bridge":{m:"Glutes, hamstrings", s:["Lie on your back with knees bent and feet flat.","Lift one foot off the floor.","Push through the other heel to lift your hips until your body is straight from shoulders to knee.","Lower slowly. Do all reps, then switch."], t:["Keep your hips level. Don't let one side drop."]},
+  "Pallof Press":{m:"Core (anti-rotation)", s:["Anchor a band or cable at chest height and stand side-on to it.","Hold the handle at your chest with both hands.","Press it straight out in front, resisting the pull to twist.","Bring it back in. Do all reps, then face the other way."], t:["Stand farther from the anchor to make it harder."]},
+  "Suitcase Carry":{m:"Core, grip", s:["Hold a heavy dumbbell or kettlebell in one hand at your side.","Stand tall and walk, not leaning toward the weight.","Switch hands halfway."], t:["Shoulders level, ribs down."]},
+  "Front Rack Carry":{m:"Core, upper back", s:["Hold kettlebells or dumbbells at your shoulders, elbows in front.","Stand tall and walk slowly.","Keep your ribs down and don't lean back."], t:[]},
+  "Overhead Carry":{m:"Shoulders, core", s:["Press a weight straight overhead and lock your arm.","Walk slowly with the weight stacked over your shoulder.","Switch arms halfway."], t:["Keep your ribs down so your back doesn't arch."]},
+  "Waiter's Carry":{m:"Shoulders, core", s:["Hold a kettlebell or dumbbell overhead with your palm flat like a tray.","Walk slowly with your arm locked.","Switch sides."], t:[]},
+  "Dead Hang":{m:"Grip, shoulders", s:["Grab a pull-up bar with an overhand grip.","Lift your feet and hang with straight arms.","Relax your shoulders slightly but stay in control.","Hold for the time."], t:["Keep a foot on a box if your grip gives out early."]},
+  "Flexed-Arm Hang":{m:"Back, biceps, grip", s:["Jump or step up so your chin is over a pull-up bar.","Hold there with your elbows bent and chest close to the bar.","Lower slowly when you can't hold any longer."], t:[]},
+  "L-Sit":{m:"Abs, hip flexors, triceps", s:["Sit between two sturdy supports or on the floor with hands by your hips.","Press down to lift your hips off the floor.","Lift your legs straight out in front, making an L.","Hold."], t:["Tuck your knees to make it easier."]},
+  "Wall Handstand Hold":{m:"Shoulders, core", s:["Put your hands on the floor about a foot from a wall.","Kick up one leg at a time so your heels rest on the wall.","Press tall through your shoulders and hold.","Come down one leg at a time."], t:["Practice the walk-up from a push-up position with feet on the wall first."]},
+  "Burpee":{m:"Full body", s:["From standing, squat down and put your hands on the floor.","Jump or step your feet back into a plank.","Do a push-up (optional).","Jump or step your feet back to your hands, then stand and jump up."], t:["Step instead of jumping to make it gentler."]},
+  "Nordic Hamstring Curl":{m:"Hamstrings", s:["Kneel with your ankles anchored under something heavy or held by a partner.","Keep your body straight from knees to head.","Slowly lean forward, fighting the fall with your hamstrings.","Catch yourself with your hands and push back up."], t:["Go only as far as you can control."]},
+  "Nordic Curl":{m:"Hamstrings", s:["Kneel with your ankles anchored.","Keep a straight line from knees to head and slowly lower forward.","Catch yourself with your hands and push back up."], t:[]},
+  "Pendlay Row":{m:"Upper back", s:["Bend over with your back flat and nearly parallel to the floor, bar on the floor.","Pull the bar explosively to your lower chest.","Lower it all the way to the floor each rep."], t:["Keep your torso still. Don't jerk with your back."]},
+  "Chest-Supported Row":{m:"Upper back", s:["Lie face down on an incline bench with a dumbbell in each hand.","Pull your elbows back until the weights reach your ribs.","Squeeze your shoulder blades, then lower."], t:[]},
+  "Landmine Press":{m:"Shoulders, chest", s:["Wedge one end of a barbell into a corner and hold the other end at your shoulder.","Stand in a staggered stance.","Press the bar up and forward until your arm is straight.","Lower to your shoulder."], t:[]},
+  "Pec Deck":{m:"Chest", s:["Sit in the machine with your back flat and handles at chest height.","Bring the handles together in front of your chest in a wide arc.","Return slowly until you feel a stretch."], t:[]},
+  "Reverse Pec Deck":{m:"Rear shoulders, upper back", s:["Sit facing the machine pad with arms straight in front, holding the handles.","Pull your arms back and out in a wide arc.","Return slowly."], t:[]},
+  "Hip Abduction Machine":{m:"Outer hips", s:["Sit with your outer thighs against the pads.","Push your knees apart.","Return slowly."], t:[]},
+  "Hip Adduction Machine":{m:"Inner thighs", s:["Sit with your inner thighs against the pads, legs apart.","Squeeze your knees together.","Return slowly."], t:[]},
+  "Thruster":{m:"Legs, shoulders", s:["Hold dumbbells or a bar at your shoulders.","Squat down.","Stand up fast and use that drive to press the weight overhead.","Lower to your shoulders and go straight into the next squat."], t:[]},
+  "Wall Ball":{m:"Legs, shoulders", s:["Stand facing a wall holding a medicine ball at your chest.","Squat down.","Stand up and throw the ball to a target high on the wall.","Catch it and go straight into the next squat."], t:[]},
+  "Bicycle Crunch":{m:"Abs, obliques", s:["Lie on your back, hands behind your head, legs lifted with knees bent.","Bring one elbow toward the opposite knee while straightening the other leg.","Switch sides in a pedaling motion."], t:["Go slowly. Rotate from your ribs, not your neck."]},
+  "Weighted Bar Torso Rotation":{m:"Obliques, core", s:["Rest the weighted bar across your upper back, hands holding it wide.","Stand with your feet hip-width and knees soft.","Rotate your torso to one side, then the other, keeping your hips facing forward."], t:["Move slowly and under control."]},
+  "Single-Leg Calf Raise":{m:"Calves", s:["Stand on one foot on the edge of a step, holding something for balance.","Lower your heel below the step.","Rise up onto your toes as high as you can.","Do all reps, then switch."], t:[]},
+  "Glute Bridge Hold":{m:"Glutes, hamstrings", s:["Lie on your back with knees bent and feet flat.","Push through your heels to lift your hips until your body is straight from shoulders to knees.","Squeeze your glutes and hold."], t:[]}
+};
+const htFind = name => {
+  if (!name) return null;
+  const own = HOWTO_OWN[name];
+  const db = howtoDB ? (howtoDB[htNorm(HOWTO_ALIAS[name] || name)] || howtoDB[htNorm(name)]) : null;
+  if (!own && !db) return null;
+  return {own, db};
+};
+/* a small independent stick figure (the players use their own) */
+const HT_FIG = `<svg class="ht-fig" viewBox="0 0 200 200" aria-hidden="true"><line x1="10" y1="181" x2="190" y2="181" class="ground"/><g class="p"></g>
+  <polyline class="fl far"/><polyline class="fa far"/><path class="to near"/><line class="ne near"/><circle class="he near head" r="10"/><polyline class="nl near"/><polyline class="na near"/><g class="w"></g></svg>`;
+const ht = {raf:0, key:"", t:0, last:0, flip:0};
+function htDraw(root){
+  const f = root.querySelector(".ht-fig"); if (!f) return;
+  const {p} = animPose(ht.key, ht.t), pt = k => `${p[k][0].toFixed(1)},${p[k][1].toFixed(1)}`, q = s => f.querySelector(s);
+  q(".fl").setAttribute("points", `${pt("pl")} ${pt("kl")} ${pt("fl")}`); q(".fa").setAttribute("points", `${pt("sl")} ${pt("el")} ${pt("hl")}`);
+  q(".nl").setAttribute("points", `${pt("pr")} ${pt("kr")} ${pt("fr")}`); q(".na").setAttribute("points", `${pt("sr")} ${pt("er")} ${pt("hr")}`);
+  q(".to").setAttribute("d", `M${pt("hip")} Q${pt("sp")} ${pt("neck")}`);
+  const ne = q(".ne"); ne.setAttribute("x1", p.neck[0]); ne.setAttribute("y1", p.neck[1]); ne.setAttribute("x2", p.head[0]); ne.setAttribute("y2", p.head[1]);
+  const he = q(".he"); he.setAttribute("cx", p.head[0]); he.setAttribute("cy", p.head[1]);
+  const def = ANIMS[ht.key] || {};
+  const w = q(".w"); if (def.wt){ if (w.children.length !== def.wt.length) w.innerHTML = def.wt.map(() => '<rect width="16" height="9" rx="1" class="wt"/>').join("");
+    [...w.children].forEach((rc, n) => { const z = p[def.wt[n]]; if (z){ rc.setAttribute("x", (z[0] - 8).toFixed(1)); rc.setAttribute("y", (z[1] - 2).toFixed(1)); } }); }
+}
+function htLoop(ts){
+  const root = $("#howtoBody");
+  if (!$("#howtoSheet").classList.contains("open")){ ht.raf = 0; return; }
+  const dt = ht.last ? Math.min(.1, (ts - ht.last) / 1000) : 0; ht.last = ts; ht.t += dt;
+  htDraw(root);
+  /* photo flipbook: start position, then the finish, back and forth */
+  const imgs = root.querySelectorAll(".ht-photos img");
+  if (imgs.length === 2){ const on = Math.floor(ht.t / 1.3) % 2; if (on !== ht.flip){ ht.flip = on; imgs[1].classList.toggle("on", !!on); const lb = root.querySelector(".ht-phase"); if (lb) lb.textContent = on ? "Finish" : "Start"; } }
+  ht.raf = requestAnimationFrame(htLoop);
+}
+const titleCase = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+function openHowto(name){
+  ensureHowto();
+  const H = htFind(name), ex = byName[String(name).toLowerCase()] || {};
+  const own = H && H.own, db = H && H.db;
+  const steps = (own && own.s) || (db && db.i) || [];
+  const tips = (own && own.t) || [];
+  const muscles = own ? own.m : db ? [...db.pm, ...db.sm].map(titleCase).join(", ") : "";
+  const equip = db && db.eq ? db.eq : ex.equip || "";
+  const photos = db && db.img && db.img.length === 2 && navigator.onLine;
+  const key = strKey(name), hasFig = key && key !== "breathe";
+  const media = photos
+    ? `<div class="ht-photos"><img src="${HOWTO_IMG + db.img[0]}" alt="${esc(name)}, start position" loading="lazy"><img src="${HOWTO_IMG + db.img[1]}" alt="${esc(name)}, finish position" loading="lazy" class="b"><span class="ht-phase">Start</span></div>`
+    : hasFig ? `<div class="ht-anim">${HT_FIG}</div>` : "";
+  const vid = "https://www.youtube.com/results?search_query=" + encodeURIComponent(name + " exercise proper form");
+  $("#howtoTitle").textContent = name;
+  $("#howtoBody").innerHTML = `${media}
+    <div class="ht-tags">${[ex.group, muscles && muscles !== ex.group ? muscles : "", equip && equip !== "body only" ? titleCase(equip) : equip ? "No equipment" : "", db && db.lv ? titleCase(db.lv) : ""].filter(Boolean).map(t => `<span>${esc(t)}</span>`).join("")}</div>
+    ${steps.length ? `<h3 class="ht-h">How to do it</h3><ol class="ht-steps">${steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>`
+      : `<p class="hint">${howtoDB ? "No written steps for this one yet." : "Step-by-step guides download the first time you're online. Try again in a moment."}</p>`}
+    ${tips.length ? `<h3 class="ht-h">Tips</h3><ul class="ht-tips">${tips.map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
+    ${guardHit(name) ? `<p class="ht-warn">Heads up: this one is hard on your ${guardWord(guardHit(name))}.</p>` : ""}
+    <a class="btn ghost wide ht-vid" href="${vid}" target="_blank" rel="noopener">Watch videos of it</a>`;
+  openSheet($("#howtoSheet"));
+  ht.key = hasFig ? key : "breathe"; ht.t = 0; ht.last = 0; ht.flip = 0;
+  cancelAnimationFrame(ht.raf); ht.raf = requestAnimationFrame(htLoop);
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-howto]"); if (!b) return;
+  e.preventDefault(); e.stopPropagation(); openHowto(b.dataset.howto);
+}, true);
+if (!howtoDB) setTimeout(ensureHowto, 4000);
+
+/* =========================================================
+   SWAP: choose the replacement yourself
+   ========================================================= */
+const swapUI = {k:"", i:-1};
+function openSwap(k, i){
+  const e = (state.workouts[k] || [])[i]; if (!e) return;
+  if (e.sets.some(x => x.done)){ toast("You've already done sets of " + e.name + ". Add a different exercise instead."); return; }
+  Object.assign(swapUI, {k, i});
+  $("#swapTitle").textContent = "Swap " + e.name;
+  $("#swapSearch").value = "";
+  $("#swapHide").checked = !!(e.sug || (e.tried || []).length);
+  $("#swapHideTxt").textContent = `Stop suggesting ${e.name}`;
+  renderSwapList();
+  openSheet($("#swapSheet"));
+}
+function swapThumb(name, group){
+  const db = htFind(name) && htFind(name).db;
+  return db && db.img && db.img[0] && navigator.onLine ? `<img class="sw-thumb" src="${HOWTO_IMG + db.img[0]}" alt="" loading="lazy">` : `<span class="sw-thumb dot" style="--c:var(${GVAR[group] || "--accent"})"></span>`;
+}
+function renderSwapList(){
+  const e = (state.workouts[swapUI.k] || [])[swapUI.i]; if (!e) return;
+  const q = $("#swapSearch").value.trim().toLowerCase();
+  let list, label;
+  if (q){
+    const inDay = new Set(entries(swapUI.k).map(x => x.name)), words = q.split(/\s+/);
+    list = catalog.filter(x => (x.type === "s" || x.type === "t") && x.group !== "Mobility" && x.group !== "Cardio" && !inDay.has(x.name) && words.every(w => x.name.toLowerCase().includes(w)))
+      .sort((a, b) => (canDo(b.name, b.equip) - canDo(a.name, a.equip)) || (b.name.toLowerCase().startsWith(q) - a.name.toLowerCase().startsWith(q))).slice(0, 40);
+    label = `${list.length} ${list.length === 1 ? "match" : "matches"}`;
+  } else { list = swapOptions(Object.assign({}, e, {tried:[]}), swapUI.k).slice(0, 10); label = `Works the same muscles · fits your gym`; }
+  $("#swapList").innerHTML = `<p class="sw-label">${esc(label)}</p>` + (list.length ? list.map(x => {
+    const db = htFind(x.name) && htFind(x.name).db, eq = (db && db.eq) || x.equip || "", have = canDo(x.name, x.equip);
+    const meta = [x.group, eq && eq !== "body only" ? titleCase(eq) : "No equipment", db && db.lv ? titleCase(db.lv) : "", have ? "" : "not in your gym"].filter(Boolean).join(" · ");
+    return `<div class="sw-row"><button class="sw-pick" data-swpick="${esc(x.name)}">${swapThumb(x.name, x.group)}<span><b>${esc(x.name)}</b><small>${esc(meta)}${guardHit(x.name) ? " · hard on your " + guardWord(guardHit(x.name)) : ""}</small></span></button><button class="link sw-how" data-howto="${esc(x.name)}">How to</button></div>`;
+  }).join("") : `<p class="hint">Nothing found. Try another word.</p>`);
+}
+$("#swapSearch").addEventListener("input", renderSwapList);
+$("#swapList").addEventListener("click", e => {
+  const b = e.target.closest("[data-swpick]"); if (!b) return;
+  const name = b.dataset.swpick, x = byName[name.toLowerCase()] || {name, group:"Full body", type:"s"};
+  closeSheet($("#swapSheet"));
+  swapEntry(swapUI.k, swapUI.i, x, $("#swapHide").checked);
+});
+$("#swapRemove").onclick = () => {
+  const L = state.workouts[swapUI.k], e = L && L[swapUI.i]; if (!e) return;
+  const old = clone(e), hide = $("#swapHide").checked, prev = clone(state.noSuggest || []);
+  if (hide && !noSuggest().includes(e.name)) state.noSuggest = [...noSuggest(), e.name];
+  L.splice(swapUI.i, 1); save(); renderLog(); closeSheet($("#swapSheet"));
+  toast(`Removed ${e.name}.`, false, {label:"Undo", fn: () => { state.workouts[swapUI.k].splice(swapUI.i, 0, old); state.noSuggest = prev; save(); renderLog(); }});
+};
 $("#openIntervals").onclick = openIntervals;
 $("#exDetailBtn").onclick = () => { const n = $("#exSelect").value; if (n) openExDetail(n); };
 window.__tally = {buildBalance: l => buildBalanceSession(l), curlStep, openCam, stopCam, suggestFor, guardHit, progAim, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
@@ -7077,7 +7468,7 @@ migrateTimed();
 migrateMobility();
 renderLog();
 handleShortcutImport();
-applyBg("log");
+applyTheme(); applyBg("log");
 resetBeepMark(); renderClock(); syncWake();
 })();
 </script>
