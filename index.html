@@ -4963,7 +4963,9 @@ function anotherHTML(){
 const MP_VER = "0.10.14";
 const MP_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}`;
 const MP_MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
-const CAM_KINDS = [[/push.?ups?\b|press.?ups?\b/i, "pushup"], [/pull.?ups?\b|chin.?ups?\b|muscle.?ups?\b/i, "pullup"], [/\bdips?\b/i, "dip"], [/cossack/i, "cossack"], [/squat/i, "squat"], [/^(?!.*\b(leg|hamstring|nordic|wrist)\b).*\bcurls?\b/i, "curl"]];
+const CAM_KINDS = [[/push.?ups?\b|press.?ups?\b/i, "pushup"], [/pull.?ups?\b|chin.?ups?\b|muscle.?ups?\b/i, "pullup"], [/\bdips?\b/i, "dip"], [/cossack/i, "cossack"], [/^(?!.*\b(walking|stretch)\b).*(\blunges?\b|split squats?\b)/i, "lunge"], [/squat/i, "squat"], [/^(?!.*\b(leg|hamstring|nordic|wrist)\b).*\bcurls?\b/i, "curl"],
+  [/^(?!.*\b(bench|chest|leg|pallof|landmine|floor)\b).*\b(overhead|shoulder|military|push|arnold)\b.*\bpress\b/i, "press"], [/\b(lateral|front|side)\b.*\braises?\b/i, "raise"],
+  [/glute bridges?\b|hip thrusts?\b/i, "bridge"], [/\bsit.?ups?\b/i, "situp"], [/^(ab(dominal)? )?crunch(es)?$/i, "crunch"], [/jumping jacks?\b|star jumps?\b/i, "jack"]];
 const camKind = name => { const m = CAM_KINDS.find(([re]) => re.test(name)); return m ? m[1] : null; };
 let poseLM = null, poseLoading = null;
 const cam = {active:false, stream:null, raf:0, i:-1, day:"", kind:"", facing:"user", lastT:-1, c:null, els:null, onRep:null};
@@ -5141,7 +5143,9 @@ function pullupStep(c, lm, t){
   }
   return false;
 }
-const CAM_STEP = {pushup: pushupStep, pullup: pullupStep, squat: (c, l, t) => squatStep(c, l, t), dip: (c, l, t) => dipStep(c, l, t), cossack: (c, l, t) => cossackStep(c, l, t), curl: (c, l, t) => curlStep(c, l, t)};
+const CAM_STEP = {pushup: pushupStep, pullup: pullupStep, squat: (c, l, t) => squatStep(c, l, t), dip: (c, l, t) => dipStep(c, l, t), cossack: (c, l, t) => cossackStep(c, l, t), curl: (c, l, t) => curlStep(c, l, t),
+  lunge: (c, l, t) => lungeStep(c, l, t), press: (c, l, t) => pressStep(c, l, t), raise: (c, l, t) => raiseStep(c, l, t), bridge: (c, l, t) => bridgeStep(c, l, t),
+  situp: (c, l, t) => situpStep(c, l, t), crunch: (c, l, t) => crunchStep(c, l, t), jack: (c, l, t) => jackStep(c, l, t)};
 /* where to put the phone, per exercise */
 const CAM_TIPS = {
   pushup: ["Phone upright, 4 to 6 feet in front of you, low and tilted up a little.", "Side on works too. Head and shoulders must stay in view.", "Hold the top for a second before your first rep."],
@@ -5149,6 +5153,13 @@ const CAM_TIPS = {
   cossack: ["Phone upright, 6 to 8 feet away, facing you, about waist high.", "Step wide so both feet stay in the picture as you shift side to side.", "Stand tall for a second. Each side counts as one rep."],
   squat: ["Phone upright, 6 to 8 feet away, about waist high.", "In front of you or side on. Your whole body, feet included, should be in view.", "Stand tall for a second before your first rep."],
   dip: ["Phone upright, 6 to 8 feet away. Side on is best.", "Shoulders, elbows and hips should stay in view at the top and the bottom.", "Start at the top with straight arms for a second."],
+  lunge: ["Phone upright, 6 to 8 feet away, about waist high. Side on is best.", "Your whole body, feet included, should be in view. Lunge in place rather than walking.", "Stand tall for a second. Every trip down counts as one rep."],
+  press: ["Phone upright, 5 to 8 feet away, facing you or side on.", "Leave room above your head: your hands must stay in view at the top.", "Hold the weight at your shoulders for a second before your first rep."],
+  raise: ["Phone upright, 5 to 8 feet away. Facing you is best for lateral raises, side on for front raises.", "Shoulders and hands need to stay in view.", "Stand still with your arms down for a second before your first rep."],
+  bridge: ["Phone on the floor or a low step, 5 to 8 feet away, side on to you.", "Shoulders, hips and knees need to stay in view.", "Start with your hips down. Lift until your body makes a straight line."],
+  situp: ["Phone on the floor or a low step, 5 to 8 feet away, side on to you.", "Shoulders, hips and knees need to stay in view.", "Lie back for a second before your first rep."],
+  crunch: ["Phone on the floor or a low step, 5 to 8 feet away, side on to you.", "Shoulders and hips need to stay in view.", "Lie back for a second before your first rep."],
+  jack: ["Phone upright, 6 to 8 feet away, facing you.", "Your whole body, hands overhead and feet included, should be in view.", "Stand still with your arms down for a second, then go."],
   pullup: ["Phone upright, 6 to 8 feet away. In front of you or behind you both work.", "Prop it about waist high and tilt it up so your elbows and shoulders stay in view at the bottom and the top. Hands on the bar can be out of frame.", "Doorway bar? Put the phone in the next room looking through the doorway. Tight on space? Side on works.", "Start from a dead hang for a second."]
 };
 function camTipsHTML(kind){
@@ -5181,7 +5192,7 @@ async function camRun(els, onRep, kind){
   if (cam.els !== els || !cam.stream) return;
   cam.active = true; window.__camOn = true; syncWake();
   cam.c.ar = (v.videoWidth && v.videoHeight) ? v.videoWidth / v.videoHeight : .75;
-  camMsg({curl:"Keep the phone upright, 5 to 8 feet away, with your shoulders, elbows and hands in view.", cossack:"Keep the phone upright, 6 to 8 feet away, facing you, with both feet in view.", pullup:"Keep the phone upright, 6 to 8 feet away, tilted up toward the bar.", squat:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", dip:"Keep the phone upright, 6 to 8 feet away. Side on works best."}[cam.kind] || "Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
+  camMsg({curl:"Keep the phone upright, 5 to 8 feet away, with your shoulders, elbows and hands in view.", cossack:"Keep the phone upright, 6 to 8 feet away, facing you, with both feet in view.", pullup:"Keep the phone upright, 6 to 8 feet away, tilted up toward the bar.", squat:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", dip:"Keep the phone upright, 6 to 8 feet away. Side on works best.", lunge:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", press:"Keep the phone upright, 5 to 8 feet away, with room above your head.", raise:"Keep the phone upright, 5 to 8 feet away, with your shoulders and hands in view.", bridge:"Put the phone low, 5 to 8 feet away, side on to you.", situp:"Put the phone low, 5 to 8 feet away, side on to you.", crunch:"Put the phone low, 5 to 8 feet away, side on to you.", jack:"Keep the phone upright, 6 to 8 feet away, with your whole body in view."}[cam.kind] || "Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
   const loop = () => {
     if (!cam.active || cam.els !== els) return;
     if (v.readyState >= 2 && v.currentTime !== cam.lastT){
@@ -5189,12 +5200,13 @@ async function camRun(els, onRep, kind){
       const t = performance.now();
       let pts = null;
       try { const r = lm.detectForVideo(v, t); pts = r && r.landmarks && r.landmarks[0]; } catch(err){}
-      const rep = (CAM_STEP[cam.kind] || pushupStep)(cam.c, pts, t);
+      const rep = camStep(cam.kind, cam.c, pts, t);
       if (screen.orientation && /landscape/.test(screen.orientation.type || "") && (v.videoHeight > v.videoWidth)) cam.c.msg = "Turn the phone upright. The counter needs a portrait picture.";
-      drawPose(pts); traceFrame(t); if (rep) cam.trace += "|"; camReadyState(v);
+      drawPose(pts); traceFrame(t); if (rep) cam.trace += "|"; else if (cam.c.shortNow) cam.trace += "x"; camReadyState(v);
       const dp = v.parentElement && v.parentElement.querySelector(".cam-depth i");
       if (dp){ dp.style.height = Math.round((cam.c.phase === "setup" ? 0 : cam.c.depth || 0) * 100) + "%"; dp.parentElement.classList.toggle("deep", cam.c.phase === "down"); }
       if (rep){ tones(880, 1); buzz([60]); replay(v.parentElement, "repflash"); if (cam.onRep) cam.onRep(cam.c.reps); say(String(cam.c.reps)); }
+      else if (cam.c.shortNow){ cam.c.shortNow = false; tones(330, 1); buzz([30, 40, 30]); say(CAM_SHORT[cam.kind] || "Go further"); }
       camMsg(cam.c.msg);
     }
     cam.raf = requestAnimationFrame(loop);
@@ -5253,14 +5265,14 @@ function camReadyState(v){
     tones(1175, 2, .11); buzz([60, 40, 60]);
     if (!cam.c.reps) say("Ready. Go.");
   } else if (cam.ready && cam.lN >= 24){ cam.ready = false; box.classList.remove("ready"); }
-  const txt = cam.ready ? (cam.c.reps ? "Tracking" : "Ready · go") : "Get in position";
+  const txt = cam.ready ? (cam.c.reps || cam.c.short ? "Tracking" + (cam.c.short ? ` · ${cam.c.short} short` : "") : "Ready · go") : "Get in position";
   if (pill.textContent !== txt) pill.textContent = txt;
 }
 function saveTrace(actual, counted){
   if (!cam.c) return;
   try {
     const L = JSON.parse(store.get(TRACE_KEY) || "[]");
-    L.push({when:Date.now(), kind:cam.kind, view:cam.c.view || cam.c.side || "", counted:counted == null ? cam.c.reps : counted, actual, trace:cam.trace || ""});
+    L.push({when:Date.now(), kind:cam.kind, view:cam.c.view || cam.c.side || "", counted:counted == null ? cam.c.reps : counted, actual, short:cam.c.short || 0, trace:cam.trace || ""});
     store.set(TRACE_KEY, JSON.stringify(L.slice(-8)));
   } catch(err){}
 }
@@ -5286,13 +5298,13 @@ function stopCam(){
   syncWake();
 }
 function saveCam(){
-  const n = cam.c ? cam.c.reps : 0, e = (state.workouts[cam.day] || [])[cam.i];
+  const n = cam.c ? cam.c.reps : 0, e = (state.workouts[cam.day] || [])[cam.i], sum = camSummary(cam.c);
   stopCam(); closeSheet($("#camSheet"));
   if (!n || !e) return;
   const empty = e.sets.find(s => !num(s.r));
   if (empty) empty.r = String(n); else e.sets.push({w:"", r:String(n)});
   save(); renderLog(); updatePR(cam.i, true); checkMilestones();
-  toast(`${n} ${n === 1 ? "rep" : "reps"} counted.`);
+  toast(`Saved: ${sum}.`);
 }
 $("#camSave").onclick = saveCam;
 $("#camTipsBtn").onclick = () => { if (cam.els) camTips(cam.els, cam.kind, true); };
@@ -6025,7 +6037,10 @@ function dropCount(c, y, scale, need, t, angDown, angUp){
   return false;
 }
 function camPts(c, lm){ const ar = c.ar || .75; return k => ({x: lm[k].x * ar, y: lm[k].y, v: (lm[k] && (lm[k].visibility ?? 1)) || 0}); }
-function squatStep(c, lm, t){
+function squatStep(c, lm, t){ return legDropStep(c, lm, t, .3, 105); }
+/* lunges and split squats: a shorter hip drop than a squat; every trip down counts, whichever leg is in front */
+function lungeStep(c, lm, t){ return legDropStep(c, lm, t, .22, 115); }
+function legDropStep(c, lm, t, need, kneeDown){
   if (!lm || lm.length < 29){ c.msg = "Can't see you. Put the phone 6 to 8 feet away so your whole body is in view."; return false; }
   const P = camPts(c, lm), legs = [];
   let kneeAng = null;
@@ -6041,8 +6056,8 @@ function squatStep(c, lm, t){
   const sh = legs.map(l => l.sy).filter(v => v != null);
   if (sh.length && sh[0] > hy - len * .2){ c.msg = "Stand up tall to start."; c.phase = "setup"; c.seen = 0; c.topY = null; return false; }
   if (kneeAng != null){ c.ang = c.ang == null ? kneeAng : c.ang * .45 + kneeAng * .55; c.angTop = Math.max(c.ang, (c.angTop || 0) - .15); }
-  const angDown = c.ang != null && c.angTop > 150 && c.ang < 105, angUp = c.ang != null && c.ang > c.angTop - 15;
-  return dropCount(c, hy, len, .3, t, angDown, angUp);
+  const angDown = c.ang != null && c.angTop > 150 && c.ang < kneeDown, angUp = c.ang != null && c.ang > c.angTop - 15;
+  return dropCount(c, hy, len, need, t, angDown, angUp);
 }
 /* Cossack squats: a wide stance, sinking onto one leg at a time. Each side counts.
    Signal: your hips drop toward the bent knee; the side comes from where your hips shift. */
@@ -6130,6 +6145,147 @@ function dipStep(c, lm, t){
   const sy = arms.reduce((a, x) => a + x.sy, 0) / arms.length, U = arms.reduce((a, x) => a + x.U, 0) / arms.length;
   const angDown = c.ang != null && c.angTop > 150 && c.ang < c.angTop - 55, angUp = c.ang != null && c.ang > c.angTop - 18;
   return dropCount(c, sy, U, .45, t, angDown, angUp);
+}
+
+/* =========================================================
+   CAMERA: presses, raises, bridges, sit-ups, crunches, jumping jacks
+   ========================================================= */
+/* shared start-to-finish counter: p is 0 at the start of a rep and 1 at the finish. Counts at the finish,
+   then waits for you to go back to the start. o: {top, bottom, go, back, start, still, gap} */
+function rangeCount(c, p, t, o){
+  c.p = c.p == null ? p : c.p * .45 + p * .55;
+  c.depth = c.p;
+  c.seen = (c.seen || 0) + 1;
+  if (c.phase === "setup" || !c.phase){ if (c.p < o.bottom && c.seen > (o.still || 8)){ c.phase = "down"; c.msg = o.go; } else c.msg = o.start; return false; }
+  if (c.phase === "down"){
+    if (c.p > o.top && t - (c.lastRep || 0) > (o.gap || 400)){ c.reps++; c.lastRep = t; c.phase = "top"; c.msg = "Good. " + o.back; return true; }
+    c.msg = c.p > .45 ? "Higher" : o.go; return false;
+  }
+  if (c.p < o.bottom){ c.phase = "down"; c.msg = o.go; } else c.msg = o.back;
+  return false;
+}
+/* the lowest value seen, creeping up slowly so a shift in position doesn't lock it low forever */
+const lowMark = (c, v) => (c.lo = c.lo == null ? v : Math.min(v, c.lo + (c.phase === "top" ? 0 : .02)));
+/* the better-seen side when you're side on to the phone: [shoulder, hip, knee, ankle] */
+function sideLeg(P){
+  const L = [11, 23, 25, 27].map(P), R = [12, 24, 26, 28].map(P);
+  const sc = a => a[0].v + a[1].v + a[2].v;
+  return sc(L) >= sc(R) ? L : R;
+}
+/* Overhead and shoulder presses, barbell or dumbbells: hands go from your shoulders to straight overhead. */
+function pressStep(c, lm, t){
+  if (!lm || lm.length < 17){ c.msg = "Can't see you. Put the phone 5 to 8 feet away with your upper body in view."; return false; }
+  if (bodyMoving(c, lm, t)){ c.msg = "Get in place and hold the weight at your shoulders."; c.phase = "setup"; c.seen = 0; return false; }
+  const P = camPts(c, lm), arms = [];
+  let low = 0, seen = 0;
+  c.al = c.al || {};
+  for (const [si, ei, wi] of [[11, 13, 15], [12, 14, 16]]){
+    const S = P(si), E = P(ei), W = P(wi);
+    if (S.v < .5 || E.v < .45 || W.v < .45) continue;
+    seen++;
+    const len = Math.hypot(S.x - E.x, S.y - E.y) + Math.hypot(E.x - W.x, E.y - W.y);
+    if (c.phase !== "top") c.al[si] = Math.max(len, (c.al[si] || 0) * .996);       /* arm length, learned at the shoulders */
+    const L = c.al[si] || len; if (!L) continue;
+    if (W.y > S.y + L * .55){ low++; continue; }                                    /* hands hanging down by your sides */
+    const lift = Math.max(0, Math.min(1, ((S.y - W.y) / L - .05) / .8));            /* 0 hands at the shoulders, 1 straight overhead */
+    const ext = Math.max(0, Math.min(1, (angleAt(S, E, W) - 75) / 90));              /* elbow straightening */
+    arms.push(lift * .6 + ext * .4);
+  }
+  if (!seen){ c.msg = "Can't see your arms. Step back so your hands stay in view overhead."; return false; }
+  if (!arms.length){ c.msg = "Bring the weight up to your shoulders to start."; if (c.phase !== "setup"){ c.phase = "setup"; c.seen = 0; } return false; }
+  return rangeCount(c, Math.max(...arms), t, {top:.8, bottom:.3, go:"Press", back:"Back to your shoulders", start:"Hold the weight at your shoulders"});
+}
+/* Lateral and front raises: straight-ish arms lift from your sides to shoulder height. Facing the phone works best for lateral raises. */
+function raiseStep(c, lm, t){
+  if (!lm || lm.length < 17){ c.msg = "Can't see you. Put the phone 5 to 8 feet away with your upper body in view."; return false; }
+  if (bodyMoving(c, lm, t)){ c.msg = "Get in place and stand still with your arms down."; c.phase = "setup"; c.seen = 0; return false; }
+  const P = camPts(c, lm), arms = [];
+  c.rl = c.rl || {};
+  for (const [si, wi] of [[11, 15], [12, 16]]){
+    const S = P(si), W = P(wi);
+    if (S.v < .5 || W.v < .45) continue;
+    const d = Math.hypot(S.x - W.x, S.y - W.y);
+    if (c.phase !== "top") c.rl[si] = Math.max(d, (c.rl[si] || 0) * .996);
+    const L = c.rl[si] || d; if (!L) continue;
+    arms.push(Math.max(0, Math.min(1, (1 - (W.y - S.y) / L) / .9)));               /* 0 hanging, 1 at shoulder height */
+  }
+  if (!arms.length){ c.msg = "Can't see your arms. Step back so your shoulders and hands are in view."; return false; }
+  return rangeCount(c, Math.max(...arms), t, {top:.82, bottom:.3, go:"Raise", back:"Lower slowly", start:"Arms down by your sides to start"});
+}
+/* Glute bridges and hip thrusts, side on: the shoulder-hip-knee line straightens as your hips come up. */
+function bridgeStep(c, lm, t){
+  if (!lm || lm.length < 29){ c.msg = "Can't see you. Put the phone 5 to 8 feet away, side on, low to the floor."; return false; }
+  const [S, H, K] = sideLeg(camPts(c, lm));
+  if (S.v < .5 || H.v < .5 || K.v < .5){ c.msg = "Can't see your shoulders, hips and knees. Turn side on to the phone."; return false; }
+  if (Math.abs(Math.atan2(H.y - S.y, Math.abs(S.x - H.x)) * 180 / Math.PI) > 60){ c.msg = "Lie on your back, side on to the phone."; c.phase = "setup"; c.seen = 0; c.lo = null; return false; }
+  const ang = angleAt(S, H, K);
+  const lo = lowMark(c, ang);
+  let p = Math.max(0, Math.min(1, (ang - lo) / Math.max(22, 172 - lo)));
+  if (ang < 150) p = Math.min(p, .75);                                              /* hips have to come all the way up */
+  return rangeCount(c, p, t, {top:.8, bottom:.3, go:"Hips up", back:"Lower", start:"Hips down to start"});
+}
+/* Sit-ups and crunches, side on: your shoulders rise off the floor while your hips stay down. */
+function situpStep(c, lm, t){ return curlUpStep(c, lm, t, 55, "Sit up"); }
+function crunchStep(c, lm, t){ return curlUpStep(c, lm, t, 16, "Crunch"); }
+function curlUpStep(c, lm, t, range, go){
+  if (!lm || lm.length < 29){ c.msg = "Can't see you. Put the phone 5 to 8 feet away, side on, low to the floor."; return false; }
+  const P = camPts(c, lm), [S, H, K, A] = sideLeg(P);
+  if (S.v < .5 || H.v < .5){ c.msg = "Can't see your shoulders and hips. Turn side on to the phone."; return false; }
+  const leg = K.v > .5 && A.v > .5 ? Math.hypot(H.x - K.x, H.y - K.y) + Math.hypot(K.x - A.x, K.y - A.y) : 0;
+  if (leg && A.y - H.y > leg * .5){ c.msg = "Lie on your back, side on to the phone."; c.phase = "setup"; c.seen = 0; c.lo = null; return false; }
+  const elev = Math.atan2(H.y - S.y, Math.abs(S.x - H.x)) * 180 / Math.PI;           /* torso angle off the floor */
+  const lo = lowMark(c, elev);
+  return rangeCount(c, Math.max(0, Math.min(1, (elev - lo) / range)), t, {top:.8, bottom:.3, go, back:"Back down", start:"Lie back to start"});
+}
+/* Jumping jacks, facing the phone: hands go overhead while your feet jump wide. */
+function jackStep(c, lm, t){
+  if (!lm || lm.length < 29){ c.msg = "Can't see you. Put the phone 6 to 8 feet away, facing you, with your whole body in view."; return false; }
+  const P = camPts(c, lm), lS = P(11), rS = P(12), lW = P(15), rW = P(16), lA = P(27), rA = P(28);
+  if (lS.v < .5 || rS.v < .5 || lW.v < .45 || rW.v < .45){ c.msg = "Face the phone with your arms in view."; return false; }
+  const sw = Math.hypot(lS.x - rS.x, lS.y - rS.y); if (sw < .03){ c.msg = "Face the phone."; return false; }
+  const d = (Math.hypot(lS.x - lW.x, lS.y - lW.y) + Math.hypot(rS.x - rW.x, rS.y - rW.y)) / 2;
+  if (c.phase !== "top") c.al = Math.max(d, (c.al || 0) * .996);
+  const L = c.al || d, sy = (lS.y + rS.y) / 2, wy = (lW.y + rW.y) / 2;
+  const arms = Math.max(0, Math.min(1, (sy + L - wy) / (L * 1.8)));                 /* 0 hands at your sides, 1 overhead */
+  const feet = lA.v > .5 && rA.v > .5 ? Math.max(0, Math.min(1, (Math.abs(lA.x - rA.x) / sw - 1) / .9)) : null;
+  return rangeCount(c, feet == null ? arms : (arms + feet) / 2, t, {top:.75, bottom:.3, go:"Jump", back:"Back in", start:"Stand still, arms down", still:6, gap:250});
+}
+
+/* ----- wrapped around every counter: short reps and rep speed ----- */
+/* A short rep: you got at least halfway, went back to the start, and it didn't count. */
+const CAM_SHORT = {pushup:"Go lower", pullup:"Pull higher", dip:"Dip lower", squat:"Squat deeper", lunge:"Lower the back knee more", cossack:"Sink lower", curl:"Curl all the way up", press:"Lock out overhead", raise:"Raise to shoulder height", bridge:"Hips all the way up", situp:"Sit all the way up", crunch:"Crunch higher", jack:"Hands all the way up"};
+function camStep(kind, c, pts, t){
+  const rep = (CAM_STEP[kind] || pushupStep)(c, pts, t);
+  c.short = c.short || 0; c.times = c.times || [];
+  if (rep){
+    c.pk = -1; c.note = null;
+    const prev = c.times[c.times.length - 1]; c.times.push(t);
+    const gaps = c.times.slice(1).map((x, i) => x - c.times[i]);
+    if (prev != null && gaps.length >= 4){                                        /* slower than your first few reps: you're tiring */
+      const base = gaps.slice(0, 3).sort((a, b) => a - b)[1];
+      if (t - prev > base * 1.6 && t - prev < 15000) c.msg = "Good. Slowing down";
+    }
+    return true;
+  }
+  const d = c.phase === "setup" || !c.phase || c.depth == null ? null : c.depth;
+  if (d == null) c.pk = -1;
+  else if (c.pk == null || c.pk < 0){ if (d < .2) c.pk = 0; }                     /* start watching once you're back at the start */
+  else {
+    c.pk = Math.max(c.pk, d);
+    if (d < .15){
+      if (c.pk >= .5 && c.pk < .95){ c.short++; c.note = {text:(CAM_SHORT[kind] || "Go further") + ". That one didn't count", until:t + 1800}; c.shortNow = true; }
+      c.pk = 0;
+    }
+  }
+  if (c.note && t < c.note.until) c.msg = c.note.text; else c.note = null;
+  return false;
+}
+/* "12 reps · 2.3 s each · 2 short" */
+function camSummary(c){
+  if (!c || !c.reps) return "";
+  const g = (c.times || []).slice(1).map((x, i) => x - c.times[i]).filter(x => x < 15000);
+  const avg = g.length >= 2 ? g.reduce((a, b) => a + b, 0) / g.length / 1000 : 0;
+  return [`${c.reps} ${c.reps === 1 ? "rep" : "reps"}`, avg ? `${avg.toFixed(1)} s each` : "", c.short ? `${c.short} short ${c.short === 1 ? "rep" : "reps"} not counted` : ""].filter(Boolean).join(" · ");
 }
 
 /* =========================================================
@@ -7442,7 +7598,7 @@ $("#swapRemove").onclick = () => {
 };
 $("#openIntervals").onclick = openIntervals;
 $("#exDetailBtn").onclick = () => { const n = $("#exSelect").value; if (n) openExDetail(n); };
-window.__tally = {buildBalance: l => buildBalanceSession(l), curlStep, openCam, stopCam, suggestFor, guardHit, progAim, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
+window.__tally = {buildBalance: l => buildBalanceSession(l), curlStep, openCam, stopCam, suggestFor, guardHit, progAim, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, lungeStep, pressStep, raiseStep, bridgeStep, situpStep, crunchStep, jackStep, camStep, camSummary, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
 
 /* ---------- full-height fix for iPhone home-screen apps ---------- */
 function setAppHeight(){ document.documentElement.style.setProperty("--app-h", Math.max(window.innerHeight, screen.height && window.navigator.standalone ? screen.height : 0) + "px"); }
