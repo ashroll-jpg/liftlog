@@ -1416,6 +1416,38 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
 .empty .quick{margin-left:-12px;margin-right:-12px}
 .empty .quick .btn{width:100%;padding:15px;border-radius:var(--r,12px)}
 [hidden]{display:none!important}
+/* special modes: Murph */
+.mu-intro{margin:0 0 6px}
+.mu-intro b{font-family:var(--display);font-weight:900;font-stretch:120%;text-transform:uppercase;font-size:22px}
+.mu-intro p{margin:4px 0 0;color:var(--mute);font-size:15px;line-height:1.35}
+.mu-best{font-family:var(--mono);font-size:13px;color:var(--str);margin-top:6px}
+.mu-steps{display:flex;flex-direction:column;gap:8px;margin:12px 0 6px}
+.mu-row{display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:var(--r,6px);background:var(--surface)}
+.mu-row .mu-name{grid-column:1/-1;font-weight:600}
+.mu-row input{width:100%;min-width:0;padding:9px 10px;border:1px solid var(--line);background:var(--field);border-radius:4px;font-size:16px}
+.mu-kind{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:8px 8px;border-radius:4px;border:1px solid var(--line);background:none;color:var(--ink);min-width:62px}
+.mu-kind.c{background:var(--car);color:#F2EFE8;border-color:transparent}
+.mu-move{display:flex;gap:2px}
+.mu-move button{width:30px;height:34px;border:0;background:none;color:var(--mute);font-size:16px}
+.mu-move button:disabled{opacity:.25}
+.mu-add{display:flex;gap:18px;justify-content:center;margin:4px 0 8px}
+.mu-sum{font-family:var(--mono);font-size:13px;color:var(--mute);text-align:center;margin:10px 0 4px}
+.mu-clock-l{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.mu-clock.over{color:#D9534F}
+.mu-tot{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px;width:100%}
+.mu-tot div{padding:6px 4px;border-radius:4px;background:var(--surface);font-family:var(--mono);font-size:12px;color:var(--mute);line-height:1.3}
+.mu-tot div b{display:block;color:var(--ink);font-size:15px}
+.mu-tot div.on{outline:2px solid var(--str)}
+.mu-tot div.ok b{color:var(--mob)}
+.mu-count{font-family:var(--mono);font-weight:700;font-size:min(22vw,96px);line-height:1;font-variant-numeric:tabular-nums}
+.mu-count small{font-size:.4em;color:var(--mute)}
+.mu-plus{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
+.mu-plus .btn{padding:14px 4px;font-size:17px}
+.mu-split{font-family:var(--mono);font-size:15px;color:var(--mute)}
+.mu-res{width:100%;text-align:left;border-collapse:collapse;font-size:15px}
+.mu-res td{padding:7px 4px;border-bottom:1px solid var(--line)}
+.mu-res td:last-child{text-align:right;font-family:var(--mono)}
+#muPlayer .cam-view{width:100%;min-height:200px;max-height:34vh;flex:none;height:34vh}
 </style>
 </head>
 <body>
@@ -1454,7 +1486,7 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
     <div class="daytools" id="dayTools"></div>
     <div class="list" id="exList"></div>
     <button class="add-big" id="openPicker"><span class="add-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Add exercise</button>
-    <div class="tools-row"><button class="link" id="openIntervals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>Interval timer</button><button class="link" id="openPlan2">Plan my week</button></div>
+    <div class="tools-row"><button class="link" id="openIntervals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>Interval timer</button><button class="link" id="openSpecial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Special modes</button><button class="link" id="openPlan2">Plan my week</button></div>
   </main>
 
   <main id="cardioView" hidden>
@@ -1859,6 +1891,22 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
   <div class="panel">
     <div class="sheet-head"><h2 id="ivPTitle">Intervals</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div id="ivPlayBody"></div>
+  </div>
+</div>
+<div class="sheet" id="muSheet" role="dialog" aria-modal="true" aria-labelledby="muTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="muTitle">Special modes</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="exd-scroll" id="muBody"></div>
+    <datalist id="muNames"></datalist>
+    <button class="btn wide" id="muStart">Start Murph</button>
+  </div>
+</div>
+<div class="sheet" id="muPlayer" role="dialog" aria-modal="true" aria-labelledby="muPTitle">
+  <div class="scrim"></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="muPTitle">Murph</h2><button class="icon-btn" data-mu-x aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="muPlayBody"></div>
   </div>
 </div>
 <div class="sheet" id="mobPlayer" role="dialog" aria-modal="true" aria-labelledby="plTitle">
@@ -2808,7 +2856,7 @@ setInterval(clockTick, 250);
 
 /* ---------- keep the screen on while a timer runs ---------- */
 let wakeLock = null, wakePending = false;
-const wantAwake = () => clockRunning() || !!timer.iv || !!hold.iv || !!(typeof player !== "undefined" && player.iv) || !!(typeof ivp !== "undefined" && ivp && ivp.iv) || !!(window.__camOn) || !!(typeof pp !== "undefined" && pp.iv);
+const wantAwake = () => clockRunning() || !!timer.iv || !!hold.iv || !!(typeof player !== "undefined" && player.iv) || !!(typeof ivp !== "undefined" && ivp && ivp.iv) || !!(window.__camOn) || !!(typeof pp !== "undefined" && pp.iv) || !!(typeof mp !== "undefined" && mp && mp.iv);
 async function syncWake(){
   if (wantAwake() && document.visibilityState === "visible"){
     if (!wakeLock && !wakePending && "wakeLock" in navigator){
@@ -4931,6 +4979,310 @@ function ivLog(){
   if (state.finished) delete state.finished[day];
   save(); closeSheet($("#ivPlayer")); curDate = day; showTab("log"); checkMilestones();
   toast(`Logged ${sets.length} ${sets.length === 1 ? "set" : "sets"} of ${ex.name}.`);
+}
+
+/* ---------- SPECIAL MODES: MURPH ----------
+   For time, under a time cap: cardio and rep steps in order. The app runs the clock and keeps your rep counts;
+   cardio steps only time themselves (no distance). Rep steps between two cardio steps can be split into rounds. */
+const MU_DEF = {cap:3600, rounds:1, vest:"", cam:false, steps:[
+  {kind:"c", name:"Road Running", goal:"1 mile"},
+  {kind:"r", name:"Pull-Up", target:100},
+  {kind:"r", name:"Push-Up", target:200},
+  {kind:"r", name:"Bodyweight Squat", target:300},
+  {kind:"c", name:"Road Running", goal:"1 mile"}]};
+function muCfg(){
+  const c = Object.assign({}, MU_DEF, state.murph || {});
+  c.steps = (Array.isArray(c.steps) && c.steps.length ? c.steps : MU_DEF.steps).map(x => Object.assign({}, x));
+  return c;
+}
+function muSave(c){ state.murph = c; save(); }
+/* the run order: cardio steps as they are; each block of rep steps between them, round by round */
+function muStages(c){
+  const out = []; let block = [];
+  const R = Math.max(1, c.rounds || 1);
+  const flush = () => {
+    for (let r = 0; r < R; r++) block.forEach(({x, i}) => {
+      const n = Math.floor(x.target / R) + (r < x.target % R ? 1 : 0);
+      if (n > 0) out.push({kind:"r", i, name:x.name, target:n, round:r + 1, rounds:R});
+    });
+    block = [];
+  };
+  c.steps.forEach((x, i) => {
+    if (!x.name || !x.name.trim()) return;
+    if (x.kind === "c"){ flush(); out.push({kind:"c", i, name:x.name.trim(), goal:(x.goal || "").trim()}); }
+    else if (num(x.target) > 0) block.push({x:{name:x.name.trim(), target:Math.round(num(x.target))}, i});
+  });
+  flush();
+  return out;
+}
+const muStepTxt = x => x.kind === "c" ? (x.goal ? `${x.name.trim()} (${x.goal.trim()})` : x.name.trim()) : `${x.name.trim()} ×${fmtN(num(x.target))}`;
+function muRoundTxt(c){
+  const R = c.rounds || 1;
+  if (R <= 1) return "Straight through: finish each exercise before the next.";
+  const reps = c.steps.filter(x => x.kind !== "c" && num(x.target) > 0 && x.name.trim());
+  return `${R} rounds of ${listWords(reps.map(x => { const n = num(x.target) / R; return `${Number.isInteger(n) ? n : "~" + Math.round(n)} ${x.name.trim().toLowerCase().replace(/([^s])$/, "$1s")}`; }))}.`;
+}
+function muBest(){ const L = (state.murphLog || []).filter(x => x.full); return L.length ? L.reduce((a, b) => b.sec < a.sec ? b : a) : null; }
+
+function openSpecial(){
+  const dl = $("#muNames");
+  if (dl){ const names = new Set([...recentNames(), ...CARDIO_TYPES.map(t => t[0]), "Pull-Up", "Push-Up", "Bodyweight Squat", "Burpee", "Jump Rope", "Rowing"]); dl.innerHTML = [...names].slice(0, 80).map(n => `<option value="${esc(n)}">`).join(""); }
+  renderMuSetup(); openSheet($("#muSheet"));
+}
+function renderMuSetup(){
+  const c = muCfg(), best = muBest(), n = c.steps.length;
+  const rows = c.steps.map((x, i) => `<div class="mu-row" data-i="${i}">
+      <input type="text" class="mu-name" list="muNames" data-mf="name" value="${esc(x.name)}" placeholder="${x.kind === "c" ? "Run, row, bike…" : "Exercise"}" autocomplete="off" aria-label="Name">
+      <button class="mu-kind${x.kind === "c" ? " c" : ""}" data-mu="kind" aria-label="Switch between cardio and reps">${x.kind === "c" ? "Cardio" : "Reps"}</button>
+      ${x.kind === "c" ? `<input type="text" data-mf="goal" value="${esc(x.goal || "")}" placeholder="Goal, e.g. 1 mile (just a label)" aria-label="Goal (just a label)">` : `<input inputmode="numeric" data-mf="target" value="${esc(String(x.target || ""))}" placeholder="Total reps" aria-label="Total reps">`}
+      <div class="mu-move"><button data-mu="up" aria-label="Move up"${i ? "" : " disabled"}>↑</button><button data-mu="down" aria-label="Move down"${i < n - 1 ? "" : " disabled"}>↓</button><button data-mu="del" aria-label="Remove"${n > 1 ? "" : " disabled"}>✕</button></div>
+    </div>`).join("");
+  const step = (k, label, val, small) => `<div class="setting"><p>${label}${small ? `<small>${small}</small>` : ""}</p><div class="stepper"><button data-mu="${k}-" aria-label="Less">−</button><b>${val}</b><button data-mu="${k}+" aria-label="More">+</button></div></div>`;
+  $("#muBody").innerHTML = `
+    <div class="mu-intro"><b>Murph</b><p>For time: run, pull-ups, push-ups, squats, run. Swap, add or remove anything. Cardio steps just keep time, no distance.</p>
+      ${best ? `<div class="mu-best">Best: ${fmtHMS(best.sec)} · ${shortDate(best.date)}</div>` : ""}</div>
+    <div class="mu-steps">${rows}</div>
+    <div class="mu-add"><button class="link" data-mu="addc">+ Cardio</button><button class="link" data-mu="addr">+ Exercise</button></div>
+    ${step("cap", "Time cap", fmtHMS(c.cap), "Counts down. You can keep going past it")}
+    ${step("rounds", "Rounds", c.rounds, esc(muRoundTxt(c)))}
+    <div class="setting"><p>Vest or weight<small>Optional, saved with each set (${state.unit})</small></p><input class="mu-vest" inputmode="decimal" data-mf="vest" value="${esc(String(c.vest || ""))}" placeholder="0" style="width:80px;padding:9px 10px;border:1px solid var(--line);background:var(--field);border-radius:4px;font-size:16px;text-align:center"></div>
+    <div class="setting"><p>Count reps with the camera<small>For push-ups, pull-ups and squats. Off means you tap + as you go</small></p><div class="seg" id="muCamSeg"><button data-mucam="0" aria-pressed="${!c.cam}">Off</button><button data-mucam="1" aria-pressed="${!!c.cam}">On</button></div></div>
+    <p class="mu-sum">${esc(muStages(c).length ? c.steps.filter(x => x.name.trim()).map(muStepTxt).join(" · ") : "Add at least one step.")}</p>
+    <p style="text-align:center;margin:4px 0 0"><button class="link" data-mu="reset">Back to the classic Murph</button></p>`;
+  $("#muStart").disabled = !muStages(c).length;
+}
+$("#muBody").addEventListener("click", e => {
+  const cs = e.target.closest("[data-mucam]"); if (cs){ const c = muCfg(); c.cam = cs.dataset.mucam === "1"; muSave(c); renderMuSetup(); return; }
+  const b = e.target.closest("[data-mu]"); if (!b) return;
+  const c = muCfg(), a = b.dataset.mu, row = b.closest(".mu-row"), i = row ? +row.dataset.i : -1;
+  if (a === "kind"){ const x = c.steps[i]; x.kind = x.kind === "c" ? "r" : "c"; if (x.kind === "r" && !num(x.target)) x.target = 50; }
+  else if (a === "up" && i > 0) [c.steps[i - 1], c.steps[i]] = [c.steps[i], c.steps[i - 1]];
+  else if (a === "down" && i < c.steps.length - 1) [c.steps[i + 1], c.steps[i]] = [c.steps[i], c.steps[i + 1]];
+  else if (a === "del" && c.steps.length > 1) c.steps.splice(i, 1);
+  else if (a === "addc") c.steps.push({kind:"c", name:"Road Running", goal:""});
+  else if (a === "addr") c.steps.push({kind:"r", name:"", target:50});
+  else if (a === "reset"){ if (!confirm("Go back to the classic Murph?")) return; Object.assign(c, {steps:MU_DEF.steps.map(x => Object.assign({}, x)), rounds:1, cap:3600}); }
+  else if (a === "cap-" || a === "cap+") c.cap = Math.min(4 * 3600, Math.max(300, c.cap + (a === "cap+" ? 300 : -300)));
+  else if (a === "rounds-" || a === "rounds+") c.rounds = Math.min(50, Math.max(1, (c.rounds || 1) + (a === "rounds+" ? 1 : -1)));
+  muSave(c); renderMuSetup();
+  if (a === "addr"){ const ins = document.querySelectorAll('#muBody [data-mf="name"]'); const last = ins[ins.length - 1]; if (last) last.focus(); }
+});
+$("#muBody").addEventListener("input", e => {
+  const f = e.target.dataset.mf; if (!f) return;
+  const c = muCfg();
+  if (f === "vest") c.vest = e.target.value.replace(/[^\d.]/g, "");
+  else {
+    const i = +e.target.closest(".mu-row").dataset.i;
+    c.steps[i][f] = f === "target" ? e.target.value.replace(/\D/g, "") : e.target.value;
+  }
+  muSave(c);
+  const sm = document.querySelector("#muBody .mu-sum"); if (sm) sm.textContent = muStages(c).length ? c.steps.filter(x => x.name.trim()).map(muStepTxt).join(" · ") : "Add at least one step.";
+  $("#muStart").disabled = !muStages(c).length;
+});
+$("#openSpecial").onclick = openSpecial;
+
+/* ----- the Murph player ----- */
+var mp = {iv:null, phase:"", cfg:null, st:[], si:0, count:0, res:[], t0:0, start:0, pauseMs:0, pausedAt:0, readyEnd:0, stStart:0, cued:{}, camBase:0, camOn:false};
+const muElapsed = () => !mp.t0 ? 0 : ((mp.phase === "paused" ? mp.pausedAt : Date.now()) - mp.t0 - mp.pauseMs) / 1000;
+$("#muStart").onclick = () => {
+  const c = muCfg(), st = muStages(c); if (!st.length) return;
+  ensureAudio();
+  Object.assign(mp, {cfg:c, st, si:0, count:0, res:[], t0:0, start:0, pauseMs:0, pausedAt:0, readyEnd:Date.now() + 10000, stStart:0, cued:{}, keep:{}, phase:"ready"});
+  closeSheet($("#muSheet")); openSheet($("#muPlayer"));
+  clearInterval(mp.iv); mp.iv = setInterval(muTick, 250);
+  say(`Murph. ${st.length} ${st.length === 1 ? "step" : "steps"}, ${secWords(c.cap)} cap. Starting in 10 seconds.`);
+  renderMu(); syncWake();
+};
+function muGo(){
+  mp.phase = "go"; mp.t0 = mp.start = Date.now(); mp.stStart = 0;
+  tones(880, 2, .12); buzz([150]); muAnnounce(); renderMu();
+}
+function muAnnounce(){ const x = mp.st[mp.si]; if (!x) return; say(x.kind === "c" ? `Go. ${x.goal ? x.goal + " " : ""}${x.name}.` : `${x.rounds > 1 ? `Round ${x.round}. ` : ""}${x.target} ${x.name}.`); }
+function muTick(){
+  if (mp.phase === "ready"){
+    const left = Math.max(0, Math.ceil((mp.readyEnd - Date.now()) / 1000));
+    const t = $("#muTime"); if (t) t.textContent = fmtHMS(left);
+    if (left <= 3 && left > 0 && mp.cued.r !== left){ mp.cued.r = left; tones(600, 1); }
+    if (left <= 0) muGo();
+    return;
+  }
+  if (mp.phase !== "go" && mp.phase !== "paused") return;
+  const el = muElapsed(), cap = mp.cfg.cap, left = cap - el;
+  const t = $("#muTime"), lab = $("#muTimeL"), bar = $("#muBar"), sp = $("#muSplit");
+  if (t){ t.textContent = left >= 0 ? fmtHMS(Math.ceil(left)) : "+" + fmtHMS(Math.floor(-left)); t.classList.toggle("over", left < 0); }
+  if (lab) lab.textContent = left >= 0 ? `left of ${fmtHMS(cap)} · ${fmtHMS(Math.floor(el))} in` : `over the ${fmtHMS(cap)} cap · ${fmtHMS(Math.floor(el))} in`;
+  if (bar) bar.style.width = Math.min(100, el / cap * 100) + "%";
+  if (sp) sp.textContent = fmtHMS(Math.floor(el - mp.stStart));
+  if (mp.phase !== "go") return;
+  for (const [k, words] of [[600, "10 minutes left."], [300, "5 minutes left."], [60, "1 minute left."]]){
+    if (cap > k * 2 && left <= k && left > k - 5 && !mp.cued[k]){ mp.cued[k] = 1; tones(700, 2, .12); say(words); }
+  }
+  if (left <= 0 && !mp.cued.cap){ mp.cued.cap = 1; tones(988, 3, .18); buzz([200, 100, 200]); flash(); say("Time cap. Keep going, or end it."); }
+}
+/* finish the current step (done = what you did) and move on */
+function muNext(){
+  const x = mp.st[mp.si]; if (!x) return;
+  const el = muElapsed();
+  mp.res[mp.si] = {count:x.kind === "r" ? mp.count : 0, sec:el - mp.stStart};
+  if (mp.camOn){ stopCam(); mp.camOn = false; }
+  mp.si++; mp.count = mp.keep[mp.si] || 0; delete mp.keep[mp.si]; mp.stStart = el;
+  if (mp.si >= mp.st.length) return muFinish();
+  tones(1047, 1); buzz([60]); muAnnounce(); renderMu();
+}
+function muBack(){
+  if (mp.si <= 0) return;
+  if (mp.camOn){ stopCam(); mp.camOn = false; }
+  mp.keep[mp.si] = mp.count;                                 /* reps on the step you backed out of stay put */
+  mp.si--; const r = mp.res[mp.si] || {count:0, sec:0};
+  mp.count = r.count; mp.stStart = muElapsed() - r.sec; mp.res.length = mp.si;
+  renderMu();
+}
+function muAdd(n){
+  const x = mp.st[mp.si]; if (!x || x.kind !== "r" || mp.phase !== "go") return;
+  mp.count = Math.max(0, mp.count + n);
+  if (cam.c && mp.camOn){ cam.c.reps = Math.max(0, mp.count - mp.camBase); }
+  if (mp.count >= x.target){ mp.count = x.target; muNext(); return; }
+  muCountUI();
+}
+function muCountUI(){
+  const x = mp.st[mp.si]; if (!x) return;
+  const c = $("#muCount"); if (c){ c.innerHTML = `${mp.count}<small> / ${x.target}</small>`; replay(c, "bump"); }
+  const tot = muTotals(); document.querySelectorAll("#muPlayBody .mu-tot [data-ti]").forEach(d => { const i = +d.dataset.ti, s0 = mp.cfg.steps[i]; d.querySelector("b").textContent = `${fmtN(tot[i] || 0)}/${fmtN(num(s0.target))}`; });
+  const cr = $("#muCamReps"); if (cr) cr.textContent = mp.count;
+}
+/* reps done so far per setup step, the current step included */
+function muTotals(){
+  const t = {};
+  mp.st.forEach((x, k) => { if (x.kind !== "r") return; const n = k < mp.si ? (mp.res[k] || {}).count || 0 : k === mp.si ? mp.count : 0; t[x.i] = (t[x.i] || 0) + n; });
+  return t;
+}
+function renderMu(){
+  const c = mp.cfg, x = mp.st[mp.si], body = $("#muPlayBody");
+  if (mp.phase === "done") return renderMuDone();
+  if (mp.phase === "ready"){
+    body.innerHTML = `<div class="player"><div class="pl-up">Get ready</div><h3 class="pl-name">Murph</h3>
+      <div class="pl-side">First: ${esc(x.kind === "c" ? muStepTxt(c.steps[x.i]) : `${x.name} ×${x.target}`)}</div>
+      <button class="pl-time ready" id="muTime" aria-label="Start now">${fmtHMS(Math.max(0, Math.ceil((mp.readyEnd - Date.now()) / 1000)))}</button>
+      <div class="pl-phase">Starts by itself · tap the time to start now</div>
+      <div class="pl-next">${esc(fmtHMS(c.cap))} cap${c.rounds > 1 ? ` · ${c.rounds} rounds` : ""}</div>
+      <div class="pl-ctrl two"><button class="btn" data-mup="now">Start now</button><button class="btn ghost" data-mup="cancel">Cancel</button></div></div>`;
+    return;
+  }
+  const paused = mp.phase === "paused", tot = muTotals();
+  const reps = c.steps.map((s0, i) => [s0, i]).filter(([s0]) => s0.kind !== "c" && num(s0.target) > 0 && s0.name.trim());
+  const cardio = mp.st.map((y, k) => [y, k]).filter(([y]) => y.kind === "c");
+  const chips = cardio.length + reps.length <= 8 ? `<div class="mu-tot">${mp.st.map((y, k) => [y, k]).filter(([y], k, a) => y.kind === "c" || a.findIndex(([z]) => z.i === y.i) === k).map(([y, k]) => y.kind === "c"
+      ? `<div class="${k === mp.si ? "on" : k < mp.si ? "ok" : ""}"><b>${k < mp.si ? fmtHMS(Math.round((mp.res[k] || {}).sec || 0)) : k === mp.si ? "Now" : "—"}</b>${esc(y.name)}</div>`
+      : `<div data-ti="${y.i}" class="${x && x.i === y.i ? "on" : (tot[y.i] || 0) >= num(c.steps[y.i].target) ? "ok" : ""}"><b>${fmtN(tot[y.i] || 0)}/${fmtN(num(c.steps[y.i].target))}</b>${esc(y.name)}</div>`).join("")}</div>` : "";
+  const useCam = x.kind === "r" && c.cam && camKind(x.name);
+  let mid;
+  if (x.kind === "c"){
+    mid = `<div class="pl-up">${x.goal ? esc(x.goal) : "Cardio"}</div><h3 class="pl-name">${esc(x.name)}</h3>
+      <div class="mu-split">This step <span id="muSplit">${fmtHMS(Math.floor(muElapsed() - mp.stStart))}</span></div>
+      <button class="finish-btn" data-mup="next">Done · ${mp.si < mp.st.length - 1 ? "next" : "finish"}</button>`;
+  } else {
+    mid = `<div class="pl-up">${x.rounds > 1 ? `Round ${x.round} of ${x.rounds}` : "Reps"}</div><h3 class="pl-name">${esc(x.name)}</h3>
+      ${useCam ? `<div class="cam-view wo-cam"><video id="muVideo" playsinline muted autoplay></video><canvas id="muCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="muCamReps">${mp.count}</div></div><p class="cam-msg" id="muCamMsg">Starting the camera…</p>` : ""}
+      <div class="mu-count" id="muCount">${mp.count}<small> / ${x.target}</small></div>
+      <div class="mu-plus"><button class="btn ghost" data-mup="-1">−1</button><button class="btn" data-mup="+1">+1</button><button class="btn" data-mup="+5">+5</button><button class="btn" data-mup="+10">+10</button></div>
+      <button class="finish-btn" data-mup="next">Done · ${mp.si < mp.st.length - 1 ? "next" : "finish"}</button>`;
+  }
+  const nx = mp.st[mp.si + 1];
+  body.innerHTML = `<div class="player">
+    <div class="mu-clock-l">${paused ? "Paused" : "Time cap"}</div>
+    <div class="pl-time mu-clock" id="muTime">${fmtHMS(c.cap)}</div>
+    <div class="mu-clock-l" id="muTimeL"></div>
+    <div class="pl-bar"><i id="muBar"></i></div>
+    ${chips}
+    ${mid}
+    <div class="pl-next">${nx ? "Next: " + esc(nx.kind === "c" ? muStepTxt(c.steps[nx.i]) : `${nx.name} ×${nx.target}${nx.rounds > 1 ? ` (round ${nx.round})` : ""}`) : "Last step"}</div>
+    <div class="pl-ctrl"><button class="btn ghost" data-mup="pause">${paused ? "Resume" : "Pause"}</button><button class="btn ghost" data-mup="back"${mp.si ? "" : " disabled"}>Back</button><button class="btn ghost" data-mup="end">End</button></div>
+  </div>`;
+  muTick();
+  if (useCam && !paused){
+    mp.camOn = true; mp.camBase = mp.count;
+    camRun({video:$("#muVideo"), canvas:$("#muCanvas"), msg:$("#muCamMsg")}, n => {
+      if (mp.phase !== "go") return;
+      mp.count = mp.camBase + n;
+      if (mp.count >= x.target){ mp.count = x.target; const si = mp.si; setTimeout(() => { if (mp.si === si && mp.phase === "go") muNext(); }, 0); } else muCountUI();
+    }, camKind(x.name));
+  }
+}
+$("#muPlayBody").addEventListener("click", e => {
+  if (e.target.closest("#muTime") && mp.phase === "ready"){ muGo(); return; }
+  const b = e.target.closest("[data-mup]"); if (!b) return;
+  const a = b.dataset.mup;
+  if (a === "now") return muGo();
+  if (a === "cancel"){ muStop(); closeSheet($("#muPlayer")); return; }
+  if (a === "close"){ closeSheet($("#muPlayer")); return; }
+  if (a === "log") return muLog();
+  if (a === "pause"){
+    if (mp.phase === "paused"){ mp.pauseMs += Date.now() - mp.pausedAt; mp.phase = "go"; }
+    else if (mp.phase === "go"){ mp.pausedAt = Date.now(); mp.phase = "paused"; if (mp.camOn){ stopCam(); mp.camOn = false; } }
+    renderMu(); return;
+  }
+  if (mp.phase !== "go") return;
+  if (a === "next") return muNext();
+  if (a === "back") return muBack();
+  if (a === "end"){ if (confirm("End the Murph here? What you've done so far is kept.")){ const x = mp.st[mp.si]; if (x && (x.kind === "c" || mp.count > 0)) muNext(); if (mp.phase !== "done") muFinish(true); } return; }
+  if (/^[+-]\d+$/.test(a)) muAdd(+a);
+});
+$("#muPlayer [data-mu-x]").onclick = () => {
+  if ((mp.phase === "go" || mp.phase === "paused") && !confirm("Stop the Murph? Nothing will be saved.")) return;
+  muStop(); closeSheet($("#muPlayer"));
+};
+function muStop(){ clearInterval(mp.iv); mp.iv = null; if (mp.camOn){ stopCam(); mp.camOn = false; } if (mp.phase !== "done") mp.phase = ""; syncWake(); }
+function muFinish(early){
+  if (mp.phase === "paused"){ mp.pauseMs += Date.now() - mp.pausedAt; }
+  mp.sec = muElapsed(); mp.phase = "done"; mp.full = !early && mp.res.length === mp.st.length && mp.st.every((x, k) => x.kind === "c" || (mp.res[k] || {}).count >= x.target);
+  muStop(); mp.phase = "done"; mp.logged = false;
+  tones(988, 3, .18); buzz([180, 120, 180]); flash();
+  say(`Done. ${secWords(Math.round(mp.sec))}${mp.sec > mp.cfg.cap ? ", over the cap" : ""}.`);
+  renderMu();
+}
+/* per setup step: reps (and each round's reps) or time */
+function muResults(){
+  const out = {};
+  mp.st.forEach((x, k) => {
+    const r = mp.res[k]; if (!r) return;
+    const o = out[x.i] = out[x.i] || {name:x.name, kind:x.kind, reps:0, sets:[], sec:0};
+    o.sec += r.sec;
+    if (x.kind === "r"){ o.reps += r.count; if (r.count) o.sets.push(r.count); }
+  });
+  return Object.keys(out).map(Number).sort((a, b) => a - b).map(i => out[i]);
+}
+function renderMuDone(){
+  const c = mp.cfg, R = muResults(), best = muBest(), over = mp.sec > c.cap;
+  const rows = R.map(o => `<tr><td>${esc(o.name)}</td><td>${o.kind === "c" ? fmtHMS(Math.round(o.sec)) : `${fmtN(o.reps)} reps${o.sets.length > 1 ? ` · ${o.sets.length} sets` : ""}`}</td></tr>`).join("");
+  const pr = mp.full && (!best || mp.sec < best.sec);
+  $("#muPlayBody").innerHTML = `<div class="player"><div class="pl-done"><div class="pl-up">${mp.full ? (over ? "Finished, over the cap" : "Finished under the cap") : "Ended early"}</div><h3 class="pl-name">${fmtHMS(Math.round(mp.sec))}</h3>
+    <p class="pl-next">${pr ? (best ? `New best. ${fmtHMS(Math.round(best.sec - mp.sec))} faster than ${fmtHMS(best.sec)}.` : "First Murph on the books.") : best && mp.full ? `Best: ${fmtHMS(best.sec)}` : ""}</p></div>
+    <table class="mu-res">${rows}</table>
+    ${mp.logged ? '<p class="note">Logged.</p>' : `<button class="btn wide" data-mup="log">Log it</button>`}
+    <button class="btn ghost wide" data-mup="close">Close</button></div>`;
+}
+function muLog(){
+  if (mp.logged) return;
+  const c = mp.cfg, day = today(), R = muResults(), w = num(c.vest) ? String(num(c.vest)) : "";
+  const list = state.workouts[day] = state.workouts[day] || [];
+  const sess = {id:uid(), start:mp.start, end:mp.start + Math.round(mp.sec * 1000), name:"Murph", dur:Math.round(mp.sec * 1000)};
+  let nStr = 0;
+  R.forEach(o => {
+    if (o.kind === "c"){
+      if (o.sec >= 1) list.push({id:uid(), name:o.name, group:"Cardio", type:"c", du:"mi", src:"murph", sets:[{min:String(Math.round(o.sec / 60 * 100) / 100), dist:""}]});
+      return;
+    }
+    if (!o.reps) return;
+    const ex = byName[o.name.toLowerCase()] || {name:o.name, group:"Other", type:"s"};
+    list.push({name:ex.name, group:ex.group, type:"s", sid:sess.id, sets:o.sets.map(r => ({w, r:String(r)}))});
+    nStr++;
+  });
+  if (nStr){ state.sessions = state.sessions || {}; (state.sessions[day] = state.sessions[day] || []).push(sess); state.dur = state.dur || {}; state.dur[day] = (state.dur[day] || 0) + sess.dur; }
+  (state.murphLog = state.murphLog || []).push({date:day, sec:Math.round(mp.sec), cap:c.cap, full:!!mp.full, rounds:c.rounds, steps:R.map(o => ({name:o.name, reps:o.reps, sec:Math.round(o.sec)}))});
+  if (state.finished) delete state.finished[day];
+  mp.logged = true; save();
+  closeSheet($("#muPlayer")); curDate = day; showTab("log"); renderLog(); checkMilestones();
+  toast(`Murph logged: ${fmtHMS(Math.round(mp.sec))}.`);
 }
 
 /* ---------- FINISH WORKOUT (Strength) ---------- */
@@ -7656,7 +8008,7 @@ $("#swapRemove").onclick = () => {
 };
 $("#openIntervals").onclick = openIntervals;
 $("#exDetailBtn").onclick = () => { const n = $("#exSelect").value; if (n) openExDetail(n); };
-window.__tally = {buildBalance: l => buildBalanceSession(l), curlStep, openCam, stopCam, suggestFor, guardHit, progAim, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, lungeStep, pressStep, raiseStep, bridgeStep, situpStep, crunchStep, jackStep, camStep, camSummary, jAng, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
+window.__tally = {buildBalance: l => buildBalanceSession(l), curlStep, openCam, stopCam, suggestFor, guardHit, progAim, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, muStages, openSpecial, lungeStep, pressStep, raiseStep, bridgeStep, situpStep, crunchStep, jackStep, camStep, camSummary, jAng, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
 
 /* ---------- full-height fix for iPhone home-screen apps ---------- */
 function setAppHeight(){ document.documentElement.style.setProperty("--app-h", Math.max(window.innerHeight, screen.height && window.navigator.standalone ? screen.height : 0) + "px"); }
