@@ -1416,6 +1416,38 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
 .empty .quick{margin-left:-12px;margin-right:-12px}
 .empty .quick .btn{width:100%;padding:15px;border-radius:var(--r,12px)}
 [hidden]{display:none!important}
+/* special modes: Murph */
+.mu-intro{margin:0 0 6px}
+.mu-intro b{font-family:var(--display);font-weight:900;font-stretch:120%;text-transform:uppercase;font-size:22px}
+.mu-intro p{margin:4px 0 0;color:var(--mute);font-size:15px;line-height:1.35}
+.mu-best{font-family:var(--mono);font-size:13px;color:var(--str);margin-top:6px}
+.mu-steps{display:flex;flex-direction:column;gap:8px;margin:12px 0 6px}
+.mu-row{display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:var(--r,6px);background:var(--surface)}
+.mu-row .mu-name{grid-column:1/-1;font-weight:600}
+.mu-row input{width:100%;min-width:0;padding:9px 10px;border:1px solid var(--line);background:var(--field);border-radius:4px;font-size:16px}
+.mu-kind{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:8px 8px;border-radius:4px;border:1px solid var(--line);background:none;color:var(--ink);min-width:62px}
+.mu-kind.c{background:var(--car);color:#F2EFE8;border-color:transparent}
+.mu-move{display:flex;gap:2px}
+.mu-move button{width:30px;height:34px;border:0;background:none;color:var(--mute);font-size:16px}
+.mu-move button:disabled{opacity:.25}
+.mu-add{display:flex;gap:18px;justify-content:center;margin:4px 0 8px}
+.mu-sum{font-family:var(--mono);font-size:13px;color:var(--mute);text-align:center;margin:10px 0 4px}
+.mu-clock-l{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.mu-clock.over{color:#D9534F}
+.mu-tot{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px;width:100%}
+.mu-tot div{padding:6px 4px;border-radius:4px;background:var(--surface);font-family:var(--mono);font-size:12px;color:var(--mute);line-height:1.3}
+.mu-tot div b{display:block;color:var(--ink);font-size:15px}
+.mu-tot div.on{outline:2px solid var(--str)}
+.mu-tot div.ok b{color:var(--mob)}
+.mu-count{font-family:var(--mono);font-weight:700;font-size:min(22vw,96px);line-height:1;font-variant-numeric:tabular-nums}
+.mu-count small{font-size:.4em;color:var(--mute)}
+.mu-plus{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
+.mu-plus .btn{padding:14px 4px;font-size:17px}
+.mu-split{font-family:var(--mono);font-size:15px;color:var(--mute)}
+.mu-res{width:100%;text-align:left;border-collapse:collapse;font-size:15px}
+.mu-res td{padding:7px 4px;border-bottom:1px solid var(--line)}
+.mu-res td:last-child{text-align:right;font-family:var(--mono)}
+#muPlayer .cam-view{width:100%;min-height:200px;max-height:34vh;flex:none;height:34vh}
 </style>
 </head>
 <body>
@@ -1454,7 +1486,7 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
     <div class="daytools" id="dayTools"></div>
     <div class="list" id="exList"></div>
     <button class="add-big" id="openPicker"><span class="add-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Add exercise</button>
-    <div class="tools-row"><button class="link" id="openIntervals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>Interval timer</button><button class="link" id="openPlan2">Plan my week</button></div>
+    <div class="tools-row"><button class="link" id="openIntervals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>Interval timer</button><button class="link" id="openSpecial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Special modes</button><button class="link" id="openPlan2">Plan my week</button></div>
   </main>
 
   <main id="cardioView" hidden>
@@ -1708,6 +1740,7 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
     <div class="setting"><p>Workout reminders<small id="remStatus">Add alerts to your phone's calendar</small></p><button class="btn ghost" id="openRem">Set up</button></div>
     <div class="setting"><p>Look<small>Light and soft, or the original dark</small></p><div class="seg" id="themeSeg"><button data-th="light">Light</button><button data-th="dark">Dark</button></div></div>
     <div class="setting" id="voiceRow"><p>Voice coach<small>Says each exercise, set and rest out loud, and counts camera reps</small></p><div class="seg" id="voiceSeg"><button data-voice="0">Off</button><button data-voice="1">On</button></div></div>
+    <div class="setting"><p>Auto-finish camera sets<small>Ends the set when you stand up, let go or step away, or stop for 15 seconds</small></p><div class="seg" id="camAutoSeg"><button data-ca="0">Off</button><button data-ca="1">On</button></div></div>
     <div class="setting col" id="noSugRow" hidden><p>Never suggest<small>Exercises you swapped out. Tap one to allow it again.</small></p><div class="plan-chips" id="noSugList"></div></div>
     <div class="setting"><p>Weekly plan<small>Plan what you'll do each day</small></p><button class="btn ghost" id="openPlan">Plan</button></div>
     <div class="setting"><p>Vibrate with beeps<small id="vibStatus">Buzzes at each interval</small></p><div class="seg" id="vibSeg"><button data-v="0">Off</button><button data-v="1">On</button></div></div>
@@ -1858,6 +1891,22 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
   <div class="panel">
     <div class="sheet-head"><h2 id="ivPTitle">Intervals</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div id="ivPlayBody"></div>
+  </div>
+</div>
+<div class="sheet" id="muSheet" role="dialog" aria-modal="true" aria-labelledby="muTitle">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="muTitle">Special modes</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="exd-scroll" id="muBody"></div>
+    <datalist id="muNames"></datalist>
+    <button class="btn wide" id="muStart">Start Murph</button>
+  </div>
+</div>
+<div class="sheet" id="muPlayer" role="dialog" aria-modal="true" aria-labelledby="muPTitle">
+  <div class="scrim"></div>
+  <div class="panel">
+    <div class="sheet-head"><h2 id="muPTitle">Murph</h2><button class="icon-btn" data-mu-x aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="muPlayBody"></div>
   </div>
 </div>
 <div class="sheet" id="mobPlayer" role="dialog" aria-modal="true" aria-labelledby="plTitle">
@@ -2807,7 +2856,7 @@ setInterval(clockTick, 250);
 
 /* ---------- keep the screen on while a timer runs ---------- */
 let wakeLock = null, wakePending = false;
-const wantAwake = () => clockRunning() || !!timer.iv || !!hold.iv || !!(typeof player !== "undefined" && player.iv) || !!(typeof ivp !== "undefined" && ivp && ivp.iv) || !!(window.__camOn) || !!(typeof pp !== "undefined" && pp.iv);
+const wantAwake = () => clockRunning() || !!timer.iv || !!hold.iv || !!(typeof player !== "undefined" && player.iv) || !!(typeof ivp !== "undefined" && ivp && ivp.iv) || !!(window.__camOn) || !!(typeof pp !== "undefined" && pp.iv) || !!(typeof mp !== "undefined" && mp && mp.iv);
 async function syncWake(){
   if (wantAwake() && document.visibilityState === "visible"){
     if (!wakeLock && !wakePending && "wakeLock" in navigator){
@@ -4600,6 +4649,7 @@ function renderSettings(){
   try { renderNoSuggest(); } catch(e){}
   $("#voiceRow").hidden = !hasVoice;
   document.querySelectorAll("#voiceSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.voice === "1") === (state.voice !== false)));
+  document.querySelectorAll("#camAutoSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.ca === "1") === camAutoOn()));
   document.querySelectorAll("#unitSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.u === state.unit));
   document.querySelectorAll("#restSeg button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.s === state.rest));
   document.querySelectorAll("#vibSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.v === "1") === !!state.vibrate));
@@ -4931,6 +4981,310 @@ function ivLog(){
   toast(`Logged ${sets.length} ${sets.length === 1 ? "set" : "sets"} of ${ex.name}.`);
 }
 
+/* ---------- SPECIAL MODES: MURPH ----------
+   For time, under a time cap: cardio and rep steps in order. The app runs the clock and keeps your rep counts;
+   cardio steps only time themselves (no distance). Rep steps between two cardio steps can be split into rounds. */
+const MU_DEF = {cap:3600, rounds:1, vest:"", cam:false, steps:[
+  {kind:"c", name:"Road Running", goal:"1 mile"},
+  {kind:"r", name:"Pull-Up", target:100},
+  {kind:"r", name:"Push-Up", target:200},
+  {kind:"r", name:"Bodyweight Squat", target:300},
+  {kind:"c", name:"Road Running", goal:"1 mile"}]};
+function muCfg(){
+  const c = Object.assign({}, MU_DEF, state.murph || {});
+  c.steps = (Array.isArray(c.steps) && c.steps.length ? c.steps : MU_DEF.steps).map(x => Object.assign({}, x));
+  return c;
+}
+function muSave(c){ state.murph = c; save(); }
+/* the run order: cardio steps as they are; each block of rep steps between them, round by round */
+function muStages(c){
+  const out = []; let block = [];
+  const R = Math.max(1, c.rounds || 1);
+  const flush = () => {
+    for (let r = 0; r < R; r++) block.forEach(({x, i}) => {
+      const n = Math.floor(x.target / R) + (r < x.target % R ? 1 : 0);
+      if (n > 0) out.push({kind:"r", i, name:x.name, target:n, round:r + 1, rounds:R});
+    });
+    block = [];
+  };
+  c.steps.forEach((x, i) => {
+    if (!x.name || !x.name.trim()) return;
+    if (x.kind === "c"){ flush(); out.push({kind:"c", i, name:x.name.trim(), goal:(x.goal || "").trim()}); }
+    else if (num(x.target) > 0) block.push({x:{name:x.name.trim(), target:Math.round(num(x.target))}, i});
+  });
+  flush();
+  return out;
+}
+const muStepTxt = x => x.kind === "c" ? (x.goal ? `${x.name.trim()} (${x.goal.trim()})` : x.name.trim()) : `${x.name.trim()} ×${fmtN(num(x.target))}`;
+function muRoundTxt(c){
+  const R = c.rounds || 1;
+  if (R <= 1) return "Straight through: finish each exercise before the next.";
+  const reps = c.steps.filter(x => x.kind !== "c" && num(x.target) > 0 && x.name.trim());
+  return `${R} rounds of ${listWords(reps.map(x => { const n = num(x.target) / R; return `${Number.isInteger(n) ? n : "~" + Math.round(n)} ${x.name.trim().toLowerCase().replace(/([^s])$/, "$1s")}`; }))}.`;
+}
+function muBest(){ const L = (state.murphLog || []).filter(x => x.full); return L.length ? L.reduce((a, b) => b.sec < a.sec ? b : a) : null; }
+
+function openSpecial(){
+  const dl = $("#muNames");
+  if (dl){ const names = new Set([...recentNames(), ...CARDIO_TYPES.map(t => t[0]), "Pull-Up", "Push-Up", "Bodyweight Squat", "Burpee", "Jump Rope", "Rowing"]); dl.innerHTML = [...names].slice(0, 80).map(n => `<option value="${esc(n)}">`).join(""); }
+  renderMuSetup(); openSheet($("#muSheet"));
+}
+function renderMuSetup(){
+  const c = muCfg(), best = muBest(), n = c.steps.length;
+  const rows = c.steps.map((x, i) => `<div class="mu-row" data-i="${i}">
+      <input type="text" class="mu-name" list="muNames" data-mf="name" value="${esc(x.name)}" placeholder="${x.kind === "c" ? "Run, row, bike…" : "Exercise"}" autocomplete="off" aria-label="Name">
+      <button class="mu-kind${x.kind === "c" ? " c" : ""}" data-mu="kind" aria-label="Switch between cardio and reps">${x.kind === "c" ? "Cardio" : "Reps"}</button>
+      ${x.kind === "c" ? `<input type="text" data-mf="goal" value="${esc(x.goal || "")}" placeholder="Goal, e.g. 1 mile (just a label)" aria-label="Goal (just a label)">` : `<input inputmode="numeric" data-mf="target" value="${esc(String(x.target || ""))}" placeholder="Total reps" aria-label="Total reps">`}
+      <div class="mu-move"><button data-mu="up" aria-label="Move up"${i ? "" : " disabled"}>↑</button><button data-mu="down" aria-label="Move down"${i < n - 1 ? "" : " disabled"}>↓</button><button data-mu="del" aria-label="Remove"${n > 1 ? "" : " disabled"}>✕</button></div>
+    </div>`).join("");
+  const step = (k, label, val, small) => `<div class="setting"><p>${label}${small ? `<small>${small}</small>` : ""}</p><div class="stepper"><button data-mu="${k}-" aria-label="Less">−</button><b>${val}</b><button data-mu="${k}+" aria-label="More">+</button></div></div>`;
+  $("#muBody").innerHTML = `
+    <div class="mu-intro"><b>Murph</b><p>For time: run, pull-ups, push-ups, squats, run. Swap, add or remove anything. Cardio steps just keep time, no distance.</p>
+      ${best ? `<div class="mu-best">Best: ${fmtHMS(best.sec)} · ${shortDate(best.date)}</div>` : ""}</div>
+    <div class="mu-steps">${rows}</div>
+    <div class="mu-add"><button class="link" data-mu="addc">+ Cardio</button><button class="link" data-mu="addr">+ Exercise</button></div>
+    ${step("cap", "Time cap", fmtHMS(c.cap), "Counts down. You can keep going past it")}
+    ${step("rounds", "Rounds", c.rounds, esc(muRoundTxt(c)))}
+    <div class="setting"><p>Vest or weight<small>Optional, saved with each set (${state.unit})</small></p><input class="mu-vest" inputmode="decimal" data-mf="vest" value="${esc(String(c.vest || ""))}" placeholder="0" style="width:80px;padding:9px 10px;border:1px solid var(--line);background:var(--field);border-radius:4px;font-size:16px;text-align:center"></div>
+    <div class="setting"><p>Count reps with the camera<small>For push-ups, pull-ups and squats. Off means you tap + as you go</small></p><div class="seg" id="muCamSeg"><button data-mucam="0" aria-pressed="${!c.cam}">Off</button><button data-mucam="1" aria-pressed="${!!c.cam}">On</button></div></div>
+    <p class="mu-sum">${esc(muStages(c).length ? c.steps.filter(x => x.name.trim()).map(muStepTxt).join(" · ") : "Add at least one step.")}</p>
+    <p style="text-align:center;margin:4px 0 0"><button class="link" data-mu="reset">Back to the classic Murph</button></p>`;
+  $("#muStart").disabled = !muStages(c).length;
+}
+$("#muBody").addEventListener("click", e => {
+  const cs = e.target.closest("[data-mucam]"); if (cs){ const c = muCfg(); c.cam = cs.dataset.mucam === "1"; muSave(c); renderMuSetup(); return; }
+  const b = e.target.closest("[data-mu]"); if (!b) return;
+  const c = muCfg(), a = b.dataset.mu, row = b.closest(".mu-row"), i = row ? +row.dataset.i : -1;
+  if (a === "kind"){ const x = c.steps[i]; x.kind = x.kind === "c" ? "r" : "c"; if (x.kind === "r" && !num(x.target)) x.target = 50; }
+  else if (a === "up" && i > 0) [c.steps[i - 1], c.steps[i]] = [c.steps[i], c.steps[i - 1]];
+  else if (a === "down" && i < c.steps.length - 1) [c.steps[i + 1], c.steps[i]] = [c.steps[i], c.steps[i + 1]];
+  else if (a === "del" && c.steps.length > 1) c.steps.splice(i, 1);
+  else if (a === "addc") c.steps.push({kind:"c", name:"Road Running", goal:""});
+  else if (a === "addr") c.steps.push({kind:"r", name:"", target:50});
+  else if (a === "reset"){ if (!confirm("Go back to the classic Murph?")) return; Object.assign(c, {steps:MU_DEF.steps.map(x => Object.assign({}, x)), rounds:1, cap:3600}); }
+  else if (a === "cap-" || a === "cap+") c.cap = Math.min(4 * 3600, Math.max(300, c.cap + (a === "cap+" ? 300 : -300)));
+  else if (a === "rounds-" || a === "rounds+") c.rounds = Math.min(50, Math.max(1, (c.rounds || 1) + (a === "rounds+" ? 1 : -1)));
+  muSave(c); renderMuSetup();
+  if (a === "addr"){ const ins = document.querySelectorAll('#muBody [data-mf="name"]'); const last = ins[ins.length - 1]; if (last) last.focus(); }
+});
+$("#muBody").addEventListener("input", e => {
+  const f = e.target.dataset.mf; if (!f) return;
+  const c = muCfg();
+  if (f === "vest") c.vest = e.target.value.replace(/[^\d.]/g, "");
+  else {
+    const i = +e.target.closest(".mu-row").dataset.i;
+    c.steps[i][f] = f === "target" ? e.target.value.replace(/\D/g, "") : e.target.value;
+  }
+  muSave(c);
+  const sm = document.querySelector("#muBody .mu-sum"); if (sm) sm.textContent = muStages(c).length ? c.steps.filter(x => x.name.trim()).map(muStepTxt).join(" · ") : "Add at least one step.";
+  $("#muStart").disabled = !muStages(c).length;
+});
+$("#openSpecial").onclick = openSpecial;
+
+/* ----- the Murph player ----- */
+var mp = {iv:null, phase:"", cfg:null, st:[], si:0, count:0, res:[], t0:0, start:0, pauseMs:0, pausedAt:0, readyEnd:0, stStart:0, cued:{}, camBase:0, camOn:false};
+const muElapsed = () => !mp.t0 ? 0 : ((mp.phase === "paused" ? mp.pausedAt : Date.now()) - mp.t0 - mp.pauseMs) / 1000;
+$("#muStart").onclick = () => {
+  const c = muCfg(), st = muStages(c); if (!st.length) return;
+  ensureAudio();
+  Object.assign(mp, {cfg:c, st, si:0, count:0, res:[], t0:0, start:0, pauseMs:0, pausedAt:0, readyEnd:Date.now() + 10000, stStart:0, cued:{}, keep:{}, phase:"ready"});
+  closeSheet($("#muSheet")); openSheet($("#muPlayer"));
+  clearInterval(mp.iv); mp.iv = setInterval(muTick, 250);
+  say(`Murph. ${st.length} ${st.length === 1 ? "step" : "steps"}, ${secWords(c.cap)} cap. Starting in 10 seconds.`);
+  renderMu(); syncWake();
+};
+function muGo(){
+  mp.phase = "go"; mp.t0 = mp.start = Date.now(); mp.stStart = 0;
+  tones(880, 2, .12); buzz([150]); muAnnounce(); renderMu();
+}
+function muAnnounce(){ const x = mp.st[mp.si]; if (!x) return; say(x.kind === "c" ? `Go. ${x.goal ? x.goal + " " : ""}${x.name}.` : `${x.rounds > 1 ? `Round ${x.round}. ` : ""}${x.target} ${x.name}.`); }
+function muTick(){
+  if (mp.phase === "ready"){
+    const left = Math.max(0, Math.ceil((mp.readyEnd - Date.now()) / 1000));
+    const t = $("#muTime"); if (t) t.textContent = fmtHMS(left);
+    if (left <= 3 && left > 0 && mp.cued.r !== left){ mp.cued.r = left; tones(600, 1); }
+    if (left <= 0) muGo();
+    return;
+  }
+  if (mp.phase !== "go" && mp.phase !== "paused") return;
+  const el = muElapsed(), cap = mp.cfg.cap, left = cap - el;
+  const t = $("#muTime"), lab = $("#muTimeL"), bar = $("#muBar"), sp = $("#muSplit");
+  if (t){ t.textContent = left >= 0 ? fmtHMS(Math.ceil(left)) : "+" + fmtHMS(Math.floor(-left)); t.classList.toggle("over", left < 0); }
+  if (lab) lab.textContent = left >= 0 ? `left of ${fmtHMS(cap)} · ${fmtHMS(Math.floor(el))} in` : `over the ${fmtHMS(cap)} cap · ${fmtHMS(Math.floor(el))} in`;
+  if (bar) bar.style.width = Math.min(100, el / cap * 100) + "%";
+  if (sp) sp.textContent = fmtHMS(Math.floor(el - mp.stStart));
+  if (mp.phase !== "go") return;
+  for (const [k, words] of [[600, "10 minutes left."], [300, "5 minutes left."], [60, "1 minute left."]]){
+    if (cap > k * 2 && left <= k && left > k - 5 && !mp.cued[k]){ mp.cued[k] = 1; tones(700, 2, .12); say(words); }
+  }
+  if (left <= 0 && !mp.cued.cap){ mp.cued.cap = 1; tones(988, 3, .18); buzz([200, 100, 200]); flash(); say("Time cap. Keep going, or end it."); }
+}
+/* finish the current step (done = what you did) and move on */
+function muNext(){
+  const x = mp.st[mp.si]; if (!x) return;
+  const el = muElapsed();
+  mp.res[mp.si] = {count:x.kind === "r" ? mp.count : 0, sec:el - mp.stStart};
+  if (mp.camOn){ stopCam(); mp.camOn = false; }
+  mp.si++; mp.count = mp.keep[mp.si] || 0; delete mp.keep[mp.si]; mp.stStart = el;
+  if (mp.si >= mp.st.length) return muFinish();
+  tones(1047, 1); buzz([60]); muAnnounce(); renderMu();
+}
+function muBack(){
+  if (mp.si <= 0) return;
+  if (mp.camOn){ stopCam(); mp.camOn = false; }
+  mp.keep[mp.si] = mp.count;                                 /* reps on the step you backed out of stay put */
+  mp.si--; const r = mp.res[mp.si] || {count:0, sec:0};
+  mp.count = r.count; mp.stStart = muElapsed() - r.sec; mp.res.length = mp.si;
+  renderMu();
+}
+function muAdd(n){
+  const x = mp.st[mp.si]; if (!x || x.kind !== "r" || mp.phase !== "go") return;
+  mp.count = Math.max(0, mp.count + n);
+  if (cam.c && mp.camOn){ cam.c.reps = Math.max(0, mp.count - mp.camBase); }
+  if (mp.count >= x.target){ mp.count = x.target; muNext(); return; }
+  muCountUI();
+}
+function muCountUI(){
+  const x = mp.st[mp.si]; if (!x) return;
+  const c = $("#muCount"); if (c){ c.innerHTML = `${mp.count}<small> / ${x.target}</small>`; replay(c, "bump"); }
+  const tot = muTotals(); document.querySelectorAll("#muPlayBody .mu-tot [data-ti]").forEach(d => { const i = +d.dataset.ti, s0 = mp.cfg.steps[i]; d.querySelector("b").textContent = `${fmtN(tot[i] || 0)}/${fmtN(num(s0.target))}`; });
+  const cr = $("#muCamReps"); if (cr) cr.textContent = mp.count;
+}
+/* reps done so far per setup step, the current step included */
+function muTotals(){
+  const t = {};
+  mp.st.forEach((x, k) => { if (x.kind !== "r") return; const n = k < mp.si ? (mp.res[k] || {}).count || 0 : k === mp.si ? mp.count : 0; t[x.i] = (t[x.i] || 0) + n; });
+  return t;
+}
+function renderMu(){
+  const c = mp.cfg, x = mp.st[mp.si], body = $("#muPlayBody");
+  if (mp.phase === "done") return renderMuDone();
+  if (mp.phase === "ready"){
+    body.innerHTML = `<div class="player"><div class="pl-up">Get ready</div><h3 class="pl-name">Murph</h3>
+      <div class="pl-side">First: ${esc(x.kind === "c" ? muStepTxt(c.steps[x.i]) : `${x.name} ×${x.target}`)}</div>
+      <button class="pl-time ready" id="muTime" aria-label="Start now">${fmtHMS(Math.max(0, Math.ceil((mp.readyEnd - Date.now()) / 1000)))}</button>
+      <div class="pl-phase">Starts by itself · tap the time to start now</div>
+      <div class="pl-next">${esc(fmtHMS(c.cap))} cap${c.rounds > 1 ? ` · ${c.rounds} rounds` : ""}</div>
+      <div class="pl-ctrl two"><button class="btn" data-mup="now">Start now</button><button class="btn ghost" data-mup="cancel">Cancel</button></div></div>`;
+    return;
+  }
+  const paused = mp.phase === "paused", tot = muTotals();
+  const reps = c.steps.map((s0, i) => [s0, i]).filter(([s0]) => s0.kind !== "c" && num(s0.target) > 0 && s0.name.trim());
+  const cardio = mp.st.map((y, k) => [y, k]).filter(([y]) => y.kind === "c");
+  const chips = cardio.length + reps.length <= 8 ? `<div class="mu-tot">${mp.st.map((y, k) => [y, k]).filter(([y], k, a) => y.kind === "c" || a.findIndex(([z]) => z.i === y.i) === k).map(([y, k]) => y.kind === "c"
+      ? `<div class="${k === mp.si ? "on" : k < mp.si ? "ok" : ""}"><b>${k < mp.si ? fmtHMS(Math.round((mp.res[k] || {}).sec || 0)) : k === mp.si ? "Now" : "—"}</b>${esc(y.name)}</div>`
+      : `<div data-ti="${y.i}" class="${x && x.i === y.i ? "on" : (tot[y.i] || 0) >= num(c.steps[y.i].target) ? "ok" : ""}"><b>${fmtN(tot[y.i] || 0)}/${fmtN(num(c.steps[y.i].target))}</b>${esc(y.name)}</div>`).join("")}</div>` : "";
+  const useCam = x.kind === "r" && c.cam && camKind(x.name);
+  let mid;
+  if (x.kind === "c"){
+    mid = `<div class="pl-up">${x.goal ? esc(x.goal) : "Cardio"}</div><h3 class="pl-name">${esc(x.name)}</h3>
+      <div class="mu-split">This step <span id="muSplit">${fmtHMS(Math.floor(muElapsed() - mp.stStart))}</span></div>
+      <button class="finish-btn" data-mup="next">Done · ${mp.si < mp.st.length - 1 ? "next" : "finish"}</button>`;
+  } else {
+    mid = `<div class="pl-up">${x.rounds > 1 ? `Round ${x.round} of ${x.rounds}` : "Reps"}</div><h3 class="pl-name">${esc(x.name)}</h3>
+      ${useCam ? `<div class="cam-view wo-cam"><video id="muVideo" playsinline muted autoplay></video><canvas id="muCanvas"></canvas><div class="cam-depth" aria-hidden="true"><i></i></div><div class="cam-reps" id="muCamReps">${mp.count}</div></div><p class="cam-msg" id="muCamMsg">Starting the camera…</p>` : ""}
+      <div class="mu-count" id="muCount">${mp.count}<small> / ${x.target}</small></div>
+      <div class="mu-plus"><button class="btn ghost" data-mup="-1">−1</button><button class="btn" data-mup="+1">+1</button><button class="btn" data-mup="+5">+5</button><button class="btn" data-mup="+10">+10</button></div>
+      <button class="finish-btn" data-mup="next">Done · ${mp.si < mp.st.length - 1 ? "next" : "finish"}</button>`;
+  }
+  const nx = mp.st[mp.si + 1];
+  body.innerHTML = `<div class="player">
+    <div class="mu-clock-l">${paused ? "Paused" : "Time cap"}</div>
+    <div class="pl-time mu-clock" id="muTime">${fmtHMS(c.cap)}</div>
+    <div class="mu-clock-l" id="muTimeL"></div>
+    <div class="pl-bar"><i id="muBar"></i></div>
+    ${chips}
+    ${mid}
+    <div class="pl-next">${nx ? "Next: " + esc(nx.kind === "c" ? muStepTxt(c.steps[nx.i]) : `${nx.name} ×${nx.target}${nx.rounds > 1 ? ` (round ${nx.round})` : ""}`) : "Last step"}</div>
+    <div class="pl-ctrl"><button class="btn ghost" data-mup="pause">${paused ? "Resume" : "Pause"}</button><button class="btn ghost" data-mup="back"${mp.si ? "" : " disabled"}>Back</button><button class="btn ghost" data-mup="end">End</button></div>
+  </div>`;
+  muTick();
+  if (useCam && !paused){
+    mp.camOn = true; mp.camBase = mp.count;
+    camRun({video:$("#muVideo"), canvas:$("#muCanvas"), msg:$("#muCamMsg")}, n => {
+      if (mp.phase !== "go") return;
+      mp.count = mp.camBase + n;
+      if (mp.count >= x.target){ mp.count = x.target; const si = mp.si; setTimeout(() => { if (mp.si === si && mp.phase === "go") muNext(); }, 0); } else muCountUI();
+    }, camKind(x.name));
+  }
+}
+$("#muPlayBody").addEventListener("click", e => {
+  if (e.target.closest("#muTime") && mp.phase === "ready"){ muGo(); return; }
+  const b = e.target.closest("[data-mup]"); if (!b) return;
+  const a = b.dataset.mup;
+  if (a === "now") return muGo();
+  if (a === "cancel"){ muStop(); closeSheet($("#muPlayer")); return; }
+  if (a === "close"){ closeSheet($("#muPlayer")); return; }
+  if (a === "log") return muLog();
+  if (a === "pause"){
+    if (mp.phase === "paused"){ mp.pauseMs += Date.now() - mp.pausedAt; mp.phase = "go"; }
+    else if (mp.phase === "go"){ mp.pausedAt = Date.now(); mp.phase = "paused"; if (mp.camOn){ stopCam(); mp.camOn = false; } }
+    renderMu(); return;
+  }
+  if (mp.phase !== "go") return;
+  if (a === "next") return muNext();
+  if (a === "back") return muBack();
+  if (a === "end"){ if (confirm("End the Murph here? What you've done so far is kept.")){ const x = mp.st[mp.si]; if (x && (x.kind === "c" || mp.count > 0)) muNext(); if (mp.phase !== "done") muFinish(true); } return; }
+  if (/^[+-]\d+$/.test(a)) muAdd(+a);
+});
+$("#muPlayer [data-mu-x]").onclick = () => {
+  if ((mp.phase === "go" || mp.phase === "paused") && !confirm("Stop the Murph? Nothing will be saved.")) return;
+  muStop(); closeSheet($("#muPlayer"));
+};
+function muStop(){ clearInterval(mp.iv); mp.iv = null; if (mp.camOn){ stopCam(); mp.camOn = false; } if (mp.phase !== "done") mp.phase = ""; syncWake(); }
+function muFinish(early){
+  if (mp.phase === "paused"){ mp.pauseMs += Date.now() - mp.pausedAt; }
+  mp.sec = muElapsed(); mp.phase = "done"; mp.full = !early && mp.res.length === mp.st.length && mp.st.every((x, k) => x.kind === "c" || (mp.res[k] || {}).count >= x.target);
+  muStop(); mp.phase = "done"; mp.logged = false;
+  tones(988, 3, .18); buzz([180, 120, 180]); flash();
+  say(`Done. ${secWords(Math.round(mp.sec))}${mp.sec > mp.cfg.cap ? ", over the cap" : ""}.`);
+  renderMu();
+}
+/* per setup step: reps (and each round's reps) or time */
+function muResults(){
+  const out = {};
+  mp.st.forEach((x, k) => {
+    const r = mp.res[k]; if (!r) return;
+    const o = out[x.i] = out[x.i] || {name:x.name, kind:x.kind, reps:0, sets:[], sec:0};
+    o.sec += r.sec;
+    if (x.kind === "r"){ o.reps += r.count; if (r.count) o.sets.push(r.count); }
+  });
+  return Object.keys(out).map(Number).sort((a, b) => a - b).map(i => out[i]);
+}
+function renderMuDone(){
+  const c = mp.cfg, R = muResults(), best = muBest(), over = mp.sec > c.cap;
+  const rows = R.map(o => `<tr><td>${esc(o.name)}</td><td>${o.kind === "c" ? fmtHMS(Math.round(o.sec)) : `${fmtN(o.reps)} reps${o.sets.length > 1 ? ` · ${o.sets.length} sets` : ""}`}</td></tr>`).join("");
+  const pr = mp.full && (!best || mp.sec < best.sec);
+  $("#muPlayBody").innerHTML = `<div class="player"><div class="pl-done"><div class="pl-up">${mp.full ? (over ? "Finished, over the cap" : "Finished under the cap") : "Ended early"}</div><h3 class="pl-name">${fmtHMS(Math.round(mp.sec))}</h3>
+    <p class="pl-next">${pr ? (best ? `New best. ${fmtHMS(Math.round(best.sec - mp.sec))} faster than ${fmtHMS(best.sec)}.` : "First Murph on the books.") : best && mp.full ? `Best: ${fmtHMS(best.sec)}` : ""}</p></div>
+    <table class="mu-res">${rows}</table>
+    ${mp.logged ? '<p class="note">Logged.</p>' : `<button class="btn wide" data-mup="log">Log it</button>`}
+    <button class="btn ghost wide" data-mup="close">Close</button></div>`;
+}
+function muLog(){
+  if (mp.logged) return;
+  const c = mp.cfg, day = today(), R = muResults(), w = num(c.vest) ? String(num(c.vest)) : "";
+  const list = state.workouts[day] = state.workouts[day] || [];
+  const sess = {id:uid(), start:mp.start, end:mp.start + Math.round(mp.sec * 1000), name:"Murph", dur:Math.round(mp.sec * 1000)};
+  let nStr = 0;
+  R.forEach(o => {
+    if (o.kind === "c"){
+      if (o.sec >= 1) list.push({id:uid(), name:o.name, group:"Cardio", type:"c", du:"mi", src:"murph", sets:[{min:String(Math.round(o.sec / 60 * 100) / 100), dist:""}]});
+      return;
+    }
+    if (!o.reps) return;
+    const ex = byName[o.name.toLowerCase()] || {name:o.name, group:"Other", type:"s"};
+    list.push({name:ex.name, group:ex.group, type:"s", sid:sess.id, sets:o.sets.map(r => ({w, r:String(r)}))});
+    nStr++;
+  });
+  if (nStr){ state.sessions = state.sessions || {}; (state.sessions[day] = state.sessions[day] || []).push(sess); state.dur = state.dur || {}; state.dur[day] = (state.dur[day] || 0) + sess.dur; }
+  (state.murphLog = state.murphLog || []).push({date:day, sec:Math.round(mp.sec), cap:c.cap, full:!!mp.full, rounds:c.rounds, steps:R.map(o => ({name:o.name, reps:o.reps, sec:Math.round(o.sec)}))});
+  if (state.finished) delete state.finished[day];
+  mp.logged = true; save();
+  closeSheet($("#muPlayer")); curDate = day; showTab("log"); renderLog(); checkMilestones();
+  toast(`Murph logged: ${fmtHMS(Math.round(mp.sec))}.`);
+}
+
 /* ---------- FINISH WORKOUT (Strength) ---------- */
 const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const finOpen = new Set();
@@ -4963,7 +5317,9 @@ function anotherHTML(){
 const MP_VER = "0.10.14";
 const MP_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}`;
 const MP_MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
-const CAM_KINDS = [[/push.?ups?\b|press.?ups?\b/i, "pushup"], [/pull.?ups?\b|chin.?ups?\b|muscle.?ups?\b/i, "pullup"], [/\bdips?\b/i, "dip"], [/cossack/i, "cossack"], [/squat/i, "squat"], [/^(?!.*\b(leg|hamstring|nordic|wrist)\b).*\bcurls?\b/i, "curl"]];
+const CAM_KINDS = [[/push.?ups?\b|press.?ups?\b/i, "pushup"], [/pull.?ups?\b|chin.?ups?\b|muscle.?ups?\b/i, "pullup"], [/\bdips?\b/i, "dip"], [/cossack/i, "cossack"], [/^(?!.*\b(walking|stretch)\b).*(\blunges?\b|split squats?\b)/i, "lunge"], [/squat/i, "squat"], [/^(?!.*\b(leg|hamstring|nordic|wrist)\b).*\bcurls?\b/i, "curl"],
+  [/^(?!.*\b(bench|chest|leg|pallof|landmine|floor)\b).*\b(overhead|shoulder|military|push|arnold)\b.*\bpress\b/i, "press"], [/\b(lateral|front|side)\b.*\braises?\b/i, "raise"],
+  [/glute bridges?\b|hip thrusts?\b/i, "bridge"], [/\bsit.?ups?\b/i, "situp"], [/^(ab(dominal)? )?crunch(es)?$/i, "crunch"], [/jumping jacks?\b|star jumps?\b/i, "jack"]];
 const camKind = name => { const m = CAM_KINDS.find(([re]) => re.test(name)); return m ? m[1] : null; };
 let poseLM = null, poseLoading = null;
 const cam = {active:false, stream:null, raf:0, i:-1, day:"", kind:"", facing:"user", lastT:-1, c:null, els:null, onRep:null};
@@ -4986,6 +5342,17 @@ function angleAt(a, b, c){
   const ab = [a.x - b.x, a.y - b.y], cb = [c.x - b.x, c.y - b.y];
   const cos = (ab[0]*cb[0] + ab[1]*cb[1]) / (Math.hypot(...ab) * Math.hypot(...cb) || 1);
   return Math.acos(Math.max(-1, Math.min(1, cos))) * 180 / Math.PI;
+}
+/* joint angle at b. Uses MediaPipe's 3D world landmarks when the frame has them (true angles, whatever the
+   phone's angle to you: an arm pointing at the camera no longer looks straight), the picture otherwise */
+function jAng(lm, P, a, b, k){
+  const w = lm && lm.world;
+  if (w && w[a] && w[b] && w[k]){
+    const u = [w[a].x - w[b].x, w[a].y - w[b].y, w[a].z - w[b].z], v = [w[k].x - w[b].x, w[k].y - w[b].y, w[k].z - w[b].z];
+    const n = Math.hypot(...u) * Math.hypot(...v);
+    if (n > 1e-6) return Math.acos(Math.max(-1, Math.min(1, (u[0]*v[0] + u[1]*v[1] + u[2]*v[2]) / n))) * 180 / Math.PI;
+  }
+  return angleAt(P(a), P(b), P(k));
 }
 function newCounter(){ return {reps:0, phase:"setup", ang:null, angTop:0, lastRep:0, msg:"Get in view", side:null, seen:0, view:null, y:null, topY:null, scale:null, ar:.75}; }
 /* lm: 33 MediaPipe landmarks (x, y in 0..1, visibility 0..1). t: milliseconds.
@@ -5038,7 +5405,7 @@ function pushupStep(c, lm, t){
     y = sh.y; scale = arm || torso * .9; need = .28;
     if (!scale){ c.msg = "Can't see your arms. Face the phone, or turn side on with your arm in view."; c.seen = 0; return false; }
     if (armOK){                                                          /* elbow angle, adapted to the camera angle */
-      const raw = angleAt(sh, el, wr);
+      const raw = q === "L" ? jAng(lm, P, 11, 13, 15) : jAng(lm, P, 12, 14, 16);
       c.ang = c.ang == null ? raw : c.ang * .45 + raw * .55;
       c.angTop = Math.max(c.ang, (c.angTop || 0) - .15);
     }
@@ -5110,7 +5477,7 @@ function pullupStep(c, lm, t){
     const parts = [Math.max(0, Math.min(1, (.85 - e) / 1.35))];
     if (wr.v > .5){
       const fore = Math.hypot(el.x - wr.x, el.y - wr.y);
-      parts.push(Math.max(0, Math.min(1, (165 - angleAt(sh, el, wr)) / 95)));     /* elbow bend */
+      parts.push(Math.max(0, Math.min(1, (165 - jAng(lm, P, ...S[k])) / 95)));     /* elbow bend */
       parts.push(Math.max(0, Math.min(1, (.95 - (sh.y - wr.y) / (U + fore)) / .65))); /* shoulders up toward hands */
       if (wr.y < sh.y - U * .6) overhead = true;
     }
@@ -5137,11 +5504,14 @@ function pullupStep(c, lm, t){
   }
   if (c.phase === "top"){
     if (c.p < .35 && overhead){ c.phase = "hang"; c.hangY = shY; c.msg = "Pull"; }
-    else c.msg = "Lower all the way";
+    else if (c.p < .35 && !overhead){ c.offN = (c.offN || 0) + 1; if (c.offN > 8){ c.phase = "setup"; c.hangN = 0; c.offN = 0; } c.msg = "Grab the bar and hang to start"; }   /* dropped off the bar */
+    else { c.offN = 0; c.msg = "Lower all the way"; }
   }
   return false;
 }
-const CAM_STEP = {pushup: pushupStep, pullup: pullupStep, squat: (c, l, t) => squatStep(c, l, t), dip: (c, l, t) => dipStep(c, l, t), cossack: (c, l, t) => cossackStep(c, l, t), curl: (c, l, t) => curlStep(c, l, t)};
+const CAM_STEP = {pushup: pushupStep, pullup: pullupStep, squat: (c, l, t) => squatStep(c, l, t), dip: (c, l, t) => dipStep(c, l, t), cossack: (c, l, t) => cossackStep(c, l, t), curl: (c, l, t) => curlStep(c, l, t),
+  lunge: (c, l, t) => lungeStep(c, l, t), press: (c, l, t) => pressStep(c, l, t), raise: (c, l, t) => raiseStep(c, l, t), bridge: (c, l, t) => bridgeStep(c, l, t),
+  situp: (c, l, t) => situpStep(c, l, t), crunch: (c, l, t) => crunchStep(c, l, t), jack: (c, l, t) => jackStep(c, l, t)};
 /* where to put the phone, per exercise */
 const CAM_TIPS = {
   pushup: ["Phone upright, 4 to 6 feet in front of you, low and tilted up a little.", "Side on works too. Head and shoulders must stay in view.", "Hold the top for a second before your first rep."],
@@ -5149,6 +5519,13 @@ const CAM_TIPS = {
   cossack: ["Phone upright, 6 to 8 feet away, facing you, about waist high.", "Step wide so both feet stay in the picture as you shift side to side.", "Stand tall for a second. Each side counts as one rep."],
   squat: ["Phone upright, 6 to 8 feet away, about waist high.", "In front of you or side on. Your whole body, feet included, should be in view.", "Stand tall for a second before your first rep."],
   dip: ["Phone upright, 6 to 8 feet away. Side on is best.", "Shoulders, elbows and hips should stay in view at the top and the bottom.", "Start at the top with straight arms for a second."],
+  lunge: ["Phone upright, 6 to 8 feet away, about waist high. Side on is best.", "Your whole body, feet included, should be in view. Lunge in place rather than walking.", "Stand tall for a second. Every trip down counts as one rep."],
+  press: ["Phone upright, 5 to 8 feet away, facing you or side on.", "Leave room above your head: your hands must stay in view at the top.", "Hold the weight at your shoulders for a second before your first rep."],
+  raise: ["Phone upright, 5 to 8 feet away. Facing you is best for lateral raises, side on for front raises.", "Shoulders and hands need to stay in view.", "Stand still with your arms down for a second before your first rep."],
+  bridge: ["Phone on the floor or a low step, 5 to 8 feet away, side on to you.", "Shoulders, hips and knees need to stay in view.", "Start with your hips down. Lift until your body makes a straight line."],
+  situp: ["Phone on the floor or a low step, 5 to 8 feet away, side on to you.", "Shoulders, hips and knees need to stay in view.", "Lie back for a second before your first rep."],
+  crunch: ["Phone on the floor or a low step, 5 to 8 feet away, side on to you.", "Shoulders and hips need to stay in view.", "Lie back for a second before your first rep."],
+  jack: ["Phone upright, 6 to 8 feet away, facing you.", "Your whole body, hands overhead and feet included, should be in view.", "Stand still with your arms down for a second, then go."],
   pullup: ["Phone upright, 6 to 8 feet away. In front of you or behind you both work.", "Prop it about waist high and tilt it up so your elbows and shoulders stay in view at the bottom and the top. Hands on the bar can be out of frame.", "Doorway bar? Put the phone in the next room looking through the doorway. Tight on space? Side on works.", "Start from a dead hang for a second."]
 };
 function camTipsHTML(kind){
@@ -5158,9 +5535,9 @@ function camTipsHTML(kind){
 
 /* ----- the screen ----- */
 /* ----- the camera loop, shared by the Count sheet and the session player ----- */
-async function camRun(els, onRep, kind){
+async function camRun(els, onRep, kind, onDone){
   stopCam();
-  Object.assign(cam, {els, c:newCounter(), lastT:-1, onRep, kind:kind || "pushup", trace:"", traceT:0, ready:false, rN:0, lN:0, traced:false, manual:0});
+  Object.assign(cam, {els, c:newCounter(), lastT:-1, onRep, onDone:onDone || null, finishAt:0, kind:kind || "pushup", trace:"", traceT:0, ready:false, rN:0, lN:0, traced:false, manual:0});
   if (els.video && els.video.parentElement){ els.video.parentElement.classList.remove("ready"); const pl = els.video.parentElement.querySelector(".cam-state"); if (pl) pl.textContent = "Starting…"; }
   camTips(els, cam.kind, false);
   camMsg("Starting the camera…");
@@ -5181,20 +5558,30 @@ async function camRun(els, onRep, kind){
   if (cam.els !== els || !cam.stream) return;
   cam.active = true; window.__camOn = true; syncWake();
   cam.c.ar = (v.videoWidth && v.videoHeight) ? v.videoWidth / v.videoHeight : .75;
-  camMsg({curl:"Keep the phone upright, 5 to 8 feet away, with your shoulders, elbows and hands in view.", cossack:"Keep the phone upright, 6 to 8 feet away, facing you, with both feet in view.", pullup:"Keep the phone upright, 6 to 8 feet away, tilted up toward the bar.", squat:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", dip:"Keep the phone upright, 6 to 8 feet away. Side on works best."}[cam.kind] || "Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
+  cam.c.auto = camAutoOn();
+  camMsg({curl:"Keep the phone upright, 5 to 8 feet away, with your shoulders, elbows and hands in view.", cossack:"Keep the phone upright, 6 to 8 feet away, facing you, with both feet in view.", pullup:"Keep the phone upright, 6 to 8 feet away, tilted up toward the bar.", squat:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", dip:"Keep the phone upright, 6 to 8 feet away. Side on works best.", lunge:"Keep the phone upright, 6 to 8 feet away, with your whole body in view.", press:"Keep the phone upright, 5 to 8 feet away, with room above your head.", raise:"Keep the phone upright, 5 to 8 feet away, with your shoulders and hands in view.", bridge:"Put the phone low, 5 to 8 feet away, side on to you.", situp:"Put the phone low, 5 to 8 feet away, side on to you.", crunch:"Put the phone low, 5 to 8 feet away, side on to you.", jack:"Keep the phone upright, 6 to 8 feet away, with your whole body in view."}[cam.kind] || "Keep the phone upright, 4 to 6 feet away, in front of you or to your side.");
   const loop = () => {
     if (!cam.active || cam.els !== els) return;
     if (v.readyState >= 2 && v.currentTime !== cam.lastT){
       cam.lastT = v.currentTime;
       const t = performance.now();
       let pts = null;
-      try { const r = lm.detectForVideo(v, t); pts = r && r.landmarks && r.landmarks[0]; } catch(err){}
-      const rep = (CAM_STEP[cam.kind] || pushupStep)(cam.c, pts, t);
+      try { const r = lm.detectForVideo(v, t); pts = r && r.landmarks && r.landmarks[0]; if (pts && r.worldLandmarks && r.worldLandmarks[0]) pts.world = r.worldLandmarks[0]; } catch(err){}
+      const rep = camStep(cam.kind, cam.c, pts, t);
       if (screen.orientation && /landscape/.test(screen.orientation.type || "") && (v.videoHeight > v.videoWidth)) cam.c.msg = "Turn the phone upright. The counter needs a portrait picture.";
-      drawPose(pts); traceFrame(t); if (rep) cam.trace += "|"; camReadyState(v);
+      drawPose(pts); traceFrame(t); if (rep) cam.trace += "|"; else if (cam.c.shortNow) cam.trace += "x"; camReadyState(v);
       const dp = v.parentElement && v.parentElement.querySelector(".cam-depth i");
       if (dp){ dp.style.height = Math.round((cam.c.phase === "setup" ? 0 : cam.c.depth || 0) * 100) + "%"; dp.parentElement.classList.toggle("deep", cam.c.phase === "down"); }
       if (rep){ tones(880, 1); buzz([60]); replay(v.parentElement, "repflash"); if (cam.onRep) cam.onRep(cam.c.reps); say(String(cam.c.reps)); }
+      else if (cam.c.shortNow){ cam.c.shortNow = false; tones(330, 1); buzz([30, 40, 30]); say(CAM_SHORT[cam.kind] || "Go further"); }
+      /* auto-finish: 2 seconds' warning, and another rep cancels it */
+      if (rep && cam.finishAt) cam.finishAt = 0;
+      if (cam.c.finished && !cam.finishAt && cam.onDone){ cam.finishAt = t + 2000; tones(660, 2, .1); say("Set done."); }
+      if (cam.finishAt){
+        if (!cam.c.finished) cam.finishAt = 0;
+        else if (t >= cam.finishAt){ cam.finishAt = 0; cam.c.finished = false; cam.c.auto = false; const f = cam.onDone; setTimeout(() => f && f(), 0); }
+        else cam.c.msg = `Set done: ${camSummary(cam.c)}. Do another rep to keep going.`;
+      }
       camMsg(cam.c.msg);
     }
     cam.raf = requestAnimationFrame(loop);
@@ -5212,7 +5599,7 @@ async function openCam(i){
   camRun({video:$("#camVideo"), canvas:$("#camCanvas"), msg:$("#camMsg")}, (n) => {
     const r = $("#camReps"); r.textContent = n; r.classList.remove("pop"); void r.offsetWidth; r.classList.add("pop");
     $("#camSave").disabled = false; $("#camSave").textContent = `Save ${n} ${n === 1 ? "rep" : "reps"}`;
-  }, camKind(e.name));
+  }, camKind(e.name), () => { if (cam.c && cam.c.reps) saveCam(); });
 }
 function camTips(els, kind, force){
   const box = els.video && els.video.parentElement; if (!box) return;
@@ -5222,6 +5609,7 @@ function camTips(els, kind, force){
   box.insertAdjacentHTML("beforeend", camTipsHTML(kind));
   box.querySelector("[data-cam-tips-ok]").onclick = ev => { ev.stopPropagation(); state.camTips[kind] = 1; save(); box.querySelector(".cam-tips").remove(); };
 }
+const camAutoOn = () => state.camAuto !== false;
 function camMsg(t){ const m = cam.els && cam.els.msg; if (m && m.textContent !== t) m.textContent = t; }
 const POSE_LINES = [[11,13],[13,15],[12,14],[14,16],[11,12],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]];
 function drawPose(pts){
@@ -5253,14 +5641,15 @@ function camReadyState(v){
     tones(1175, 2, .11); buzz([60, 40, 60]);
     if (!cam.c.reps) say("Ready. Go.");
   } else if (cam.ready && cam.lN >= 24){ cam.ready = false; box.classList.remove("ready"); }
-  const txt = cam.ready ? (cam.c.reps ? "Tracking" : "Ready · go") : "Get in position";
+  const sd = cam.c.sides && cam.c.sides.L + cam.c.sides.R ? ` · L ${cam.c.sides.L} R ${cam.c.sides.R}` : "";
+  const txt = cam.finishAt ? "Finishing set" : cam.ready ? (cam.c.reps || cam.c.short ? "Tracking" + sd + (cam.c.short ? ` · ${cam.c.short} short` : "") : "Ready · go") : "Get in position";
   if (pill.textContent !== txt) pill.textContent = txt;
 }
 function saveTrace(actual, counted){
   if (!cam.c) return;
   try {
     const L = JSON.parse(store.get(TRACE_KEY) || "[]");
-    L.push({when:Date.now(), kind:cam.kind, view:cam.c.view || cam.c.side || "", counted:counted == null ? cam.c.reps : counted, actual, trace:cam.trace || ""});
+    L.push({when:Date.now(), kind:cam.kind, view:cam.c.view || cam.c.side || "", counted:counted == null ? cam.c.reps : counted, actual, short:cam.c.short || 0, sides:cam.c.sides || null, trace:cam.trace || ""});
     store.set(TRACE_KEY, JSON.stringify(L.slice(-8)));
   } catch(err){}
 }
@@ -5286,17 +5675,17 @@ function stopCam(){
   syncWake();
 }
 function saveCam(){
-  const n = cam.c ? cam.c.reps : 0, e = (state.workouts[cam.day] || [])[cam.i];
+  const n = cam.c ? cam.c.reps : 0, e = (state.workouts[cam.day] || [])[cam.i], sum = camSummary(cam.c);
   stopCam(); closeSheet($("#camSheet"));
   if (!n || !e) return;
   const empty = e.sets.find(s => !num(s.r));
   if (empty) empty.r = String(n); else e.sets.push({w:"", r:String(n)});
   save(); renderLog(); updatePR(cam.i, true); checkMilestones();
-  toast(`${n} ${n === 1 ? "rep" : "reps"} counted.`);
+  toast(`Saved: ${sum}.`);
 }
 $("#camSave").onclick = saveCam;
 $("#camTipsBtn").onclick = () => { if (cam.els) camTips(cam.els, cam.kind, true); };
-$("#camReset").onclick = () => { cam.trace = ""; if (cam.c){ const ar = cam.c.ar; cam.c = newCounter(); cam.c.ar = ar; $("#camReps").textContent = "0"; $("#camSave").disabled = true; $("#camSave").textContent = "Save"; } };
+$("#camReset").onclick = () => { cam.trace = ""; cam.finishAt = 0; if (cam.c){ const ar = cam.c.ar; cam.c = newCounter(); cam.c.ar = ar; cam.c.auto = camAutoOn(); $("#camReps").textContent = "0"; $("#camSave").disabled = true; $("#camSave").textContent = "Save"; } };
 $("#camFlip").onclick = () => { cam.facing = cam.facing === "user" ? "environment" : "user"; openCam(cam.i); };
 document.querySelectorAll("#camSheet [data-close]").forEach(b => b.addEventListener("click", stopCam));
 
@@ -5642,7 +6031,7 @@ function wpCam(){
     wp.reps = n; const c = $("#woCount"); if (c){ c.textContent = n; c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
     const b = document.querySelector('#woBody .wo-step b'); if (b){ b.textContent = n; replay(b, "bump"); }
     wpGoalMark();
-  }, e ? camKind(e.name) : "pushup");
+  }, e ? camKind(e.name) : "pushup", () => { const b = document.querySelector('#woBody [data-wo="done"]'); if (b) b.click(); });
 }
 $("#woBody").addEventListener("click", ev => {
   const go = ev.target.closest("[data-wo-go]"); if (go){ wpEnter(+go.dataset.woGo); return; }
@@ -6025,7 +6414,17 @@ function dropCount(c, y, scale, need, t, angDown, angUp){
   return false;
 }
 function camPts(c, lm){ const ar = c.ar || .75; return k => ({x: lm[k].x * ar, y: lm[k].y, v: (lm[k] && (lm[k].visibility ?? 1)) || 0}); }
-function squatStep(c, lm, t){
+function squatStep(c, lm, t){ return legDropStep(c, lm, t, .3, 105); }
+/* lunges and split squats: a shorter hip drop than a squat; every trip down counts, whichever leg is in front */
+function lungeStep(c, lm, t){
+  const rep = legDropStep(c, lm, t, .22, 115);
+  if (c.phase === "down" && lm && lm.length >= 29){
+    const a = lm[25], b = lm[26];
+    if ((a.visibility ?? 1) > .5 && (b.visibility ?? 1) > .5 && Math.abs(a.y - b.y) > .02) c.repSide = a.y < b.y ? "L" : "R";   /* front knee stays higher */
+  }
+  return rep;
+}
+function legDropStep(c, lm, t, need, kneeDown){
   if (!lm || lm.length < 29){ c.msg = "Can't see you. Put the phone 6 to 8 feet away so your whole body is in view."; return false; }
   const P = camPts(c, lm), legs = [];
   let kneeAng = null;
@@ -6034,15 +6433,15 @@ function squatStep(c, lm, t){
     if (H.v < .5 || K.v < .5) continue;
     const thigh = Math.hypot(H.x - K.x, H.y - K.y), shin = A.v > .5 ? Math.hypot(K.x - A.x, K.y - A.y) : thigh;
     legs.push({hy:H.y, len:thigh + shin, sy:S.v > .5 ? S.y : null});
-    if (A.v > .5){ const ang = angleAt(H, K, A); kneeAng = kneeAng == null ? ang : Math.min(kneeAng, ang); }
+    if (A.v > .5){ const ang = jAng(lm, P, h, k, a); kneeAng = kneeAng == null ? ang : Math.min(kneeAng, ang); }
   }
   if (!legs.length){ c.msg = "Can't see your hips and knees. Move the phone back so your legs are in view."; return false; }
   const hy = legs.reduce((a, l) => a + l.hy, 0) / legs.length, len = legs.reduce((a, l) => a + l.len, 0) / legs.length;
   const sh = legs.map(l => l.sy).filter(v => v != null);
   if (sh.length && sh[0] > hy - len * .2){ c.msg = "Stand up tall to start."; c.phase = "setup"; c.seen = 0; c.topY = null; return false; }
   if (kneeAng != null){ c.ang = c.ang == null ? kneeAng : c.ang * .45 + kneeAng * .55; c.angTop = Math.max(c.ang, (c.angTop || 0) - .15); }
-  const angDown = c.ang != null && c.angTop > 150 && c.ang < 105, angUp = c.ang != null && c.ang > c.angTop - 15;
-  return dropCount(c, hy, len, .3, t, angDown, angUp);
+  const angDown = c.ang != null && c.angTop > 150 && c.ang < kneeDown, angUp = c.ang != null && c.ang > c.angTop - 15;
+  return dropCount(c, hy, len, need, t, angDown, angUp);
 }
 /* Cossack squats: a wide stance, sinking onto one leg at a time. Each side counts.
    Signal: your hips drop toward the bent knee; the side comes from where your hips shift. */
@@ -6056,7 +6455,7 @@ function cossackStep(c, lm, t){
   if (lS.v > .5 && rS.v > .5 && (lS.y + rS.y) / 2 > hy - leg * .2){ c.msg = "Stand tall in a wide stance to start."; c.phase = "setup"; c.seen = 0; c.topY = null; return false; }
   let kAng = null, side = null;
   if (lA.v > .5 && rA.v > .5){
-    const la = angleAt(lH, lK, lA), ra = angleAt(rH, rK, rA);
+    const la = jAng(lm, P, 23, 25, 27), ra = jAng(lm, P, 24, 26, 28);
     kAng = Math.min(la, ra); side = la < ra ? "L" : "R";              /* the bent knee is the working side */
   }
   if (kAng != null){ c.ang = c.ang == null ? kAng : c.ang * .45 + kAng * .55; c.angTop = Math.max(c.ang, (c.angTop || 0) - .15); }
@@ -6064,7 +6463,7 @@ function cossackStep(c, lm, t){
   const was = c.phase;
   const rep = dropCount(c, hy, leg, .22, t, angDown, angUp);
   if (c.phase === "down" && was !== "down") c.downSide = side;
-  if (rep && c.downSide) c.msg = `Good. ${c.downSide === "L" ? "Left" : "Right"} side`;
+  if (rep && c.downSide){ c.msg = `Good. ${c.downSide === "L" ? "Left" : "Right"} side`; c.repSide = c.downSide; }
   return rep;
 }
 /* Curls (bar, dumbbells, bands): the hands come up toward the shoulders while the elbows stay down by your sides.
@@ -6093,13 +6492,14 @@ function curlStep(c, lm, t){
     c.ua = c.ua || {}; if (c.phase !== "top") c.ua[si] = Math.max(U, (c.ua[si] || 0) * .996);
     const ua = c.ua[si] || U; if (!ua) continue;
     if (E.y < S.y - ua * .35 || W.y < S.y - ua * .7) over = true;              /* elbows or hands overhead: a press, not a curl */
-    const bend = Math.max(0, Math.min(1, (160 - angleAt(S, E, W)) / 105));       /* 0 straight, 1 fully bent */
+    const bend = Math.max(0, Math.min(1, (160 - jAng(lm, P, si, ei, wi)) / 105));       /* 0 straight, 1 fully bent */
     const lift = Math.max(0, Math.min(1, ((E.y - W.y) / ua + .85) / 1.35));      /* 0 hand hanging below the elbow, 1 hand up near the shoulder */
-    arms.push((bend + lift) / 2);
+    arms.push({s:si === 11 ? "L" : "R", p:(bend + lift) / 2});
   }
   if (!arms.length){ c.msg = "Can't see your arms. Step back so your shoulders, elbows and hands are in view."; return false; }
+  armSide(c, arms);
   if (over){ c.msg = "Keep your elbows down by your sides."; c.phase = c.phase === "top" ? "top" : "setup"; c.seen = 0; return false; }
-  const p = Math.max(...arms);
+  const p = Math.max(...arms.map(a => a.p));
   c.p = c.p == null ? p : c.p * .45 + p * .55;
   c.depth = c.p;
   c.seen = (c.seen || 0) + 1;
@@ -6121,7 +6521,7 @@ function dipStep(c, lm, t){
     const U = Math.hypot(S.x - E.x, S.y - E.y);
     c.ua = c.ua || {}; if (c.phase !== "down") c.ua[s] = Math.max(U, (c.ua[s] || 0) * .995);
     arms.push({sy:S.y, U:c.ua[s] || U});
-    if (W.v > .5){ const a = angleAt(S, E, W); elAng = elAng == null ? a : Math.min(elAng, a); if (W.y < S.y) hipsBelow = false; }
+    if (W.v > .5){ const a = jAng(lm, P, s, e, w); elAng = elAng == null ? a : Math.min(elAng, a); if (W.y < S.y) hipsBelow = false; }
     if (H.v > .5 && H.y < S.y) hipsBelow = false;
   }
   if (!arms.length){ c.msg = "Can't see your shoulders and elbows. Move the phone back."; return false; }
@@ -6130,6 +6530,167 @@ function dipStep(c, lm, t){
   const sy = arms.reduce((a, x) => a + x.sy, 0) / arms.length, U = arms.reduce((a, x) => a + x.U, 0) / arms.length;
   const angDown = c.ang != null && c.angTop > 150 && c.ang < c.angTop - 55, angUp = c.ang != null && c.ang > c.angTop - 18;
   return dropCount(c, sy, U, .45, t, angDown, angUp);
+}
+
+/* =========================================================
+   CAMERA: presses, raises, bridges, sit-ups, crunches, jumping jacks
+   ========================================================= */
+/* shared start-to-finish counter: p is 0 at the start of a rep and 1 at the finish. Counts at the finish,
+   then waits for you to go back to the start. o: {top, bottom, go, back, start, still, gap} */
+function rangeCount(c, p, t, o){
+  c.p = c.p == null ? p : c.p * .45 + p * .55;
+  c.depth = c.p;
+  c.seen = (c.seen || 0) + 1;
+  if (c.phase === "setup" || !c.phase){ if (c.p < o.bottom && c.seen > (o.still || 8)){ c.phase = "down"; c.msg = o.go; } else c.msg = o.start; return false; }
+  if (c.phase === "down"){
+    if (c.p > o.top && t - (c.lastRep || 0) > (o.gap || 400)){ c.reps++; c.lastRep = t; c.phase = "top"; c.msg = "Good. " + o.back; return true; }
+    c.msg = c.p > .45 ? "Higher" : o.go; return false;
+  }
+  if (c.p < o.bottom){ c.phase = "down"; c.msg = o.go; } else c.msg = o.back;
+  return false;
+}
+/* arms: [{s:"L"|"R", p}]. A one-arm rep: one arm near the top while the other one, also in view, stays down */
+function armSide(c, arms){
+  if (arms.length < 2){ c.armSide = null; return; }
+  const [a, b] = arms[0].p >= arms[1].p ? arms : [arms[1], arms[0]];
+  c.armSide = a.p > .6 && b.p < .35 ? a.s : null;
+}
+/* the lowest value seen, creeping up slowly so a shift in position doesn't lock it low forever */
+const lowMark = (c, v) => (c.lo = c.lo == null ? v : Math.min(v, c.lo + (c.phase === "top" ? 0 : .02)));
+/* the better-seen side when you're side on to the phone: [shoulder, hip, knee, ankle] */
+const LEG_L = [11, 23, 25, 27], LEG_R = [12, 24, 26, 28];
+function sideLeg(P){
+  const L = LEG_L.map(P), R = LEG_R.map(P);
+  const sc = a => a[0].v + a[1].v + a[2].v;
+  return sc(L) >= sc(R) ? Object.assign(L, {idx:LEG_L}) : Object.assign(R, {idx:LEG_R});
+}
+/* Overhead and shoulder presses, barbell or dumbbells: hands go from your shoulders to straight overhead. */
+function pressStep(c, lm, t){
+  if (!lm || lm.length < 17){ c.msg = "Can't see you. Put the phone 5 to 8 feet away with your upper body in view."; return false; }
+  if (bodyMoving(c, lm, t)){ c.msg = "Get in place and hold the weight at your shoulders."; c.phase = "setup"; c.seen = 0; return false; }
+  const P = camPts(c, lm), arms = [];
+  let low = 0, seen = 0;
+  c.al = c.al || {};
+  for (const [si, ei, wi] of [[11, 13, 15], [12, 14, 16]]){
+    const S = P(si), E = P(ei), W = P(wi);
+    if (S.v < .5 || E.v < .45 || W.v < .45) continue;
+    seen++;
+    const len = Math.hypot(S.x - E.x, S.y - E.y) + Math.hypot(E.x - W.x, E.y - W.y);
+    if (c.phase !== "top") c.al[si] = Math.max(len, (c.al[si] || 0) * .996);       /* arm length, learned at the shoulders */
+    const L = c.al[si] || len; if (!L) continue;
+    if (W.y > S.y + L * .55){ low++; continue; }                                    /* hands hanging down by your sides */
+    const lift = Math.max(0, Math.min(1, ((S.y - W.y) / L - .05) / .8));            /* 0 hands at the shoulders, 1 straight overhead */
+    const ext = Math.max(0, Math.min(1, (jAng(lm, P, si, ei, wi) - 75) / 90));              /* elbow straightening */
+    arms.push({s:si === 11 ? "L" : "R", p:lift * .6 + ext * .4});
+  }
+  if (!seen){ c.msg = "Can't see your arms. Step back so your hands stay in view overhead."; return false; }
+  if (!arms.length){ c.msg = "Bring the weight up to your shoulders to start."; if (c.phase !== "setup"){ c.phase = "setup"; c.seen = 0; } return false; }
+  armSide(c, arms);
+  return rangeCount(c, Math.max(...arms.map(a => a.p)), t, {top:.8, bottom:.3, go:"Press", back:"Back to your shoulders", start:"Hold the weight at your shoulders"});
+}
+/* Lateral and front raises: straight-ish arms lift from your sides to shoulder height. Facing the phone works best for lateral raises. */
+function raiseStep(c, lm, t){
+  if (!lm || lm.length < 17){ c.msg = "Can't see you. Put the phone 5 to 8 feet away with your upper body in view."; return false; }
+  if (bodyMoving(c, lm, t)){ c.msg = "Get in place and stand still with your arms down."; c.phase = "setup"; c.seen = 0; return false; }
+  const P = camPts(c, lm), arms = [];
+  c.rl = c.rl || {};
+  for (const [si, wi] of [[11, 15], [12, 16]]){
+    const S = P(si), W = P(wi);
+    if (S.v < .5 || W.v < .45) continue;
+    const d = Math.hypot(S.x - W.x, S.y - W.y);
+    if (c.phase !== "top") c.rl[si] = Math.max(d, (c.rl[si] || 0) * .996);
+    const L = c.rl[si] || d; if (!L) continue;
+    arms.push({s:si === 11 ? "L" : "R", p:Math.max(0, Math.min(1, (1 - (W.y - S.y) / L) / .9))});   /* 0 hanging, 1 at shoulder height */
+  }
+  if (!arms.length){ c.msg = "Can't see your arms. Step back so your shoulders and hands are in view."; return false; }
+  armSide(c, arms);
+  return rangeCount(c, Math.max(...arms.map(a => a.p)), t, {top:.82, bottom:.3, go:"Raise", back:"Lower slowly", start:"Arms down by your sides to start"});
+}
+/* Glute bridges and hip thrusts, side on: the shoulder-hip-knee line straightens as your hips come up. */
+function bridgeStep(c, lm, t){
+  if (!lm || lm.length < 29){ c.msg = "Can't see you. Put the phone 5 to 8 feet away, side on, low to the floor."; return false; }
+  const P = camPts(c, lm), sl = sideLeg(P), [S, H, K] = sl;
+  if (S.v < .5 || H.v < .5 || K.v < .5){ c.msg = "Can't see your shoulders, hips and knees. Turn side on to the phone."; return false; }
+  if (Math.abs(Math.atan2(H.y - S.y, Math.abs(S.x - H.x)) * 180 / Math.PI) > 60){ c.msg = "Lie on your back, side on to the phone."; c.phase = "setup"; c.seen = 0; c.lo = null; return false; }
+  const ang = jAng(lm, P, sl.idx[0], sl.idx[1], sl.idx[2]);
+  const lo = lowMark(c, ang);
+  let p = Math.max(0, Math.min(1, (ang - lo) / Math.max(22, 172 - lo)));
+  if (ang < 150) p = Math.min(p, .75);                                              /* hips have to come all the way up */
+  return rangeCount(c, p, t, {top:.8, bottom:.3, go:"Hips up", back:"Lower", start:"Hips down to start"});
+}
+/* Sit-ups and crunches, side on: your shoulders rise off the floor while your hips stay down. */
+function situpStep(c, lm, t){ return curlUpStep(c, lm, t, 55, "Sit up"); }
+function crunchStep(c, lm, t){ return curlUpStep(c, lm, t, 16, "Crunch"); }
+function curlUpStep(c, lm, t, range, go){
+  if (!lm || lm.length < 29){ c.msg = "Can't see you. Put the phone 5 to 8 feet away, side on, low to the floor."; return false; }
+  const P = camPts(c, lm), [S, H, K, A] = sideLeg(P);
+  if (S.v < .5 || H.v < .5){ c.msg = "Can't see your shoulders and hips. Turn side on to the phone."; return false; }
+  const leg = K.v > .5 && A.v > .5 ? Math.hypot(H.x - K.x, H.y - K.y) + Math.hypot(K.x - A.x, K.y - A.y) : 0;
+  if (leg && A.y - H.y > leg * .5){ c.msg = "Lie on your back, side on to the phone."; c.phase = "setup"; c.seen = 0; c.lo = null; return false; }
+  const elev = Math.atan2(H.y - S.y, Math.abs(S.x - H.x)) * 180 / Math.PI;           /* torso angle off the floor */
+  const lo = lowMark(c, elev);
+  return rangeCount(c, Math.max(0, Math.min(1, (elev - lo) / range)), t, {top:.8, bottom:.3, go, back:"Back down", start:"Lie back to start"});
+}
+/* Jumping jacks, facing the phone: hands go overhead while your feet jump wide. */
+function jackStep(c, lm, t){
+  if (!lm || lm.length < 29){ c.msg = "Can't see you. Put the phone 6 to 8 feet away, facing you, with your whole body in view."; return false; }
+  const P = camPts(c, lm), lS = P(11), rS = P(12), lW = P(15), rW = P(16), lA = P(27), rA = P(28);
+  if (lS.v < .5 || rS.v < .5 || lW.v < .45 || rW.v < .45){ c.msg = "Face the phone with your arms in view."; return false; }
+  const sw = Math.hypot(lS.x - rS.x, lS.y - rS.y); if (sw < .03){ c.msg = "Face the phone."; return false; }
+  const d = (Math.hypot(lS.x - lW.x, lS.y - lW.y) + Math.hypot(rS.x - rW.x, rS.y - rW.y)) / 2;
+  if (c.phase !== "top") c.al = Math.max(d, (c.al || 0) * .996);
+  const L = c.al || d, sy = (lS.y + rS.y) / 2, wy = (lW.y + rW.y) / 2;
+  const arms = Math.max(0, Math.min(1, (sy + L - wy) / (L * 1.8)));                 /* 0 hands at your sides, 1 overhead */
+  const feet = lA.v > .5 && rA.v > .5 ? Math.max(0, Math.min(1, (Math.abs(lA.x - rA.x) / sw - 1) / .9)) : null;
+  return rangeCount(c, feet == null ? arms : (arms + feet) / 2, t, {top:.75, bottom:.3, go:"Jump", back:"Back in", start:"Stand still, arms down", still:6, gap:250});
+}
+
+/* ----- wrapped around every counter: short reps and rep speed ----- */
+/* A short rep: you got at least halfway, went back to the start, and it didn't count. */
+const CAM_SHORT = {pushup:"Go lower", pullup:"Pull higher", dip:"Dip lower", squat:"Squat deeper", lunge:"Lower the back knee more", cossack:"Sink lower", curl:"Curl all the way up", press:"Lock out overhead", raise:"Raise to shoulder height", bridge:"Hips all the way up", situp:"Sit all the way up", crunch:"Crunch higher", jack:"Hands all the way up"};
+function camStep(kind, c, pts, t){
+  const rep = (CAM_STEP[kind] || pushupStep)(c, pts, t);
+  c.short = c.short || 0; c.times = c.times || [];
+  c.sides = c.sides || {L:0, R:0};
+  /* auto-finish: after at least one rep, you stood up / let go / stepped out of frame for 2.5 s, or stopped for 15 s */
+  if (!pts) c.goneAt = c.goneAt || t; else c.goneAt = 0;
+  if (!rep && (c.phase === "setup" || !c.phase)) c.setupAt = c.setupAt || t; else c.setupAt = 0;
+  if (c.auto && !c.finished && c.reps > 0 && !rep){
+    const idle = t - (c.lastRep || 0);
+    if ((c.setupAt && t - c.setupAt > 2500 && idle > 2500) || (c.goneAt && t - c.goneAt > 2500) || idle > 15000) c.finished = true;
+  }
+  if (rep){
+    c.pk = -1; c.note = null; c.finished = false;
+    const sd = c.repSide || c.armSide; c.repSide = null;
+    if (sd) c.sides[sd]++;
+    const prev = c.times[c.times.length - 1]; c.times.push(t);
+    const gaps = c.times.slice(1).map((x, i) => x - c.times[i]);
+    if (prev != null && gaps.length >= 4){                                        /* slower than your first few reps: you're tiring */
+      const base = gaps.slice(0, 3).sort((a, b) => a - b)[1];
+      if (t - prev > base * 1.6 && t - prev < 15000) c.msg = "Good. Slowing down";
+    }
+    return true;
+  }
+  const d = c.phase === "setup" || !c.phase || c.depth == null ? null : c.depth;
+  if (d == null) c.pk = -1;
+  else if (c.pk == null || c.pk < 0){ if (d < .2) c.pk = 0; }                     /* start watching once you're back at the start */
+  else {
+    c.pk = Math.max(c.pk, d);
+    if (d < .15){
+      if (c.pk >= .5 && c.pk < .95){ c.short++; c.note = {text:(CAM_SHORT[kind] || "Go further") + ". That one didn't count", until:t + 1800}; c.shortNow = true; }
+      c.pk = 0;
+    }
+  }
+  if (c.note && t < c.note.until) c.msg = c.note.text; else c.note = null;
+  return false;
+}
+/* "12 reps · 2.3 s each · 2 short" */
+function camSummary(c){
+  if (!c || !c.reps) return "";
+  const g = (c.times || []).slice(1).map((x, i) => x - c.times[i]).filter(x => x < 15000);
+  const avg = g.length >= 2 ? g.reduce((a, b) => a + b, 0) / g.length / 1000 : 0;
+  const sd = c.sides && c.sides.L + c.sides.R ? `left ${c.sides.L}, right ${c.sides.R}` : "";
+  return [`${c.reps} ${c.reps === 1 ? "rep" : "reps"}`, sd, avg ? `${avg.toFixed(1)} s each` : "", c.short ? `${c.short} short ${c.short === 1 ? "rep" : "reps"} not counted` : ""].filter(Boolean).join(" · ");
 }
 
 /* =========================================================
@@ -6559,7 +7120,7 @@ function ptRender(){
         pp.reps = n; const c = $("#ptCount"), r = $("#ptReps");
         if (c){ c.textContent = n; c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
         if (r){ r.textContent = n; replay(r, "bump"); }
-      }, ck);
+      }, ck, () => { const b = document.querySelector('#ptBody [data-pt="done"]'); if (b) b.click(); });
     }
   } else animSet(st.name, st.side === "R" ? "R" : "", $("#ptBody"), ptAnimKey(st.name));
 }
@@ -7011,6 +7572,11 @@ function mobVoiceReady(){
   if (pv && pv.id === st.id && st.side && pv.side !== st.side) say(`Done. Switch sides.`);
   else say(`${player.i ? "Done. Next" : "First"}: ${st.name}${st.side ? ", " + sideWord(st.side) : ""}. ${secWords(st.sec)}.`);
 }
+$("#camAutoSeg").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.camAuto = b.dataset.ca === "1"; save(); renderSettings();
+  if (cam.c) cam.c.auto = state.camAuto;
+});
 $("#voiceSeg").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   state.voice = b.dataset.voice === "1"; save(); renderSettings();
@@ -7442,7 +8008,7 @@ $("#swapRemove").onclick = () => {
 };
 $("#openIntervals").onclick = openIntervals;
 $("#exDetailBtn").onclick = () => { const n = $("#exSelect").value; if (n) openExDetail(n); };
-window.__tally = {buildBalance: l => buildBalanceSession(l), curlStep, openCam, stopCam, suggestFor, guardHit, progAim, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
+window.__tally = {buildBalance: l => buildBalanceSession(l), curlStep, openCam, stopCam, suggestFor, guardHit, progAim, camKindTest: n => camKind(n), ptParseScript, cossackStep, canDo, squatStep, dipStep, densityWeeks, cardioLoad, openExDetail, parseWorkoutText, markDup, openCardioSheet, pushupStep, pullupStep, newCounter, muStages, openSpecial, lungeStep, pressStep, raiseStep, bridgeStep, situpStep, crunchStep, jackStep, camStep, camSummary, jAng, mergeStates, mut: f => { f(state); save(); }, syncNow};   /* test hook */
 
 /* ---------- full-height fix for iPhone home-screen apps ---------- */
 function setAppHeight(){ document.documentElement.style.setProperty("--app-h", Math.max(window.innerHeight, screen.height && window.navigator.standalone ? screen.height : 0) + "px"); }
