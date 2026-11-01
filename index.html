@@ -1448,6 +1448,82 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
 .mu-res td{padding:7px 4px;border-bottom:1px solid var(--line)}
 .mu-res td:last-child{text-align:right;font-family:var(--mono)}
 #muPlayer .cam-view{width:100%;min-height:200px;max-height:34vh;flex:none;height:34vh}
+/* 5.8: phones held sideways (short landscape). The tablet layout above sized the camera for an iPad and pushed
+   the counter and Done button off screen; here the camera fills the left side and the controls stay on the right.
+   Full-screen players also keep clear of the notch / Dynamic Island. */
+@media (min-width:760px){
+  #woPlayer .panel,#ptPlayer .panel{padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+  #woPlayer .sheet-head{right:max(16px,env(safe-area-inset-right,0px))}
+}
+@media (orientation:landscape) and (max-height:540px){
+  #woPlayer .panel,#ptPlayer .panel{top:0;bottom:0;left:0;right:0;transform:none;max-width:none;width:100%;height:100%;border-radius:0;
+    padding:max(6px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px))}
+  #woPlayer .sheet-head{position:absolute;top:max(4px,env(safe-area-inset-top,0px));right:max(8px,env(safe-area-inset-right,0px));margin:0;z-index:3}
+  #woPlayer .sheet-head h2{display:none}
+  #woPlayer .sheet-head .icon-btn{width:38px;height:38px}
+  /* header: clock, End session and the exercise strip on one line */
+  .wo{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;column-gap:14px}
+  .wo-top{grid-column:1;padding-right:0;gap:12px}
+  .wo-strip{grid-column:2;padding:4px 48px 4px 0;align-items:center}
+  .wo-main,.wo-nav{grid-column:1 / -1}
+  .wo-clock{display:flex;align-items:baseline;gap:8px}
+  .wo-clock span{font-size:10px}
+  .wo-clock b{font-size:30px;line-height:1;letter-spacing:0}
+  .wo-end{padding:7px 12px;font-size:13px}
+  .wo-chip{font-size:13px;padding:6px 11px}
+  /* body: camera (or figure) down the left, name and controls on the right */
+  .wo-main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-rows:auto auto auto auto minmax(0,1fr);gap:2px 18px;align-items:start;overflow:hidden;padding-top:2px}
+  .wo-main > *{grid-column:2;max-width:none}
+  .wo-main > .pl-name,.wo-main > .pl-side,.wo-main > .wo-center,.wo-main > .wo-tally,.wo-main > .wo-stats{grid-column:2}
+  .wo-main > .wo-media{grid-column:1;grid-row:1 / -1;align-self:stretch;height:100%;min-height:0;position:relative;justify-content:center}
+  .wo-main > .wo-ctl{grid-row:-2 / -1;align-self:stretch;min-height:0;overflow-y:auto;justify-content:flex-start;flex:none}
+  .wo-main > .pl-name{font-size:22px;margin:0}
+  .wo-main > .pl-side{font-size:13px;letter-spacing:.12em}
+  .wo-main > .pl-how{display:none}
+  .wo-main > .wo-actions{grid-column:1 / -1}
+  .wo-main.resting .wo-media{display:flex}
+  .wo-tally{margin:0}.wo-tally .tally{height:12px}
+  .wo-stats.in-head{display:none}
+  .wo-stats.in-ctl{display:grid;margin:2px 0 4px;gap:6px;width:100%}
+  .wo-stats>div{padding:3px 4px;border-radius:8px}
+  .wo-stats span{font-size:10px}
+  .wo-stats b{font-size:19px}
+  .wo-media .wo-cam{flex:none;height:100%;min-height:0;max-height:none;width:100%;max-width:none}
+  .wo-media .wo-fig{width:auto;height:100%;max-height:100%;aspect-ratio:1}
+  .wo-media .wo-fig .pl-fig{width:auto;height:100%;max-width:100%}
+  .wo-media .cam-msg{position:absolute;left:0;right:0;bottom:0;margin:0;padding:18px 12px 8px;min-height:0;font-size:14px;background:linear-gradient(transparent,rgba(0,0,0,.8));color:#F2EFE8;z-index:1;border-radius:0 0 var(--r,6px) var(--r,6px)}
+  .wo-media .wo-camlinks{position:absolute;bottom:4px;left:0;right:0;margin:0}
+  .wo-main .cam-reps{font-size:clamp(56px,24vh,110px);top:6px;right:12px}
+  .wo-main .cam-depth{width:12px;left:8px;top:8%;bottom:8%}
+  .cam-state{font-size:12px;padding:5px 12px;top:8px}
+  .wo-ctl{gap:2px}
+  .wo-ctl .wo-step{padding:3px 0}
+  .wo-ctl .wo-step > span{font-size:11px}
+  .wo-ctl .wo-step .stepper button{width:40px;height:40px;font-size:22px}
+  .wo-ctl .wo-step .stepper b{font-size:30px;min-width:1.6em}
+  .wo-ctl .cam-tools{margin:0 0 2px;gap:6px}
+  .wo-ctl .cam-tools .btn{padding:6px 10px;font-size:12px}
+  .wo-ctl .wo-settime{font-size:12px}.wo-ctl .wo-settime b{font-size:18px}
+  .wo-ctl .wo-actions{position:sticky;bottom:0;padding-top:6px;background:linear-gradient(transparent,var(--bg) 35%)}
+  .wo-ctl .wo-actions .finish-btn{padding:12px;font-size:17px}
+  .wo-ctl .wo-row3{margin-top:2px}.wo-ctl .wo-row3 .btn{padding:8px 6px;font-size:15px}
+  .wo-ctl .wo-rest .iv-label{font-size:18px;line-height:1.1;margin:0}
+  .wo-ctl .rest-ring{width:min(27vh,130px);margin:0 auto}
+  .wo-ctl .rest-ring .pl-time{font-size:min(8vh,40px)}
+  .wo-ctl .wo-addset{font-size:13px;margin:2px 0 0}
+  .wo-ctl .pl-next{font-size:12px}
+  .wo-nav{padding-top:6px;gap:8px}
+  .wo-nav .btn{padding:8px 6px;font-size:15px}
+  /* PT player: same idea */
+  .pt-player{gap:2px;justify-content:flex-start}
+  .pt-player .pl-name{font-size:22px}
+  .pt-split{flex-direction:row;align-items:stretch;gap:18px;flex:1;min-height:0;width:100%}
+  .pt-media{flex:1.35;min-height:0;position:relative;display:flex;flex-direction:column}
+  .pt-ctl{flex:1;min-height:0;overflow-y:auto}
+  .pt-player .pt-cam{height:auto;flex:1;min-height:0;max-height:none}
+  .pt-player .finish-btn{padding:12px;font-size:17px}
+  .pt-player .pl-ctrl .btn{padding:8px 6px}
+}
 </style>
 </head>
 <body>
@@ -1991,7 +2067,7 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "5.7.0";
+const APP_VERSION = "5.8.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
