@@ -3420,7 +3420,8 @@ const CARDIO_TYPES = [
   ["Swimming","yd","swim"],["Open Water Swim","yd","swim"],["Rowing","m","split"],
   ["Soccer","mi",""],["Basketball","mi",""],["Tennis","mi",""],["Pickleball","mi",""],["Golf","mi",""],
   ["Elliptical","mi",""],["Stair Climber","mi",""],["Jump Rope","mi",""],["HIIT","mi",""],
-  ["Skiing","mi",""],["Kayaking","mi","speed"],["Climbing","mi",""]
+  ["Skiing","mi",""],["Kayaking","mi","speed"],["Climbing","mi",""],
+  ["Mixed Cardio","mi",""],["Cross Training","mi",""],["Dance","mi",""],["Kickboxing","mi",""]
 ];
 const cardioInfo = name => CARDIO_TYPES.find(t => t[0] === name) || [name, /swim/i.test(name) ? "yd" : /row/i.test(name) ? "m" : "mi", /run|walk|hik|treadmill/i.test(name) ? "pace" : /cycl|bike|ride/i.test(name) ? "speed" : /swim/i.test(name) ? "swim" : ""];
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
@@ -3605,7 +3606,9 @@ function loadTesseract(){
 function readImage(file){
   return new Promise((res, rej) => { const img = new Image(), url = URL.createObjectURL(file); img.onload = () => res({img, url}); img.onerror = () => rej(new Error("img")); img.src = url; });
 }
-/* black-and-white, high contrast, dark text on light: what OCR reads best */
+/* black-and-white, high contrast, dark text on light: what OCR reads best.
+   Colored numbers (Apple's red calories, yellow time, green distance) vanish if you go by plain brightness, so a dark
+   screenshot is read by each pixel's brightest channel and a light one by its darkest: any colored text ends up black */
 async function prepShot(file){
   const {img, url} = await readImage(file);
   const sc = Math.min(2, 2400 / Math.max(img.width, img.height));
@@ -3614,9 +3617,12 @@ async function prepShot(file){
   const x = c.getContext("2d"); x.drawImage(img, 0, 0, w, h);
   const d = x.getImageData(0, 0, w, h), p = d.data;
   let sum = 0;
-  for (let i=0; i<p.length; i+=4){ const g = p[i]*.299 + p[i+1]*.587 + p[i+2]*.114; p[i] = g; sum += g; }
+  for (let i=0; i<p.length; i+=4) sum += p[i]*.299 + p[i+1]*.587 + p[i+2]*.114;
   const dark = sum / (p.length/4) < 115;
-  for (let i=0; i<p.length; i+=4){ let g = p[i]; if (dark) g = 255 - g; g = Math.max(0, Math.min(255, (g-128)*1.5 + 128)); p[i] = p[i+1] = p[i+2] = g; }
+  for (let i=0; i<p.length; i+=4){
+    let g = dark ? 255 - Math.max(p[i], p[i+1], p[i+2]) : Math.min(p[i], p[i+1], p[i+2]);
+    g = Math.max(0, Math.min(255, (g-128)*1.5 + 128)); p[i] = p[i+1] = p[i+2] = g;
+  }
   x.putImageData(d, 0, 0);
   const t = document.createElement("canvas"), ts = 480 / img.width;
   t.width = 480; t.height = Math.round(img.height*ts);
@@ -3639,6 +3645,7 @@ function parseWorkoutText(raw, fileTime, skipFirst = true){
 
   /* activity */
   const ACTS = [
+    [/mixed\s*cardio/, "Mixed Cardio"], [/cross\s*training/, "Cross Training"], [/kickbox/, "Kickboxing"], [/\bdanc(e|ing)\b/, "Dance"],
     [/trail\s*run/, "Trail Running"], [/indoor\s*run|treadmill/, "Treadmill"], [/outdoor\s*run|road\s*run|\brun(ning)?\b/, "Road Running"],
     [/hik(e|ing)/, "Hiking"], [/walk/, "Walking"], [/mountain\s*bik/, "Mountain Biking"], [/indoor\s*cycl|stationary|spin/, "Stationary Bike"],
     [/cycl|\bride\b|\bbike\b|biking/, "Cycling"], [/open\s*water/, "Open Water Swim"], [/swim|pool/, "Swimming"], [/soccer|football/, "Soccer"],
@@ -3700,7 +3707,8 @@ function parseWorkoutText(raw, fileTime, skipFirst = true){
   /* extras most watches show */
   const calM = /active\s*(?:calories|kilocalories|energy|cal)[\s\S]{0,60}?(\d[\dOo,]{1,5})\s*k?cal/i.exec(body) || /(\d[\dOo,]{1,5})\s*(?:active\s*)?k?cal\b/i.exec(body);
   const cal = calM ? parseInt(calM[1].replace(/[Oo]/g, "0").replace(/,/g, ""), 10) || 0 : 0;
-  const hrM = /(?:avg\.?|average)\s*heart\s*rate[\s\S]{0,60}?(\d{2,3})\s*bpm/i.exec(body) || /(\d{2,3})\s*bpm/i.exec(body);
+  /* "BPM" often comes back as "8PM" when it's tight against the number (107BPM → 1078PM); never a clock time like 10:18PM */
+  const hrM = /(?:avg\.?|average)\s*heart\s*rate[\s\S]{0,60}?(?<![:\d])(\d{2,3})\s*[b8]pm/i.exec(body) || /(?<![:\d])(\d{2,3})\s*[b8]pm/i.exec(body);
   const hr = hrM && +hrM[1] >= 40 && +hrM[1] <= 230 ? +hrM[1] : 0;
   const efM = /effort[^\n]{0,8}\n?\s*(\d{1,2})\s*(easy|moderate|hard|all\s*out)/i.exec(body);
   const effort = efM && +efM[1] >= 1 && +efM[1] <= 10 ? +efM[1] : 0;
