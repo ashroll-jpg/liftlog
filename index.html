@@ -1448,6 +1448,88 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
 .mu-res td{padding:7px 4px;border-bottom:1px solid var(--line)}
 .mu-res td:last-child{text-align:right;font-family:var(--mono)}
 #muPlayer .cam-view{width:100%;min-height:200px;max-height:34vh;flex:none;height:34vh}
+/* 5.8: phones held sideways (short landscape). The tablet layout above sized the camera for an iPad and pushed
+   the counter and Done button off screen; here the camera fills the left side and the controls stay on the right.
+   Full-screen players also keep clear of the notch / Dynamic Island. */
+@media (min-width:760px){
+  #woPlayer .panel,#ptPlayer .panel{padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+  #woPlayer .sheet-head{right:max(16px,env(safe-area-inset-right,0px))}
+}
+@media (orientation:landscape) and (max-height:540px){
+  #woPlayer .panel,#ptPlayer .panel{top:0;bottom:0;left:0;right:0;transform:none;max-width:none;width:100%;height:100%;border-radius:0;
+    padding:max(6px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px))}
+  #woPlayer .sheet-head{position:absolute;top:max(4px,env(safe-area-inset-top,0px));right:max(8px,env(safe-area-inset-right,0px));margin:0;z-index:3}
+  #woPlayer .sheet-head h2{display:none}
+  #woPlayer .sheet-head .icon-btn{width:38px;height:38px}
+  /* header: clock, End session and the exercise strip on one line */
+  .wo{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;column-gap:14px}
+  .wo-top{grid-column:1;padding-right:0;gap:12px}
+  .wo-strip{grid-column:2;padding:4px 48px 4px 0;align-items:center}
+  .wo-main,.wo-nav{grid-column:1 / -1}
+  .wo-clock{display:flex;align-items:baseline;gap:8px}
+  .wo-clock span{font-size:10px}
+  .wo-clock b{font-size:30px;line-height:1;letter-spacing:0}
+  .wo-end{padding:7px 12px;font-size:13px}
+  .wo-chip{font-size:13px;padding:6px 11px}
+  /* body: camera (or figure) down the left, name and controls on the right */
+  .wo-main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-rows:auto auto auto auto minmax(0,1fr);gap:2px 18px;align-items:start;overflow:hidden;padding-top:2px}
+  .wo-main > *{grid-column:2;max-width:none}
+  .wo-main > .pl-name,.wo-main > .pl-side,.wo-main > .wo-center,.wo-main > .wo-tally,.wo-main > .wo-stats{grid-column:2}
+  .wo-main > .wo-media{grid-column:1;grid-row:1 / -1;align-self:stretch;height:100%;min-height:0;position:relative;justify-content:center}
+  .wo-main > .wo-ctl{grid-row:-2 / -1;align-self:stretch;min-height:0;overflow-y:auto;justify-content:flex-start;flex:none}
+  .wo-main > .pl-name{font-size:22px;margin:0}
+  .wo-main > .pl-side{font-size:13px;letter-spacing:.12em}
+  .wo-main > .pl-how{display:none}
+  .wo-main > .wo-actions{grid-column:1 / -1}
+  .wo-main.resting .wo-media{display:flex}
+  .wo-tally{margin:0}.wo-tally .tally{height:12px}
+  .wo-stats.in-head{display:none}
+  .wo-stats.in-ctl{display:grid;margin:2px 0 4px;gap:6px;width:100%}
+  .wo-stats>div{padding:3px 4px;border-radius:8px}
+  .wo-stats span{font-size:10px}
+  .wo-stats b{font-size:19px}
+  .wo-media .wo-cam{flex:none;height:100%;min-height:0;max-height:none;width:100%;max-width:none}
+  .wo-media .wo-fig{width:auto;height:100%;max-height:100%;aspect-ratio:1}
+  .wo-media .wo-fig .pl-fig{width:auto;height:100%;max-width:100%}
+  .wo-media .cam-msg{position:absolute;left:0;right:0;bottom:0;margin:0;padding:18px 12px 8px;min-height:0;font-size:14px;background:linear-gradient(transparent,rgba(0,0,0,.8));color:#F2EFE8;z-index:1;border-radius:0 0 var(--r,6px) var(--r,6px)}
+  .wo-media .wo-camlinks{position:absolute;bottom:4px;left:0;right:0;margin:0}
+  .wo-main .cam-reps{font-size:clamp(56px,24vh,110px);top:6px;right:12px}
+  .wo-main .cam-depth{width:12px;left:8px;top:8%;bottom:8%}
+  .cam-state{font-size:12px;padding:5px 12px;top:8px}
+  .wo-ctl{gap:2px}
+  .wo-ctl .wo-step{padding:3px 0}
+  .wo-ctl .wo-step > span{font-size:11px}
+  .wo-ctl .wo-step .stepper button{width:40px;height:40px;font-size:22px}
+  .wo-ctl .wo-step .stepper b{font-size:30px;min-width:1.6em}
+  .wo-ctl .cam-tools{margin:0 0 2px;gap:6px}
+  .wo-ctl .cam-tools .btn{padding:6px 10px;font-size:12px}
+  .wo-ctl .wo-settime{font-size:12px}.wo-ctl .wo-settime b{font-size:18px}
+  .wo-ctl .wo-actions{position:sticky;bottom:0;padding-top:6px;background:linear-gradient(transparent,var(--bg) 35%)}
+  .wo-ctl .wo-actions .finish-btn{padding:12px;font-size:17px}
+  .wo-ctl .wo-row3{margin-top:2px}.wo-ctl .wo-row3 .btn{padding:8px 6px;font-size:15px}
+  .wo-ctl .wo-rest .iv-label{font-size:18px;line-height:1.1;margin:0}
+  .wo-ctl .rest-ring{width:min(27vh,130px);margin:0 auto}
+  .wo-ctl .rest-ring .pl-time{font-size:min(8vh,40px)}
+  .wo-ctl .wo-addset{font-size:13px;margin:2px 0 0}
+  .wo-ctl .pl-next{font-size:12px}
+  .wo-nav{padding-top:6px;gap:8px}
+  .wo-nav .btn{padding:8px 6px;font-size:15px}
+  /* PT player: same idea */
+  .pt-player{gap:2px;justify-content:flex-start}
+  .pt-player .pl-name{font-size:22px}
+  .pt-split{flex-direction:row;align-items:stretch;gap:18px;flex:1;min-height:0;width:100%}
+  .pt-media{flex:1.35;min-height:0;position:relative;display:flex;flex-direction:column}
+  .pt-ctl{flex:1;min-height:0;overflow-y:auto}
+  .pt-player .pt-cam{height:auto;flex:1;min-height:0;max-height:none}
+  .pt-player .finish-btn{padding:12px;font-size:17px}
+  .pt-player .pl-ctrl .btn{padding:8px 6px}
+}
+/* voice commands */
+.vc-pill{position:fixed;left:max(12px,env(safe-area-inset-left,0px));bottom:max(12px,calc(env(safe-area-inset-bottom,0px) + 4px));z-index:95;display:flex;align-items:center;gap:6px;padding:6px 12px 6px 9px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.3);pointer-events:none;opacity:.85;transition:background .2s}
+.vc-pill svg{width:16px;height:16px}
+.vc-pill.heard{background:var(--mob);color:#fff;opacity:1}
+.vc-pill.miss{opacity:1}
+.vc-pill.off{opacity:.5}
 </style>
 </head>
 <body>
@@ -1740,6 +1822,7 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
     <div class="setting"><p>Workout reminders<small id="remStatus">Add alerts to your phone's calendar</small></p><button class="btn ghost" id="openRem">Set up</button></div>
     <div class="setting"><p>Look<small>Light and soft, or the original dark</small></p><div class="seg" id="themeSeg"><button data-th="light">Light</button><button data-th="dark">Dark</button></div></div>
     <div class="setting" id="voiceRow"><p>Voice coach<small>Says each exercise, set and rest out loud, and counts camera reps</small></p><div class="seg" id="voiceSeg"><button data-voice="0">Off</button><button data-voice="1">On</button></div></div>
+    <div class="setting" id="vcRow"><p>Voice commands<small id="vcNote">Say “ready”, “done”, “skip”, “next” or “plus five” during a workout. Listens only while a workout screen is open. On iPhone, Apple turns the speech into text.</small></p><div class="seg" id="vcSeg"><button data-vc="0">Off</button><button data-vc="1">On</button></div></div>
     <div class="setting"><p>Auto-finish camera sets<small>Ends the set when you stand up, let go or step away, or stop for 15 seconds</small></p><div class="seg" id="camAutoSeg"><button data-ca="0">Off</button><button data-ca="1">On</button></div></div>
     <div class="setting col" id="noSugRow" hidden><p>Never suggest<small>Exercises you swapped out. Tap one to allow it again.</small></p><div class="plan-chips" id="noSugList"></div></div>
     <div class="setting"><p>Weekly plan<small>Plan what you'll do each day</small></p><button class="btn ghost" id="openPlan">Plan</button></div>
@@ -1991,7 +2074,7 @@ html[data-theme="light"] .sess-build{background:transparent;box-shadow:none;bord
 "use strict";
 
 /* ---------- storage (falls back to memory if blocked) ---------- */
-const APP_VERSION = "5.7.0";
+const APP_VERSION = "5.9.0";
 const KEY = "liftlog.v1", CAT_KEY = "liftlog.catalog.v2";
 const mem = {};
 const store = {
@@ -2535,8 +2618,8 @@ function repeatDay(k){
 /* ---------- PICKER ---------- */
 const picker = $("#picker");
 let filterGroup = "All";
-function openSheet(el){ el.classList.add("open"); document.body.style.overflow = "hidden"; }
-function closeSheet(el){ el.classList.remove("open"); if (!document.querySelector(".sheet.open")) document.body.style.overflow = ""; }
+function openSheet(el){ el.classList.add("open"); window.__lastSheet = el.id; document.body.style.overflow = "hidden"; try { vcSync(); } catch(e){} }
+function closeSheet(el){ el.classList.remove("open"); if (!document.querySelector(".sheet.open")) document.body.style.overflow = ""; try { vcSync(); } catch(e){} }
 document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => closeSheet(b.closest(".sheet")));
 document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".sheet.open").forEach(closeSheet); });
 
@@ -3344,7 +3427,8 @@ const CARDIO_TYPES = [
   ["Swimming","yd","swim"],["Open Water Swim","yd","swim"],["Rowing","m","split"],
   ["Soccer","mi",""],["Basketball","mi",""],["Tennis","mi",""],["Pickleball","mi",""],["Golf","mi",""],
   ["Elliptical","mi",""],["Stair Climber","mi",""],["Jump Rope","mi",""],["HIIT","mi",""],
-  ["Skiing","mi",""],["Kayaking","mi","speed"],["Climbing","mi",""]
+  ["Skiing","mi",""],["Kayaking","mi","speed"],["Climbing","mi",""],
+  ["Mixed Cardio","mi",""],["Cross Training","mi",""],["Dance","mi",""],["Kickboxing","mi",""]
 ];
 const cardioInfo = name => CARDIO_TYPES.find(t => t[0] === name) || [name, /swim/i.test(name) ? "yd" : /row/i.test(name) ? "m" : "mi", /run|walk|hik|treadmill/i.test(name) ? "pace" : /cycl|bike|ride/i.test(name) ? "speed" : /swim/i.test(name) ? "swim" : ""];
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
@@ -3529,7 +3613,9 @@ function loadTesseract(){
 function readImage(file){
   return new Promise((res, rej) => { const img = new Image(), url = URL.createObjectURL(file); img.onload = () => res({img, url}); img.onerror = () => rej(new Error("img")); img.src = url; });
 }
-/* black-and-white, high contrast, dark text on light: what OCR reads best */
+/* black-and-white, high contrast, dark text on light: what OCR reads best.
+   Colored numbers (Apple's red calories, yellow time, green distance) vanish if you go by plain brightness, so a dark
+   screenshot is read by each pixel's brightest channel and a light one by its darkest: any colored text ends up black */
 async function prepShot(file){
   const {img, url} = await readImage(file);
   const sc = Math.min(2, 2400 / Math.max(img.width, img.height));
@@ -3538,9 +3624,12 @@ async function prepShot(file){
   const x = c.getContext("2d"); x.drawImage(img, 0, 0, w, h);
   const d = x.getImageData(0, 0, w, h), p = d.data;
   let sum = 0;
-  for (let i=0; i<p.length; i+=4){ const g = p[i]*.299 + p[i+1]*.587 + p[i+2]*.114; p[i] = g; sum += g; }
+  for (let i=0; i<p.length; i+=4) sum += p[i]*.299 + p[i+1]*.587 + p[i+2]*.114;
   const dark = sum / (p.length/4) < 115;
-  for (let i=0; i<p.length; i+=4){ let g = p[i]; if (dark) g = 255 - g; g = Math.max(0, Math.min(255, (g-128)*1.5 + 128)); p[i] = p[i+1] = p[i+2] = g; }
+  for (let i=0; i<p.length; i+=4){
+    let g = dark ? 255 - Math.max(p[i], p[i+1], p[i+2]) : Math.min(p[i], p[i+1], p[i+2]);
+    g = Math.max(0, Math.min(255, (g-128)*1.5 + 128)); p[i] = p[i+1] = p[i+2] = g;
+  }
   x.putImageData(d, 0, 0);
   const t = document.createElement("canvas"), ts = 480 / img.width;
   t.width = 480; t.height = Math.round(img.height*ts);
@@ -3563,6 +3652,7 @@ function parseWorkoutText(raw, fileTime, skipFirst = true){
 
   /* activity */
   const ACTS = [
+    [/mixed\s*cardio/, "Mixed Cardio"], [/cross\s*training/, "Cross Training"], [/kickbox/, "Kickboxing"], [/\bdanc(e|ing)\b/, "Dance"],
     [/trail\s*run/, "Trail Running"], [/indoor\s*run|treadmill/, "Treadmill"], [/outdoor\s*run|road\s*run|\brun(ning)?\b/, "Road Running"],
     [/hik(e|ing)/, "Hiking"], [/walk/, "Walking"], [/mountain\s*bik/, "Mountain Biking"], [/indoor\s*cycl|stationary|spin/, "Stationary Bike"],
     [/cycl|\bride\b|\bbike\b|biking/, "Cycling"], [/open\s*water/, "Open Water Swim"], [/swim|pool/, "Swimming"], [/soccer|football/, "Soccer"],
@@ -3624,7 +3714,8 @@ function parseWorkoutText(raw, fileTime, skipFirst = true){
   /* extras most watches show */
   const calM = /active\s*(?:calories|kilocalories|energy|cal)[\s\S]{0,60}?(\d[\dOo,]{1,5})\s*k?cal/i.exec(body) || /(\d[\dOo,]{1,5})\s*(?:active\s*)?k?cal\b/i.exec(body);
   const cal = calM ? parseInt(calM[1].replace(/[Oo]/g, "0").replace(/,/g, ""), 10) || 0 : 0;
-  const hrM = /(?:avg\.?|average)\s*heart\s*rate[\s\S]{0,60}?(\d{2,3})\s*bpm/i.exec(body) || /(\d{2,3})\s*bpm/i.exec(body);
+  /* "BPM" often comes back as "8PM" when it's tight against the number (107BPM → 1078PM); never a clock time like 10:18PM */
+  const hrM = /(?:avg\.?|average)\s*heart\s*rate[\s\S]{0,60}?(?<![:\d])(\d{2,3})\s*[b8]pm/i.exec(body) || /(?<![:\d])(\d{2,3})\s*[b8]pm/i.exec(body);
   const hr = hrM && +hrM[1] >= 40 && +hrM[1] <= 230 ? +hrM[1] : 0;
   const efM = /effort[^\n]{0,8}\n?\s*(\d{1,2})\s*(easy|moderate|hard|all\s*out)/i.exec(body);
   const effort = efM && +efM[1] >= 1 && +efM[1] <= 10 ? +efM[1] : 0;
@@ -4649,6 +4740,8 @@ function renderSettings(){
   try { renderNoSuggest(); } catch(e){}
   $("#voiceRow").hidden = !hasVoice;
   document.querySelectorAll("#voiceSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.voice === "1") === (state.voice !== false)));
+  document.querySelectorAll("#vcSeg button").forEach(b => { b.setAttribute("aria-pressed", (b.dataset.vc === "1") === vcOn()); b.disabled = !SpeechRec; });
+  if (!SpeechRec) $("#vcNote").textContent = "Not available in this browser.";
   document.querySelectorAll("#camAutoSeg button").forEach(b => b.setAttribute("aria-pressed", (b.dataset.ca === "1") === camAutoOn()));
   document.querySelectorAll("#unitSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.u === state.unit));
   document.querySelectorAll("#restSeg button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.s === state.rest));
@@ -7552,7 +7645,8 @@ function say(text, queue){
     if (!queue) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     if (voicePick){ u.voice = voicePick; u.lang = voicePick.lang; } else u.lang = "en-US";
-    u.rate = 1.05; u.onend = u.onerror = () => { wakeAudio(); const v = cam.els && cam.els.video; if (v && cam.stream && v.paused) v.play().catch(() => {}); };
+    window.__ttsAt = Date.now();
+    u.rate = 1.05; u.onend = u.onerror = () => { window.__ttsEnd = Date.now(); wakeAudio(); const v = cam.els && cam.els.video; if (v && cam.stream && v.paused) v.play().catch(() => {}); };
     speechSynthesis.speak(u); setTimeout(wakeAudio, 50);
   } catch(e){}
 }
@@ -7581,6 +7675,122 @@ $("#voiceSeg").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   state.voice = b.dataset.voice === "1"; save(); renderSettings();
   if (state.voice) say("Voice coach on.");
+});
+
+/* =========================================================
+   VOICE COMMANDS: "ready", "done", "skip"… while a workout screen is open.
+   Uses the browser's speech recognition (on iPhone, Apple's). Listens only while a player or the Count sheet is open,
+   and ignores everything while the voice coach is talking, so it doesn't obey itself.
+   ========================================================= */
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+const vcOn = () => !!SpeechRec && !!state.vcmd;
+const VC_MAP = {
+  camSheet: {done:['#camSave:not([disabled])'], reset:['#camReset'], ready:['@cam']},
+  woPlayer: {done:['[data-wo="done"]'], ready:['[data-wo="skiprest"]', '[data-wo="hold"]', '[data-wo-go]', '@cam'], skip:['[data-wo="skiprest"]'],
+             next:['[data-wo="next"]:not([disabled])'], back:['[data-wo="prev"]:not([disabled])'], up:['[data-wo="r+"]'], down:['[data-wo="r-"]'], reset:['@camreset']},
+  ptPlayer: {done:['[data-pt="done"]'], ready:['[data-pt="skiprest"]', '#ptTime.ready', '@cam'], skip:['[data-pt="skiprest"]', '[data-pt="skip"]'], next:['[data-pt="skip"]'],
+             pause:['[data-pt="pause"]:not([disabled])'], up:['[data-pt="r+"]'], down:['[data-pt="r-"]'], reset:['@camreset']},
+  muPlayer: {done:['[data-mup="next"]'], next:['[data-mup="next"]'], ready:['[data-mup="now"]', '@cam'], pause:['[data-mup="pause"]'], back:['[data-mup="back"]:not([disabled])'], up:['[data-mup="+1"]'], down:['[data-mup="-1"]']},
+  ivPlayer: {ready:['#ivTime.ready'], skip:['#ivSkip'], next:['#ivSkip'], pause:['#ivPause']},
+  mobPlayer: {ready:['#plTime.ready'], skip:['#plSkipRest', '#plSkip'], next:['#plSkip'], pause:['#plPause']}
+};
+const VC_WORDS = [[/^(done|stop|finished|finish|next set|that's it)$/, "done"], [/^(start over|reset)$/, "reset"], [/^(ready|go|let's go|start)$/, "ready"],
+  [/^(skip|skip rest)$/, "skip"], [/^(pause|resume)$/, "pause"], [/^(next|next exercise)$/, "next"], [/^(back|previous)$/, "back"]];
+const VC_NUM = {one:1, won:1, two:2, to:2, too:2, three:3, four:4, for:4, five:5, six:6, seven:7, eight:8, nine:9, ten:10, fifteen:15, twenty:20};
+/* every command in a transcript, in order: [{k, w, n}] */
+function vcParse(t){
+  const out = [], re = /\b(next set|next exercise|skip rest|start over|let's go|that's it|done|stop|finished|finish|ready|go|start|reset|skip|pause|resume|next|back|previous|(?:plus|add)\s+(\d+|one|won|two|to|too|three|four|for|five|six|seven|eight|nine|ten|fifteen|twenty)|(?:minus|take away)\s+(\d+|one|won|two|three|four|five|ten))\b/g;
+  let m;
+  while ((m = re.exec(t.toLowerCase()))){
+    const w = m[1];
+    if (m[2] || m[3]){ const v = m[2] || m[3], n = /^\d+$/.test(v) ? +v : VC_NUM[v]; if (n > 0 && n <= 50) out.push({k: m[2] ? "up" : "down", n, w}); continue; }
+    const hit = VC_WORDS.find(([r]) => r.test(w)); if (hit) out.push({k:hit[1], n:1, w});
+  }
+  return out;
+}
+const vc = {rec:null, on:false, seen:{}, last:{}, fails:0, blocked:false};
+/* the workout screen on top: the one opened last, if it's still open */
+const vcCtx = () => { const open = Object.keys(VC_MAP).filter(id => { const el = document.getElementById(id); return el && el.classList.contains("open"); });
+  return open.includes(window.__lastSheet) ? window.__lastSheet : open[0] || null; };
+/* quiet while the coach talks and for a beat after (the mic hears the speaker) */
+const vcQuiet = () => { try { if (speechSynthesis.speaking) return true; } catch(e){} return Date.now() - (window.__ttsEnd || 0) < 1100 || Date.now() - (window.__ttsAt || 0) < 500; };
+function vcSync(){
+  const want = vcOn() && !vc.blocked && !!vcCtx() && !document.hidden;
+  if (want && !vc.on) vcStart(); else if (!want && vc.on) vcStop();
+  vcPill();
+}
+function vcStart(){
+  try {
+    const r = vc.rec = new SpeechRec();
+    r.continuous = true; r.interimResults = true; r.lang = "en-US";
+    r.onresult = vcResult;
+    r.onerror = e => {
+      if (e.error === "not-allowed" || e.error === "service-not-allowed"){ vc.blocked = true; vc.on = false; vcPill(); toast("Voice commands need the microphone. Allow it for Tally, then turn them on again."); }
+    };
+    r.onend = () => {                                      /* phones stop listening after a pause: start again while still wanted */
+      if (vc.rec !== r) return;
+      vc.on = false; vc.seen = {};
+      if (Date.now() - vc.startAt < 1500) vc.fails++; else vc.fails = 0;
+      if (vc.fails < 6) setTimeout(vcSync, vc.fails ? 600 * vc.fails : 150); else vcPill();
+    };
+    vc.startAt = Date.now(); vc.seen = {};
+    r.start(); vc.on = true;
+  } catch(e){ vc.on = false; }
+}
+function vcStop(){ const r = vc.rec; vc.rec = null; vc.on = false; if (r){ try { r.onend = null; r.abort(); } catch(e){} } }
+function vcResult(e){
+  for (let i = e.resultIndex; i < e.results.length; i++){
+    const cmds = vcParse(e.results[i][0].transcript || "");
+    const from = vc.seen[i] || 0;
+    if (cmds.length <= from) continue;
+    vc.seen[i] = cmds.length;
+    if (vcQuiet()) continue;                               /* probably the coach's own voice: drop it */
+    cmds.slice(from).forEach(vcRun);
+  }
+}
+function vcRun(c){
+  const id = vcCtx(); if (!id) return;
+  if (Date.now() - (vc.last[c.k + c.n] || 0) < 1200) return;   /* the same word reported twice */
+  vc.last[c.k + c.n] = Date.now();
+  const sheet = document.getElementById(id), sels = VC_MAP[id][c.k] || [];
+  let did = false;
+  for (const s of sels){
+    if (s === "@cam" || s === "@camreset"){
+      /* "ready" with the camera on: measure your start position again, right now (only before the first rep) */
+      if (cam.active && cam.c && (s === "@camreset" || !cam.c.reps)){
+        const ar = cam.c.ar, auto = cam.c.auto;
+        cam.c = newCounter(); Object.assign(cam.c, {ar, auto}); cam.trace = ""; cam.finishAt = 0;
+        if (cam.onRep && s === "@camreset") cam.onRep(0);
+        did = true; break;
+      }
+      continue;
+    }
+    const b = sheet.querySelector(s);
+    if (b && b.offsetParent !== null && !b.disabled){
+      for (let k = 0; k < (c.k === "up" || c.k === "down" ? c.n : 1); k++) b.click();
+      did = true; break;
+    }
+  }
+  vcFlash(did ? `“${c.w}”` : `“${c.w}” · nothing to do here`, did);
+  if (did) tones(1320, 1, .05);
+}
+function vcPill(){
+  let p = document.getElementById("vcPill");
+  if (!p){ document.body.insertAdjacentHTML("beforeend", '<div class="vc-pill" id="vcPill" aria-live="polite" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Listening</span></div>'); p = document.getElementById("vcPill"); }
+  p.hidden = !(vcOn() && vcCtx() && (vc.on || vc.fails >= 6 || vc.blocked));
+  if (!vc.flashUntil || Date.now() > vc.flashUntil){ p.classList.remove("heard", "miss"); p.querySelector("span").textContent = vc.on ? "Listening" : "Mic off"; p.classList.toggle("off", !vc.on); }
+}
+function vcFlash(t, ok){
+  vcPill(); const p = document.getElementById("vcPill"); if (!p) return;
+  p.querySelector("span").textContent = t; p.classList.toggle("heard", ok); p.classList.toggle("miss", !ok);
+  vc.flashUntil = Date.now() + 1800; setTimeout(vcPill, 1900);
+}
+setInterval(vcSync, 1500);
+document.addEventListener("visibilitychange", vcSync);
+$("#vcSeg").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return;
+  state.vcmd = b.dataset.vc === "1"; vc.blocked = false; vc.fails = 0; save(); renderSettings();
+  if (state.vcmd) toast("Voice commands on. Say “ready”, “done” or “skip” during a workout.");
 });
 
 /* =========================================================
